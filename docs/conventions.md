@@ -1,81 +1,67 @@
 # Convenciones
 
-## Unidades internas
+## Unidades — UN-001 cerrada
 
-Se recomienda SI coherente:
+El núcleo almacena y procesa exclusivamente SI:
 
-| Magnitud | Unidad interna | Presentación típica futura |
-|---|---:|---:|
-| Longitud | metro (`m`) | milímetro (`mm`) |
-| Ángulo | radián (`rad`) | grado (`deg`) |
-| Fuerza | newton (`N`) | N o kN |
-| Masa | kilogramo (`kg`) | kg |
-| Tiempo | segundo (`s`) | s |
+| Magnitud | Unidad interna |
+|---|---:|
+| Longitud | metro (`m`) |
+| Ángulo | radián (`rad`) |
+| Fuerza | newton (`N`) |
+| Masa | kilogramo (`kg`) |
+| Tiempo | segundo (`s`) |
 
-Los metros mantienen coherencia directa con N, kg y s para módulos dinámicos futuros y evitan factores ocultos al integrar con el ecosistema SI. Las dimensiones de una suspensión, típicamente décimas de metro, siguen teniendo una escala numérica razonable en doble precisión. MATLAB usa radianes en sus funciones trigonométricas básicas; los grados son una preocupación de presentación.
+El API de construcción v0.1 acepta longitudes con unidad explícita `"m"` o `"mm"`. La conversión ocurre una sola vez en `fsd.model.createDoubleWishboneGeometry`; el struct canónico conserva únicamente `xyz_m` y declara `metadata.lengthUnit = "m"`.
 
-Las conversiones solo se realizan en fronteras de entrada/salida. El núcleo no acepta valores “a veces mm, a veces m”. Los nombres de campos serializados que contienen magnitudes deben incluir unidad cuando ayude a impedir ambigüedad, por ejemplo `xyz_m`; las variables algebraicas pueden omitirla cuando el contrato ya fija la unidad.
-
-> **OPEN DECISION UN-001 — Unit-aware input API:** decidir en v0.1 si la API pública acepta exclusivamente SI o también un valor acompañado de unidad. En ambos casos, el almacenamiento canónico seguirá siendo SI.
+No existe todavía un sistema universal de unidades ni se aceptan unidades implícitas.
 
 ## Identificadores de hardpoints
 
-Se compararon tres estilos:
-
-1. **Muy compacto** (`FL_UCAF`): cómodo en croquis, pero ambiguo, difícil de buscar y poco extensible.
-2. **Completamente descriptivo** (`FrontLeftUpperControlArmForwardChassisPivot`): legible una vez, pero largo, propenso a variantes y poco práctico en tablas.
-3. **ID corto estable + display name**: identificador técnico inequívoco y una etiqueta humana/localizable independiente.
-
-Se recomienda la tercera opción. El ID canónico completo usa ASCII y `UPPER_SNAKE_CASE`:
+El ID canónico es ASCII en `UPPER_SNAKE_CASE`:
 
 `<CORNER>_<POINT_ROLE>`
 
-Ejemplo: `FL_UCA_FWD_CHASSIS`. Dentro de un objeto que ya declara `cornerId = "FL"`, se almacena el rol `UCA_FWD_CHASSIS`; el ID completo se forma solo para logs, exportación o claves globales. No se usa la nomenclatura de Adams como modelo interno.
+v0.1 exige exactamente:
 
-Reglas léxicas:
+- `<CORNER>_UCA_FWD_CHASSIS`
+- `<CORNER>_UCA_AFT_CHASSIS`
+- `<CORNER>_UBJ`
+- `<CORNER>_LCA_FWD_CHASSIS`
+- `<CORNER>_LCA_AFT_CHASSIS`
+- `<CORNER>_LBJ`
+- `<CORNER>_WHEEL_CENTER`
+- `<CORNER>_CONTACT_PATCH`
 
-- Esquinas: `FL`, `FR`, `RL`, `RR`.
-- Componentes comunes: `UCA`, `LCA`, `UBJ`, `LBJ`.
-- Direcciones longitudinales: `FWD` y `AFT`; se evita `REAR` para un pivot porque puede confundirse con el eje trasero.
-- Ubicación transversal: `INBOARD` y `OUTBOARD` cuando expresa pertenencia funcional, no simplemente el signo Y.
-- Los IDs nunca contienen unidad, nombre del proveedor ni texto localizado.
-- `displayName` es presentación y puede cambiar sin migrar datos; el ID no cambia sin una migración de schema.
+Se utiliza `FWD/AFT`, no `FRONT/REAR`, para evitar confundir un pivot posterior con el eje trasero. El ID estable se almacena por separado de `hardpoints.displayName`, que es solo presentación.
 
-### Roles v0.1 recomendados
+IDs desconocidos se rechazan en el schema v0.1; una ampliación futura requiere actualizar schema, documentación y tests.
 
-| Point role ID | Display name inglés | Descripción |
-|---|---|---|
-| `UCA_FWD_CHASSIS` | UCA forward chassis pivot | Pivot delantero del brazo superior en chasis. |
-| `UCA_AFT_CHASSIS` | UCA aft chassis pivot | Pivot posterior del brazo superior en chasis. |
-| `UBJ` | Upper ball joint | Unión superior upright–brazo. |
-| `LCA_FWD_CHASSIS` | LCA forward chassis pivot | Pivot delantero del brazo inferior en chasis. |
-| `LCA_AFT_CHASSIS` | LCA aft chassis pivot | Pivot posterior del brazo inferior en chasis. |
-| `LBJ` | Lower ball joint | Unión inferior upright–brazo. |
-| `WHEEL_CENTER` | Wheel center | Centro de rueda/hub en la condición de referencia. |
-| `CONTACT_PATCH` | Contact patch reference | Punto de referencia del contacto en la condición estática. |
+## Procedencia — DM-003 cerrada
 
-`WHEEL_CENTER` y `CONTACT_PATCH` son puntos geométricos de referencia aunque no sean joints mecánicos. El nombre genérico “hardpoint” se utilizará para el conjunto de puntos canónicos, dejando `kind` o `role` para distinguir pivots, joints y referencias.
+La procedencia es `N×3`, alineada con las columnas X/Y/Z:
 
-### Roles futuros reservados, no implementados
+```matlab
+geometry.hardpoints.sourceKind  % N-by-3 string
+geometry.hardpoints.sourceNote  % N-by-3 string
+```
 
-| Point role ID recomendado | Uso futuro |
-|---|---|
-| `TIE_ROD_INBOARD` / `TIE_ROD_OUTBOARD` | Extremos del tie rod. |
-| `ACTUATION_OUTBOARD` / `ACTUATION_ROCKER` | Extremos funcionales del pushrod o pullrod. |
-| `ROCKER_PIVOT` | Eje/punto de pivot del rocker según su modelo futuro. |
-| `DAMPER_FIXED` / `DAMPER_MOVING` | Anclajes fijo y móvil del amortiguador. |
-| `RACK_LEFT_JOINT` / `RACK_RIGHT_JOINT` | Joints internos izquierdo y derecho sobre la cremallera. |
-| `RACK_HOUSING_LEFT_MOUNT` / `RACK_HOUSING_RIGHT_MOUNT` | Montajes de carcasa si packaging los necesita. |
+`sourceKind` admite `KNOWN`, `ASSUMED`, `DERIVED` y `UNSPECIFIED`. `sourceNote` puede registrar, por coordenada, una referencia como CAD, packaging u optimización. Si la procedencia opcional no se proporciona se usa `UNSPECIFIED`; no se inventa conocimiento.
 
-Estos nombres reservan vocabulario, no contratos ni geometría.
+La procedencia no es el estado de diseño futuro `FIXED/RANGE/FREE`.
 
-> **OPEN DECISION NM-001 — Actuation IDs:** confirmar si los endpoints deben ser genéricos (`ACTUATION_*`, recomendado) con `mechanismType`, o específicos (`PUSHROD_*`/`PULLROD_*`). Se decidirá al diseñar actuación.
+## Wheel axis — NM-003 cerrada
 
-> **OPEN DECISION NM-002 — Rocker representation:** decidir si `ROCKER_PIVOT` será un punto más un eje, o dos puntos que definan el eje. Un único punto no define una rotación 3D.
+`geometry.wheel.wheelAxis` es un vector real, finito, unitario `1×3` que apunta desde el interior del vehículo hacia el exterior de la rueda.
 
-> **OPEN DECISION NM-003 — Wheel orientation:** decidir qué dato canónico define el eje de rueda y su orientación estática. `WHEEL_CENTER` y `CONTACT_PATCH` por sí solos no fijan completamente la pose 3D.
+- esquina izquierda: componente Y negativa;
+- esquina derecha: componente Y positiva.
 
-## Datos conocidos y asumidos
+El constructor normaliza cualquier vector no nulo y normalizable. El validador exige que la representación canónica ya sea unitaria y tenga una proyección lateral estrictamente hacia fuera. No se usa una matriz de rotación completa y no se representa el giro alrededor del eje.
 
-Todo input futuro llevará procedencia explícita. El vocabulario inicial recomendado es `KNOWN`, `ASSUMED` y `DERIVED`; v0.1 necesita al menos los dos primeros. Un valor asumido debe incluir una nota o referencia. “Default” describe cómo se obtuvo un valor, no su validez física, y no sustituye a la procedencia.
+## Decisiones aún abiertas
+
+> **OPEN DECISION NM-001 — Actuation IDs:** elegir IDs genéricos `ACTUATION_*` o específicos `PUSHROD_*`/`PULLROD_*` cuando se diseñe actuación.
+
+> **OPEN DECISION NM-002 — Rocker representation:** decidir si el eje del rocker se define mediante punto y dirección o mediante dos puntos.
 

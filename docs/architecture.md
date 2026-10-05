@@ -2,7 +2,7 @@
 
 ## Objetivo y límite actual
 
-FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. En esta fase solo se fija la arquitectura necesaria para implementar después **v0.1 — Static Double Wishbone Geometry**. No hay solver, reglas, optimización ni dinámica funcionales.
+FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.1 — Static Double Wishbone Geometry** implementa únicamente el modelo estático de una esquina, sus invariantes, operaciones geométricas elementales, visualización y persistencia MAT. No hay solver, reglas, optimización ni dinámica funcionales.
 
 ## Capas
 

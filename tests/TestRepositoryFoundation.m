@@ -27,7 +27,7 @@ classdef TestRepositoryFoundation < matlab.unittest.TestCase
 
     methods (Test)
         function packageIsReachable(testCase)
-            testCase.verifyEqual(fsd.version(), "0.1.0-dev");
+            testCase.verifyEqual(fsd.version(), "0.1.0");
         end
 
         function requiredDocumentationExists(testCase, RequiredDocument)
@@ -37,4 +37,3 @@ classdef TestRepositoryFoundation < matlab.unittest.TestCase
         end
     end
 end
-
