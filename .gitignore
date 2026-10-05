@@ -1,0 +1,23 @@
+# MATLAB generated files
+*.asv
+*.autosave
+*.m~
+*.mex*
+*.slxc
+*.mlappinstall
+*.mltbx
+codegen/
+slprj/
+
+# Local generated results (keep the folder documentation)
+/output/*
+!/output/README.md
+
+# Codex workspace internals, not part of the MATLAB project
+/work/
+/outputs/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
