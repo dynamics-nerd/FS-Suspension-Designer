@@ -192,6 +192,208 @@ a_mirror = M_Y * a
 
 La reflexión conserva X, Z y distancias, y cambia `FL↔FR` o `RL↔RR`. `det(M_Y)=-1`; no es una rotación propia.
 
+## Restricción cinemática frontal de un wishbone v0.4
+
+Sean `P1` y `P2` los pivotes interiores 3D y `B` el ball joint actual. El eje
+interior unitario y la proyección ortogonal de `B` sobre él son:
+
+```text
+u = (P2-P1) / norm(P2-P1)
+Paxis = P1 + dot(B-P1,u)*u
+r = B-Paxis
+```
+
+La dirección instantánea de velocidad del ball joint al rotar el wishbone
+alrededor de su eje es:
+
+```text
+v = u × r
+q = [v_y, v_z]
+```
+
+La restricción cinemática en la vista matemática YZ es la línea que pasa por
+la proyección del ball joint y es perpendicular a esa velocidad proyectada:
+
+```text
+v_y*(Y-B_y) + v_z*(Z-B_z) = 0
+```
+
+UCA usa UBJ y LCA usa LBJ. El orden de los dos pivotes puede invertir `u` y
+`v`, pero no altera la línea después de su normalización canónica. No se usa
+un midpoint ni un plano `X=constante`. Por ello la formulación sigue siendo
+válida con ejes interiores oblicuos, ball joints longitudinalmente escalonados
+y wheel stagger.
+
+El contrato es `DEGENERATE` si los pivotes no definen un eje, el ball joint
+está sobre ese eje o `norm(q)` es numéricamente nulo. Cuando el eje interior
+es longitudinal, la restricción pasa por el YZ del pivote interior y el YZ del
+ball joint, recuperando exactamente la construcción frontal clásica.
+
+## Intersecciones proyectivas YZ y FVIC
+
+Una línea euclídea normalizada se almacena homogéneamente como:
+
+```text
+l = [A,B,C]
+A*Y + B*Z + C = 0
+sqrt(A^2+B^2) = 1
+```
+
+Un punto finito es `p=[Y,Z,1]`; una dirección o punto en infinito es
+`p=[dY,dZ,0]`. La unión de dos puntos y la intersección de dos líneas usan el
+producto vectorial homogéneo:
+
+```text
+l = p1 × p2
+p = l1 × l2
+```
+
+La intersección es `FINITE` cuando `p_3` es no nulo, `INFINITE` cuando
+`p_3=0` y queda una dirección no nula, `COINCIDENT` cuando las líneas son la
+misma, y `DEGENERATE` cuando algún dato no define una construcción única.
+Solo `FINITE` publica Y/Z. `INFINITE` publica dirección unitaria y coordenadas
+euclídeas `NaN`, no un punto artificialmente lejano.
+
+Para normales unitarias, el indicador de condicionamiento es:
+
+```text
+conditioning = abs(A1*B2-B1*A2) = abs(sin(theta))
+```
+
+Un valor pequeño indica una intersección finita sensible. El flag
+`isIllConditioned` informa esa condición sin cambiar un resultado finito por
+uno infinito. El FVIC cinemático es `upperConstraint ∩ lowerConstraint`.
+
+Por definición, el **Front-View Kinematic Instant Center** es la intersección
+en YZ de las líneas que pasan por UBJ y LBJ proyectados y son normales a sus
+respectivas velocidades instantáneas proyectadas, derivadas de la rotación de
+cada wishbone alrededor de su eje interior real.
+
+## Rueda circular rígida y contacto geométrico
+
+El radio geométrico estático es:
+
+```text
+R = norm(CONTACT_PATCH_static - WHEEL_CENTER_static)
+```
+
+Para habilitar el análisis v0.4, el datum estático debe coincidir con el punto
+más bajo del círculo ideal, pertenecer al plano perpendicular al wheel axis y
+estar en `Z=0`. Esta es una precondición del análisis, no del schema histórico
+`DoubleWishboneGeometry`.
+
+Para centro actual `WC`, wheel axis unitario `a` y vertical descendente
+`d=[0,0,-1]`:
+
+```text
+d_p = d - (d·a)*a
+d_hat = d_p / norm(d_p)
+C = WC + R*d_hat
+```
+
+`C` es el punto del círculo que minimiza Z. Si `norm(d_p)` es numéricamente
+nulo —wheel axis vertical— el contacto no es único y se devuelve
+`DEGENERATE`. Este modelo no es loaded radius, effective rolling radius ni un
+modelo de fuerzas de neumático. El `CONTACT_PATCH` transformado rígidamente
+permanece como datum material y no sustituye a `C`.
+
+## Roll center del eje
+
+Para cada lado se construye la línea geométrica YZ desde el contacto ideal
+finito `C=[Y_C,Z_C,1]` hasta su FVIC homogéneo. Se denomina
+`rollCenterConstructionLine`; no afirma que se haya calculado una fuerza de
+neumático:
+
+```text
+constructionLine = C × IC
+```
+
+La misma operación funciona si el IC es `INFINITE`: produce la línea que pasa
+por el contacto con la dirección del IC, sin elegir una distancia ficticia.
+
+El roll center es la intersección de las dos líneas de construcción:
+
+```text
+RC = line(C_left, IC_left) ∩ line(C_right, IC_right)
+```
+
+No se impone `RC_Y=0`. Si las líneas se cortan en infinito, el roll center
+queda `INFINITE` con dirección válida y `RC_Y/RC_Z=NaN`. Coincidencia y
+degeneración también son explícitas. Dos IC infinitos pueden, no obstante,
+generar líneas de construcción cuya intersección sea un roll center finito.
+
+`rollCenterZ_m` es siempre coordenada global/chassis-frame. Si los dos
+contactos comparten nivel dentro de tolerancia:
+
+```text
+Z_contact = 0.5*(C_left.z + C_right.z)
+rollCenterHeight = RC_Z - Z_contact
+```
+
+Con niveles incompatibles, la coordenada RC puede seguir siendo finita pero
+`rollCenterHeight_m` es `NaN` con `CONTACT_LEVEL_MISMATCH`.
+
+## Heave simétrico y migración
+
+v0.4 define únicamente:
+
+```text
+wheelTravel_left = wheelTravel_right = z
+```
+
+Cada lado usa el solver v0.2 y su continuation. No existe DOF de carrocería:
+el chasis permanece fijo. Para cada target con convergencia bilateral se
+calculan `RC_Y(z)`, `RC_Z(z)` y, cuando existe referencia común,
+`RCHeight(z)`. Esto no es migración durante body roll.
+
+## Benchmarks analíticos v0.4
+
+En el benchmark simétrico los ejes interiores son longitudinales. En el lado
+izquierdo las líneas UCA/LCA se intersectan exactamente en:
+
+```text
+IC_left = [-1/10, 1/4] m
+contact_left = [-13/20, 0] m
+```
+
+El lado derecho es su reflexión. Las líneas contacto–IC se cruzan en:
+
+```text
+RC = [0, 13/44] m
+```
+
+Estos valores se derivan de ecuaciones lineales, no de la implementación.
+
+El benchmark asimétrico conserva el lado izquierdo y define:
+
+```text
+IC_right = [-1/5, 3/10] m
+contact_right = [13/20, 0] m
+```
+
+Resolviendo independientemente las dos rectas:
+
+```text
+RC_Y = -247/3020 m
+RC_Z = 429/1661 m
+```
+
+El Y no nulo protege frente a implementaciones que fuercen centerline.
+
+El benchmark proyectivo hace paralelas las restricciones upper/lower de cada
+lado. En el lado izquierdo su dirección tiene pendiente `dZ/dY=-1/3` y pasa
+por el contacto `[-13/20,0]`; la reflexión derecha tiene pendiente `+1/3` y
+pasa por `[13/20,0]`:
+
+```text
+left construction:  Z = -(Y+13/20)/3
+right construction: Z =  (Y-13/20)/3
+RC = [0,-13/60] m
+```
+
+Ambos FVIC están en infinito, pero las dos líneas contacto–dirección se
+intersectan en ese roll center finito.
+
 ## Tolerancias
 
 `AbsTol = 1e-9 m` y `RelTol = 1e-9` son tolerancias de software. No representan fabricación, montaje, diseño ni optimización.
@@ -211,12 +413,24 @@ camber = 0
 
 Este resultado se deriva de la ecuación del círculo y no del solver.
 
-## Límites geométricos v0.3
+## Límites geométricos
 
-`CONTACT_PATCH` continúa rígidamente unido al upright en v0.2/v0.3 y no es el punto de intersección instantáneo de la rueda orientada con el plano de carretera. Por ello no se publican scrub radius ni mechanical/pneumatic trail: hacerlo daría una precisión física falsa.
+`CONTACT_PATCH` continúa rígidamente unido al upright en el estado cinemático.
+v0.4 añade un contacto circular ideal solo para la construcción de roll center.
+No se publican scrub radius ni mechanical/pneumatic trail.
 
-Roll center e instant centers requieren como mínimo un modelo coherente de eje completo y una especificación de construcción geométrica. El modelo actual resuelve una sola esquina, por lo que se difieren explícitamente.
+La geometría proyectiva YZ de v0.4 conserva un IC en infinito como dirección.
+Por ello puede construir su línea contacto–IC y, junto al otro lado, producir
+un roll center finito o infinito. Esto sigue siendo una construcción
+cinemática ideal: no añade compliance ni interpretación de fuerzas.
+
+La regresión numérica 3D estima velocidades de ball joint alrededor de
+`wheelTravel=20 mm` con diferencia central usando `h=1e-5 m`. Ese paso es una
+elección de verificación del test, no una constante del solver ni una
+tolerancia física.
 
 ## Pending mathematical specifications
 
-No están especificados ni implementados steering input/rack motion, Ackermann, scrub radius, trail, instant centers, roll center, anti geometry, actuation, compliance, neumáticos ni dinámica.
+No están especificados ni implementados body roll, roll axis de vehículo,
+steering input/rack motion, Ackermann, scrub radius, trail, anti geometry,
+actuation, compliance, neumáticos de fuerzas ni dinámica.

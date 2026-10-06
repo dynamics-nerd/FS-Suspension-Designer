@@ -61,3 +61,25 @@ Se baja `TIE_ROD_INBOARD` 50 mm respecto a `TIE_ROD_OUTBOARD`, manteniendo los b
 Los tolerances angulares de los tests analíticos son `1e-14 rad`. Las comparaciones que atraviesan `fsolve` usan `2e-8 rad`, coherentes con las tolerancias existentes del benchmark v0.2 y no representan tolerancias de fabricación.
 
 Los tests sin cero verifican directamente `bumpSteer=toe-staticToe`, además de comprobar que ni el primer target ni el target más próximo a cero se convierten en referencia implícita.
+
+## Cobertura v0.4
+
+- contratos FRONT `FL/FR` y REAR `RL/RR`, orden lateral e identity de eje;
+- wheel stagger y geometría deliberadamente asimétrica;
+- restricción cinemática desde `u × (B-Paxis)` y reducción al método clásico;
+- ejes interiores 3D oblicuos, pivot order y regresión contra el antiguo
+  atajo de seccionar el plano del brazo;
+- velocidad de UBJ/LBJ alrededor de `20 mm` por diferencia central del solver
+  (`h=1e-5 m`) y FVIC independiente obtenido resolviendo las dos restricciones
+  de velocidad;
+- benchmark exacto simétrico: IC `±0.1 m`, `Z=0.25 m`, RC `Z=13/44 m`;
+- benchmark asimétrico: `Y_RC=-247/3020 m`, sin forzar centerline;
+- rueda circular ideal, radio, ortogonalidad y rechazo de datum incompatible;
+- IC infinito, coincidente y restricciones degeneradas;
+- intersecciones homogéneas, casi paralelas y conditioning explícito;
+- líneas de construcción con IC infinito, incluidos RC finito y RC infinito;
+- composición de heave, continuation bilateral y simetría de `Y_RC`;
+- rechazo de resultados intercambiados, axle identities mezcladas y análisis
+  de puntos sin convergencia bilateral, con payload fallido completamente
+  inválido y sin datos dinámicos clonados del estado estático;
+- plots de vista frontal y migración en unidades de presentación.

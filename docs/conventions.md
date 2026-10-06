@@ -89,6 +89,39 @@ Son parámetros numéricos, no límites físicos. Pueden sobrescribirse mediante
 
 El núcleo mantiene m/rad. Las funciones de plot convierten wheel travel a mm y ángulos a grados exclusivamente en la frontera de presentación.
 
+## Eje y vista frontal v0.4
+
+- `FRONT` exige `FL` a la izquierda y `FR` a la derecha; `REAR`, `RL/RR`.
+- No se exige simetría. El lado procede del corner ID, no del signo Y.
+- La vista frontal es el plano matemático YZ: Y negativa a la izquierda,
+  positiva a la derecha y Z positiva hacia arriba.
+- No existe `xReference_m`: la restricción YZ se obtiene de la cinemática 3D
+  real de cada eje interior y de su ball joint. Wheel stagger sigue siendo
+  válido y no crea una dependencia entre corners.
+- Los statuses de intersección son `FINITE`, `INFINITE`, `COINCIDENT` y
+  `DEGENERATE`. `INFINITE` conserva una dirección proyectiva unitaria, pero
+  sus coordenadas euclídeas son `NaN`; nunca se usa una distancia enorme.
+- `conditioning` es el valor absoluto del seno del ángulo entre las normales
+  unitarias de dos líneas. `isIllConditioned` advierte de intersecciones
+  finitas sensibles sin alterar su clasificación geométrica.
+
+## Contacto y altura de roll center
+
+`CONTACT_PATCH` sigue siendo un punto material del upright. El análisis v0.4
+exige además que, en estático, coincida con el punto inferior de la rueda
+circular ideal y con `Z=0`. Esta precondición se comprueba al entrar en el
+análisis; no invalida retroactivamente una geometría v0.3.
+
+`rollCenterZ_m` es coordenada en el frame global/chassis. Solo se publica
+`rollCenterHeight_m` cuando los contactos geométricos izquierdo y derecho
+comparten Z dentro de tolerancia; entonces se resta su nivel común.
+
+Symmetric axle heave significa exclusivamente `zLeft=zRight` de wheel travel
+respecto al chasis fijo. No representa body heave ni body roll.
+
+El roll center de v0.4 es una construcción cinemática frontal. No implica una
+línea de acción de fuerza, compliance ni un centro de fuerza.
+
 ## Decisiones aún abiertas
 
 > **OPEN DECISION NM-001 — Actuation IDs:** elegir IDs de actuación al diseñar pushrod/pullrod.

@@ -1,4 +1,4 @@
-# Modelo de datos v0.3
+# Modelo de datos v0.4
 
 ## DoubleWishboneGeometry
 
@@ -198,9 +198,105 @@ points = fsd.geometry.transformPointsRigid(points, reference, translation, R)
 
 La API v0.1 de construcción, consulta, reflexión, métricas y MAT permanece con las mismas firmas. La API v0.2 también permanece; `fsd.kinematics.camberFromWheelAxis` es un wrapper compatible.
 
+## AxleGeometry y AxleGeometryIdentity
+
+`AxleGeometry` es un struct escalar; no duplica hardpoints:
+
+```matlab
+axle.schemaVersion       % "0.4.0"
+axle.kind                % "AxleGeometry"
+axle.axleId              % FRONT o REAR
+axle.leftGeometry        % FL o RL
+axle.rightGeometry       % FR o RR
+```
+
+`AxleGeometryIdentity` incluye schema, axle ID y las dos
+`DoubleWishboneGeometryIdentity` completas. No contiene una referencia X: el
+análisis frontal se deriva por esquina de la cinemática 3D. Permite geometría
+asimétrica y wheel stagger.
+
+## AxleKinematicResult y AxleHeaveSweepResult
+
+`AxleKinematicResult` compone, sin copiar sus estados internos, un
+`KinematicResult` izquierdo y otro derecho:
+
+```matlab
+result.axleIdentity
+result.requestedWheelTravel_m
+result.leftResult
+result.rightResult
+result.leftConverged
+result.rightConverged
+result.converged          % true solo si ambos convergen
+result.status
+result.failureReason
+```
+
+El status agregado es `CONVERGED` si ambos convergen, `NOT_ATTEMPTED` si
+ninguno fue intentado y `NO_CONVERGENCE` en los demás casos, incluida
+convergencia unilateral. El sweep conserva ambos `BumpSweepResult`, sus flags
+por lado y los resultados compuestos por target.
+
+## FrontViewInstantCenter y AxleRollCenterAnalysis
+
+Cada FVIC conserva las restricciones cinemáticas UCA/LCA, sus líneas YZ
+homogéneas, status, diagnóstico, conditioning y coordenadas solo cuando son
+finitas. Un IC `INFINITE` conserva `homogeneousPoint=[dy,dz,0]` y
+`direction_yz`, mientras sus coordenadas euclídeas son `NaN`.
+
+`AxleRollCenterAnalysis` conserva:
+
+```matlab
+analysis.axleIdentity
+analysis.status
+analysis.rollCenterY_m
+analysis.rollCenterZ_m
+analysis.rollCenterHeight_m
+analysis.rollCenterHeightStatus
+analysis.roadReferenceZ_m
+analysis.rollCenterHomogeneousPoint
+analysis.rollCenterDirection_yz
+analysis.rollCenterConditioning
+analysis.rollCenterIllConditioned
+analysis.left.instantCenter
+analysis.left.geometricContact
+analysis.left.rollCenterConstructionLine
+analysis.right              % contrato equivalente
+```
+
+`AxleHeaveRollCenterAnalysis` añade vectores ordenados de Y, Z y altura,
+tiempos separados y el análisis por target. Un punto sin convergencia bilateral
+no publica roll center y recibe un payload inválido nuevo: no clona Wheel
+Center, wheel axis, contacto, ejes de pivotes ni líneas del estado estático.
+
+## API pública v0.4
+
+```matlab
+axle = fsd.model.createAxleGeometry(leftGeometry, rightGeometry)
+fsd.model.validateAxleGeometry(axle)
+identity = fsd.model.axleIdentity(axle)
+fsd.model.validateAxleIdentity(identity)
+
+result = fsd.kinematics.solveAxleHeave(axle, travel, unit)
+sweep = fsd.kinematics.solveAxleHeaveSweep(axle, travelVector, unit)
+fsd.kinematics.validateAxleKinematicResult(result)
+fsd.kinematics.validateAxleHeaveSweepResult(sweep)
+
+ic = fsd.analysis.frontViewInstantCenter(geometry)
+ic = fsd.analysis.frontViewInstantCenter(geometry, kinematicResult)
+contact = fsd.analysis.geometricWheelContact(geometry)
+analysis = fsd.analysis.analyzeAxleState(axle)
+analysis = fsd.analysis.analyzeAxleState(axle, result)
+migration = fsd.analysis.analyzeAxleHeaveSweep(axle, sweep)
+handles = fsd.analysis.plotAxleFrontView(analysis)
+handles = fsd.analysis.plotRollCenterMigration(migration)
+```
+
 ## Persistencia
 
-MAT sigue siendo el formato canónico. Solo se persiste `DoubleWishboneGeometry`; estados, resultados y caches no se guardan automáticamente. La carga revalida schema e invariantes.
+MAT sigue siendo el formato canónico. La persistencia automática continúa
+limitada a `DoubleWishboneGeometry`; axle, estados, resultados y caches no se
+guardan automáticamente en v0.4.
 
 ## Error IDs añadidos
 

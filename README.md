@@ -4,7 +4,7 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
-**v0.3 — Single-Corner Kinematic Analysis** implementa:
+**v0.4 — Axle Geometry, Front-View Instant Centers & Roll Center** implementa:
 
 - geometría double wishbone de una esquina con diez hardpoints, incluido tie rod/toe link;
 - cierre físico del mecanismo mediante UCA, LCA y tie rod rígidos;
@@ -19,9 +19,17 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 - cinco curvas frente a wheel travel y tiempos separados de solver/análisis;
 - diagnóstico explícito de convergencia;
 - visualización estática/desplazada y persistencia MAT de la geometría.
+- composición `FL+FR` o `RL+RR` en un `AxleGeometry` asimétrico;
+- FVIC cinemático desde la velocidad instantánea proyectada de cada ball joint;
+- intersecciones YZ proyectivas con estados finito, infinito, coincidente y
+  degenerado, sin fabricar coordenadas remotas;
+- contacto geométrico inferior de una rueda circular rígida ideal;
+- roll center estático, coordenada Z y altura respecto al nivel común de contacto;
+- heave simétrico y migración de roll center, conservando convergencia por lado;
+- visualización frontal YZ y curvas de migración en mm.
 
-No calcula steering input ni rack travel, Ackermann, scrub radius, trail,
-instant centers, roll center, actuación, dinámica ni optimización.
+No calcula body roll, steering input, rack travel, Ackermann, scrub radius,
+trail, anti geometry, actuación, dinámica ni optimización.
 
 ## Convención
 
@@ -58,6 +66,12 @@ API principal:
 result = fsd.kinematics.solveBump(geometry, 20, "mm");
 sweep = fsd.kinematics.solveBumpSweep(geometry, -30:5:30, "mm");
 analysis = fsd.analysis.analyzeBumpSweep(geometry, sweep);
+
+axle = fsd.model.createAxleGeometry(geometryFL, geometryFR);
+staticRollCenter = fsd.analysis.rollCenter(axle);
+leftFvic = fsd.analysis.frontViewInstantCenter(geometryFL);
+axleSweep = fsd.kinematics.solveAxleHeaveSweep(axle, -30:5:30, "mm");
+migration = fsd.analysis.analyzeAxleHeaveSweep(axle, axleSweep);
 ```
 
 Si `result.converged` es falso, sus puntos y camber son `NaN`; la causa y los residuos permanecen en `result.diagnostics` y `result.failureReason`.
@@ -78,7 +92,15 @@ Además de comparar identidades, cada resultado convergido se valida físicament
 
 ## Compatibilidad
 
-El constructor conserva su firma de v0.1. `DoubleWishboneGeometry` y `SuspensionState` mantienen schema `0.2.0`; `KinematicResult`, `BumpSweepResult` y los resultados de análisis usan schema `0.3.0`. La geometría exige `TIE_ROD_INBOARD` y `TIE_ROD_OUTBOARD`. Un MAT de schema 0.1 no se interpreta silenciosamente porque carece del constraint necesario para determinar la pose del upright.
+El constructor conserva su firma de v0.1. `DoubleWishboneGeometry` y
+`SuspensionState` mantienen schema `0.2.0`; los contratos v0.2/v0.3 no se
+alteran. Los nuevos modelos y resultados de eje usan schema `0.4.0`.
+`CONTACT_PATCH` continúa siendo un datum material del upright; para análisis
+de roll center debe además satisfacer explícitamente la precondición de rueda
+circular ideal documentada en `docs/equations.md`.
+
+El FVIC y el roll center de v0.4 son construcciones cinemáticas en YZ. No son
+centros de fuerza ni dependen de un plano longitudinal de referencia.
 
 ## Aviso
 

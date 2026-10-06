@@ -87,3 +87,13 @@ Bump es positivo en Z y rebound negativo. La reflexión izquierda/derecha conser
 - Centralizar reflexión y conversión de unidades.
 - No inferir convenciones de ángulos todavía no especificados.
 - Probar reflexión, doble reflexión e invariancia de distancias.
+
+## Vista frontal de eje
+
+La vista frontal v0.4 conserva directamente las coordenadas globales YZ. No
+invierte Y para imitar una vista gráfica convencional: el lado izquierdo se
+representa con Y negativa y el derecho con Y positiva. No se selecciona ni se
+almacena un plano `X=constante`: cada restricción frontal procede de proyectar
+la velocidad instantánea 3D de su ball joint al plano matemático YZ. Así, el
+resultado conserva correctamente ejes interiores oblicuos y longitudinal
+stagger sin introducir una referencia artificial compartida.

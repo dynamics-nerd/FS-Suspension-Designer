@@ -34,9 +34,33 @@
 - **VAL-003:** `diagnostics.attempted` distingue solve ejecutado de target no intentado sin inferirlo de los contadores de `fsolve`.
 - **ARCH-001:** la fórmula única de camber reside en `geometry`; `kinematics` y `analysis` son wrappers sin dependencia circular.
 
+## Cerradas en v0.4
+
+- **AXL-001:** `AxleGeometry` compone dos structs de esquina y no introduce un
+  plano X común. El wheel stagger es dato geométrico, no una referencia del
+  análisis frontal.
+- **FVI-001:** la restricción frontal de cada wishbone es perpendicular a la
+  proyección YZ de la velocidad instantánea del ball joint, calculada como
+  `cross(u, B-Paxis)`. La línea pasa por la proyección YZ del ball joint.
+- **LIN-001:** puntos y líneas YZ se operan homogéneamente. Las intersecciones
+  se clasifican `FINITE`, `INFINITE`, `COINCIDENT` o `DEGENERATE`; solo un
+  punto finito publica coordenadas euclídeas.
+- **LIN-002:** `conditioning=|sin(theta)|` para normales de línea unitarias;
+  una intersección finita puede marcarse `isIllConditioned` sin reclasificarse
+  arbitrariamente como infinita.
+- **WHL-001:** radio geométrico desde `|CONTACT_PATCH-WHEEL_CENTER|`, sujeto a
+  coherencia explícita con el círculo estático ideal y `Z=0`.
+- **RC-001:** roll center es la intersección YZ de las líneas contacto ideal–FVIC;
+  Y no se fuerza a cero.
+- **RC-002:** height usa el nivel medio de contactos solo si ambos Z coinciden
+  dentro de tolerancia numérica.
+- **HEV-001:** heave simétrico es igual wheel travel por lado con chasis fijo.
+- **FAIL-001:** un estado de sweep no convergido se construye como payload
+  inválido nuevo; no hereda geometría dinámica de un análisis estático válido.
+
 ## Abiertas
 
 - **OPEN DECISION NM-001:** nomenclatura de endpoints de actuación.
 - **OPEN DECISION NM-002:** representación del eje del rocker.
 
-No han aparecido decisiones humanas nuevas que bloqueen v0.3.
+No han aparecido decisiones humanas nuevas que bloqueen v0.4.

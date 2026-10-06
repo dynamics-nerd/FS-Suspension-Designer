@@ -61,6 +61,39 @@ No incluye:
 6. Solver y análisis publican tiempos separados; las cinco curvas se representan sin recalcular cinemática.
 7. Pasan todos los tests previos y nuevos, ejemplos afectados, Code Analyzer y `git diff --check`.
 
+## v0.4 — Axle Geometry, Front-View Instant Centers & Roll Center
+
+Estado: **implementada, pendiente de auditoría independiente**.
+
+Incluye composición FRONT/REAR asimétrica, identity de eje, restricciones
+frontales derivadas de la velocidad instantánea 3D, FVIC proyectivo con
+statuses explícitos, rueda circular ideal, roll center estático, altura
+respecto a contacto común, heave simétrico, migración, visualizaciones y
+benchmarks analíticos.
+
+No incluye body roll, roll axis de vehículo completo, steering, scrub/trail,
+anti geometry, actuación, neumático de fuerzas, dinámica, optimización, Adams
+ni App Designer.
+
+### Criterios de aceptación v0.4
+
+1. Solo se aceptan pares FL/FR o RL/RR correctamente ordenados, sin exigir
+   simetría.
+2. La formulación cinemática 3D se reduce al método frontal clásico con ejes
+   interiores longitudinales y se verifica con ejes oblicuos y diferencias
+   finitas del solver.
+3. Casos finito, infinito, coincidente y degenerado se distinguen sin puntos
+   ficticios; una intersección casi paralela expone conditioning.
+4. Los benchmarks simétrico y asimétrico reproducen valores derivados a mano.
+5. El contacto dinámico usa wheel axis actual y radio geométrico constante.
+6. Heave y sweep conservan identities y convergencia independiente por lado.
+7. Simetría reflejada mantiene `Y_RC=0` durante el sweep.
+8. Pasan tests anteriores y nuevos, ejemplos, Code Analyzer y diff check.
+9. Un IC infinito puede construir una línea contacto–IC y obtener un roll
+   center finito cuando la geometría del eje lo permite.
+10. Los puntos fallidos del sweep no contienen una copia de datos dinámicos
+    pertenecientes al estado estático.
+
 ## Milestone siguiente
 
-No está definida en este cambio. Ningún trabajo de v0.4 se inicia desde v0.3.
+No se define ni se inicia v0.5 en este cambio.

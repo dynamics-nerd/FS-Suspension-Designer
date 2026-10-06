@@ -2,7 +2,7 @@
 
 ## Objetivo y límite actual
 
-FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.3 — Single-Corner Kinematic Analysis** interpreta los estados ya resueltos por v0.2 mediante métricas de una esquina. Rules, optimización, dinámica, modelos de eje completo y UI siguen sin implementación funcional.
+FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.4** compone dos esquinas compatibles en un eje y calcula FVIC, roll center y su migración en heave simétrico. Rules, optimización, dinámica, vehículo completo y UI siguen sin implementación funcional.
 
 ## Capas
 
@@ -18,9 +18,9 @@ Solo el directorio `src` debe añadirse al path. MATLAB resuelve los subpaquetes
 | Módulo | Responsabilidad prevista |
 |---|---|
 | `model` | Contratos de datos, IDs, unidades, geometría e identidad canónica. |
-| `geometry` | Primitivas y operaciones geométricas estáticas. |
-| `kinematics` | Solver de bump, continuation y pose física del upright; no contiene reglas ni interpreta toe/caster/KPI. |
-| `analysis` | Camber, toe, bump steer, caster, KPI y curvas derivadas de estados resueltos. |
+| `geometry` | Primitivas 3D/2D, intersecciones y contacto circular ideal. |
+| `kinematics` | Solver de esquina y composición de dos sweeps para heave simétrico. |
+| `analysis` | Métricas de esquina, FVIC, roll center y curvas derivadas. |
 | `actuation` | Geometría y métricas de accionamiento futuras. |
 | `vehicle` | Composición de las cuatro esquinas y parámetros del vehículo. |
 | `tire` | Contrato sustituible para modelos de neumático futuros. |
@@ -63,6 +63,15 @@ Por compatibilidad, `KinematicResult.camber_rad` y `fsd.kinematics.camberFromWhe
 
 La dirección queda acíclica: `analysis → kinematics` para validar resultados, mientras `analysis → geometry` y `kinematics → geometry` consumen primitivas compartidas. `kinematics` no llama a `analysis`.
 
+v0.4 conserva esa dirección. `model` define `AxleGeometry` e identities;
+`geometry` no consume resultados cinemáticos; `kinematics` compone las APIs de
+esquina sin interpretar roll center; `analysis` consume los contratos ya
+validados. No existe llamada `kinematics → analysis`. La primitiva de
+`geometry` obtiene cada restricción frontal desde el eje de pivotes y la
+velocidad instantánea 3D del ball joint; `analysis` combina después esas
+líneas mediante geometría proyectiva YZ. Ninguna capa necesita un plano X de
+referencia compartido.
+
 ## Integridad geometry/result
 
 `fsd.model.geometryIdentity` genera una representación canónica versionada con todos los inputs geométricos consumidos por el solver: schema de geometría, `cornerId`, IDs de hardpoints en orden canónico, coordenadas XYZ y wheel axis estático. No incluye display names ni procedencia porque no alteran el mecanismo.
@@ -77,18 +86,21 @@ Los validadores `fsd.kinematics.validateSuspensionState`, `validateKinematicResu
 
 La frontera de entrada convierte unidades y nombres externos a un modelo canónico, conserva procedencia (`KNOWN`/`ASSUMED`) y valida estructura. El núcleo opera únicamente en coordenadas y unidades internas. Los resultados son datos explícitos, no estado oculto. La UI, los informes y los exportadores convierten esos datos a sus representaciones finales.
 
-Un cálculo no debe depender de handles gráficos, componentes App Designer, variables del base workspace ni archivos implícitos. El flujo v0.3 es:
+Un cálculo no debe depender de handles gráficos, componentes App Designer, variables del base workspace ni archivos implícitos. El flujo de eje es:
 
 ```text
-DoubleWishboneGeometry
-    -> fsd.kinematics.solveBumpSweep
-    -> BumpSweepResult (estados físicos)
-    -> fsd.analysis.analyzeBumpSweep
-    -> BumpSweepAnalysis (métricas derivadas)
-    -> plot/report/UI (conversión de presentación)
+left/right DoubleWishboneGeometry -> AxleGeometry
+    -> solveAxleHeaveSweep (dos BumpSweepResult con continuation)
+    -> AxleHeaveSweepResult
+    -> analyzeAxleHeaveSweep
+    -> FVIC/contact/roll-center migration
+    -> plot/report/UI
 ```
 
-`analysis` no modifica estados, no repite el solve y no interpola puntos fallidos.
+`analysis` no modifica estados, no repite el solve y no interpola puntos
+fallidos. Un punto sin convergencia bilateral publica métricas de roll center
+como `NaN` y conserva el status de la cinemática. Su payload se crea inválido
+desde cero y no reutiliza datos dinámicos de un estado estático válido.
 
 ## Integración futura con Adams Car
 
