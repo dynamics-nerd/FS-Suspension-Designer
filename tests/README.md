@@ -21,6 +21,13 @@ La suite cubre:
 - sweep, continuidad y round trip a cero;
 - fallo explícito para travel imposible;
 - plot estático/desplazado.
+- toe analítico con toe-in/out y simetría por lado;
+- aislamiento de toe frente a camber;
+- steering axis LBJ→UBJ, caster XZ y kingpin inclination YZ;
+- toe estático no nulo conservado y bump steer cero en traslación pura;
+- fixture con bump steer de signo conocido, continuidad y reflexión FL/FR;
+- correspondencia exacta sweep/análisis y propagación `NaN` de fallos;
+- cinco curvas de análisis y unidades de presentación.
 
 ## Benchmark independiente
 
@@ -33,3 +40,11 @@ camber = 0
 ```
 
 La expectativa se deriva del círculo, no de la salida del solver.
+
+En v0.3 se asigna toe estático conocido al mismo fixture. Como `R=I`, el wheel axis no rota: toe permanece constante y bump steer debe ser cero independientemente de la implementación de análisis.
+
+## Fixture independiente de bump steer
+
+Se baja `TIE_ROD_INBOARD` 50 mm respecto a `TIE_ROD_OUTBOARD`, manteniendo los brazos del benchmark. Al desplazarse el upright, la longitud fija del tie rod obliga una rotación: el fixture produce toe-in en rebound y toe-out en bump con la convención X hacia atrás. Los tests comprueban signo, cero estático, continuidad y reflexión lateral; no generan el expected value llamando de nuevo a la función probada.
+
+Los tolerances angulares de los tests analíticos son `1e-14 rad`. Las comparaciones que atraviesan `fsolve` usan `2e-8 rad`, coherentes con las tolerancias existentes del benchmark v0.2 y no representan tolerancias de fabricación.

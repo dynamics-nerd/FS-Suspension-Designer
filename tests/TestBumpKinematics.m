@@ -156,6 +156,11 @@ classdef TestBumpKinematics < matlab.unittest.TestCase
             testCase.verifyEqual(flPositive, angle, "AbsTol", 1e-14);
         end
 
+        function legacyCamberApiStillNormalizesDirection(testCase)
+            testCase.verifyEqual( ...
+                fsd.kinematics.camberFromWheelAxis([0, -4, 0], "FL"), 0);
+        end
+
         function sweepIsContinuous(testCase)
             geometry = testCase.benchmarkGeometry();
             sweep = fsd.kinematics.solveBumpSweep( ...
@@ -255,4 +260,3 @@ if isgraphics(figureHandle, "figure")
     close(figureHandle);
 end
 end
-

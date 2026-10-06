@@ -33,11 +33,30 @@ Son solidarios UBJ, LBJ, `TIE_ROD_OUTBOARD`, Wheel Center, Contact Patch y wheel
 - negativo: rebound/droop;
 - cero: estado estático.
 
-## Wheel axis y camber
+## Wheel axis, camber y toe
 
 El wheel axis unitario apunta interior→exterior. La pose actual lo obtiene rotando el eje estático con la misma matriz del upright.
 
 Camber negativo significa parte superior hacia el centro; positivo, hacia fuera. El valor del núcleo está en radianes. La ecuación simétrica por lado está en `equations.md`.
+
+Toe positivo significa toe-in y toe negativo significa toe-out. Se obtiene solo de la proyección XY del wheel axis; la componente Z debida a camber no puede crear toe ficticio. Los ejes nominales `[0,-1,0]` para FL/RL y `[0,+1,0]` para FR/RR producen toe cero.
+
+## Steering axis, caster y kingpin inclination
+
+El steering axis unitario apunta siempre desde LBJ hacia UBJ. Su componente Z no se fuerza a ser positiva: una geometría inusual sigue conservando el sentido físico LBJ→UBJ y se interpreta con `atan2`.
+
+- caster positivo: UBJ desplazado hacia `+X` (parte trasera) respecto a LBJ;
+- `kingpinInclination`/KPI positivo: extremo superior del eje hacia el centro del vehículo;
+- en FR/RR, KPI positivo implica menor Y en UBJ; en FL/RL, mayor Y;
+- caster y KPI se almacenan en radianes.
+
+## Bump steer
+
+```text
+bumpSteer(z) = toe(z) - toe(0)
+```
+
+Se conservan por separado `staticToe_rad`, `toe_rad` y `bumpSteer_rad`. `toe(0)` procede de la geometría estática, aunque el sweep solicitado no incluya cero.
 
 ## Solver
 
@@ -49,9 +68,12 @@ v0.2 usa `fsolve` de Optimization Toolbox. Configuración central:
 
 Son parámetros numéricos, no límites físicos. Pueden sobrescribirse mediante un options struct validado. La aceptación final sigue las tolerancias dimensionales de `fsd.model.numericTolerances`.
 
+## Visualización
+
+El núcleo mantiene m/rad. Las funciones de plot convierten wheel travel a mm y ángulos a grados exclusivamente en la frontera de presentación.
+
 ## Decisiones aún abiertas
 
 > **OPEN DECISION NM-001 — Actuation IDs:** elegir IDs de actuación al diseñar pushrod/pullrod.
 
 > **OPEN DECISION NM-002 — Rocker representation:** definir el eje del rocker cuando se implemente actuación.
-

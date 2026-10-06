@@ -3,8 +3,8 @@
 % Namespaces
 %   fsd.model        - Canonical data contracts and validation.
 %   fsd.geometry     - Geometry primitives and static geometry operations.
-%   fsd.kinematics   - Double-wishbone bump kinematics and camber.
-%   fsd.analysis     - Future derived engineering metrics.
+%   fsd.kinematics   - Double-wishbone bump kinematics and state solving.
+%   fsd.analysis     - Single-corner camber, toe, caster, KPI and sweeps.
 %   fsd.actuation    - Future spring/damper actuation geometry.
 %   fsd.vehicle      - Future whole-vehicle composition.
 %   fsd.tire         - Future replaceable tire-model contracts.

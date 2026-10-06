@@ -2,7 +2,7 @@
 
 ## Objetivo y límite actual
 
-FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.2 — Bump Kinematics** añade el primer solver real a la geometría estática: cierre UCA/LCA/tie rod, pose rígida del upright, pose de rueda y camber. Rules, optimización, dinámica y UI siguen sin implementación funcional.
+FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.3 — Single-Corner Kinematic Analysis** interpreta los estados ya resueltos por v0.2 mediante métricas de una esquina. Rules, optimización, dinámica, modelos de eje completo y UI siguen sin implementación funcional.
 
 ## Capas
 
@@ -19,8 +19,8 @@ Solo el directorio `src` debe añadirse al path. MATLAB resuelve los subpaquetes
 |---|---|
 | `model` | Contratos de datos, IDs, unidades declaradas y validación estructural. |
 | `geometry` | Primitivas y operaciones geométricas estáticas. |
-| `kinematics` | Solver de bump, continuation, pose del upright y camber v0.2; no contiene reglas. |
-| `analysis` | Métricas futuras ajenas al output mínimo de v0.2. |
+| `kinematics` | Solver de bump, continuation y pose física del upright; no contiene reglas ni interpreta toe/caster/KPI. |
+| `analysis` | Camber, toe, bump steer, caster, KPI y curvas derivadas de estados resueltos. |
 | `actuation` | Geometría y métricas de accionamiento futuras. |
 | `vehicle` | Composición de las cuatro esquinas y parámetros del vehículo. |
 | `tire` | Contrato sustituible para modelos de neumático futuros. |
@@ -38,7 +38,7 @@ Dependencias permitidas en la primera evolución:
 
 - `geometry → model`.
 - `kinematics → geometry, model`.
-- `analysis → model` y, cuando proceda, datos de salida de `geometry` o `kinematics`.
+- `analysis → model` y contratos públicos producidos por `geometry` o `kinematics`.
 - `actuation → geometry, model`.
 - `vehicle → model` y contratos públicos de los subsistemas que componga.
 - `dynamics → vehicle, model` y la interfaz pública sustituible de `tire`.
@@ -59,11 +59,24 @@ Cuando dos módulos necesiten intercambiar información, compartirán un contrat
 
 v0.2 depende de Optimization Toolbox exclusivamente dentro de `kinematics`, mediante `fsolve`. `model` y `geometry` no dependen del toolbox. La cinemática no llama a `rules`, `app`, exporters ni módulos futuros.
 
+Por compatibilidad, `KinematicResult.camber_rad` y `fsd.kinematics.camberFromWheelAxis` continúan disponibles. La implementación canónica de esa interpretación reside desde v0.3 en `fsd.analysis.camberFromWheelAxis`; el wrapper legado es la única dependencia estrecha `kinematics → analysis`. No se añaden toe, caster ni KPI al solver.
+
 ## Flujo de datos
 
 La frontera de entrada convierte unidades y nombres externos a un modelo canónico, conserva procedencia (`KNOWN`/`ASSUMED`) y valida estructura. El núcleo opera únicamente en coordenadas y unidades internas. Los resultados son datos explícitos, no estado oculto. La UI, los informes y los exportadores convierten esos datos a sus representaciones finales.
 
-Un cálculo no debe depender de handles gráficos, componentes App Designer, variables del base workspace ni archivos implícitos.
+Un cálculo no debe depender de handles gráficos, componentes App Designer, variables del base workspace ni archivos implícitos. El flujo v0.3 es:
+
+```text
+DoubleWishboneGeometry
+    -> fsd.kinematics.solveBumpSweep
+    -> BumpSweepResult (estados físicos)
+    -> fsd.analysis.analyzeBumpSweep
+    -> BumpSweepAnalysis (métricas derivadas)
+    -> plot/report/UI (conversión de presentación)
+```
+
+`analysis` no modifica estados, no repite el solve y no interpola puntos fallidos.
 
 ## Integración futura con Adams Car
 

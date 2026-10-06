@@ -1,6 +1,7 @@
 function camber_rad = camberFromWheelAxis(wheelAxis, cornerId)
 %CAMBERFROMWHEELAXIS Return side-independent camber in radians.
-%   Negative camber means the wheel top leans toward vehicle center.
+%   Compatibility wrapper retained for the public v0.2 API. New code may
+%   call fsd.analysis.camberFromWheelAxis directly.
 
 if ~isnumeric(wheelAxis) || ~isreal(wheelAxis) || ...
         ~isequal(size(wheelAxis), [1, 3]) || any(~isfinite(wheelAxis))
@@ -14,21 +15,21 @@ if axisNorm <= tolerances.AbsTol_m
         "wheelAxis must be nonzero.");
 end
 wheelAxis = double(wheelAxis) ./ axisNorm;
-cornerId = upper(strtrim(string(cornerId)));
-if ~isscalar(cornerId) || ~ismember(cornerId, ["FL", "FR", "RL", "RR"])
-    error("fsd:model:InvalidCorner", ...
-        "Corner must be one of FL, FR, RL, or RR.");
-end
 
-sideSign = 1;
-if ismember(cornerId, ["FL", "RL"])
-    sideSign = -1;
+try
+    camber_rad = fsd.analysis.camberFromWheelAxis(wheelAxis, cornerId);
+catch cause
+    switch cause.identifier
+        case {"fsd:analysis:InvalidWheelAxis", ...
+                "fsd:analysis:DegenerateWheelAxis"}
+            error("fsd:kinematics:InvalidWheelAxis", "%s", cause.message);
+        case "fsd:analysis:InvalidWheelAxisOrientation"
+            error("fsd:kinematics:InvalidWheelAxisOrientation", ...
+                "%s", cause.message);
+        case "fsd:analysis:InvalidCorner"
+            error("fsd:model:InvalidCorner", "%s", cause.message);
+        otherwise
+            rethrow(cause)
+    end
 end
-outwardComponent = sideSign * wheelAxis(2);
-if outwardComponent <= tolerances.RelTol
-    error("fsd:kinematics:InvalidWheelAxisOrientation", ...
-        "wheelAxis must retain a positive lateral outward component.");
 end
-camber_rad = -atan2(wheelAxis(3), outwardComponent);
-end
-

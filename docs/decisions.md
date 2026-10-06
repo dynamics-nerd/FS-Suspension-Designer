@@ -19,9 +19,18 @@
 - **KIN-005:** failure result explícito con valores cinemáticos `NaN`.
 - **CAM-001:** `camber=-atan2(a_z, sideSign*a_y)`, en radianes.
 
+## Cerradas en v0.3
+
+- **TOE-001:** toe positivo es toe-in; `toe=atan2(-a_x, sideSign*a_y)` y se ignora `a_z`.
+- **BST-001:** bump steer es toe absoluto menos toe estático de la geometría, incluso si el sweep no contiene cero.
+- **AXIS-001:** steering axis dirigido y unitario LBJ→UBJ, sin imponer componente Z positiva.
+- **CAS-001:** caster se obtiene en XZ; positivo cuando el extremo UBJ está hacia `+X`.
+- **KPI-001:** `kingpinInclination` se obtiene en YZ; positivo hacia el centro y simétrico por lado.
+- **ANA-001:** estados no convergidos se conservan sin interpolación, con métricas `NaN` y status original.
+
 ## Abiertas
 
 - **OPEN DECISION NM-001:** nomenclatura de endpoints de actuación.
 - **OPEN DECISION NM-002:** representación del eje del rocker.
 
-No han aparecido decisiones humanas nuevas que bloqueen v0.2.
+No han aparecido decisiones humanas nuevas que bloqueen v0.3.
