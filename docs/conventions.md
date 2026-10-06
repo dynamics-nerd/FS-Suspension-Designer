@@ -1,67 +1,57 @@
 # Convenciones
 
-## Unidades — UN-001 cerrada
+## Unidades
 
-El núcleo almacena y procesa exclusivamente SI:
+El núcleo utiliza SI: m, rad, N, kg y s. Las APIs de geometría y wheel travel aceptan `"m"` o `"mm"`; convierten en la frontera mediante `fsd.model.convertLengthToMetres`.
 
-| Magnitud | Unidad interna |
-|---|---:|
-| Longitud | metro (`m`) |
-| Ángulo | radián (`rad`) |
-| Fuerza | newton (`N`) |
-| Masa | kilogramo (`kg`) |
-| Tiempo | segundo (`s`) |
+## Hardpoint IDs v0.2
 
-El API de construcción v0.1 acepta longitudes con unidad explícita `"m"` o `"mm"`. La conversión ocurre una sola vez en `fsd.model.createDoubleWishboneGeometry`; el struct canónico conserva únicamente `xyz_m` y declara `metadata.lengthUnit = "m"`.
+Cada ID es `<CORNER>_<POINT_ROLE>`, con corner `FL`, `FR`, `RL` o `RR`. Son obligatorios:
 
-No existe todavía un sistema universal de unidades ni se aceptan unidades implícitas.
+- `UCA_FWD_CHASSIS`, `UCA_AFT_CHASSIS`, `UBJ`;
+- `LCA_FWD_CHASSIS`, `LCA_AFT_CHASSIS`, `LBJ`;
+- `TIE_ROD_INBOARD`, `TIE_ROD_OUTBOARD`;
+- `WHEEL_CENTER`, `CONTACT_PATCH`.
 
-## Identificadores de hardpoints
+`TIE_ROD` es el nombre técnico genérico también para una futura toe link trasera. `TIE_ROD_INBOARD` permanece fijo en v0.2 y `TIE_ROD_OUTBOARD` forma parte del upright rígido.
 
-El ID canónico es ASCII en `UPPER_SNAKE_CASE`:
+IDs estables y `displayName` continúan separados.
 
-`<CORNER>_<POINT_ROLE>`
+## Procedencia
 
-v0.1 exige exactamente:
+`sourceKind` y `sourceNote` son `N×3`, una entrada para X/Y/Z. Los kinds admitidos son `KNOWN`, `ASSUMED`, `DERIVED` y `UNSPECIFIED`. No representan el estado futuro `FIXED/RANGE/FREE`.
 
-- `<CORNER>_UCA_FWD_CHASSIS`
-- `<CORNER>_UCA_AFT_CHASSIS`
-- `<CORNER>_UBJ`
-- `<CORNER>_LCA_FWD_CHASSIS`
-- `<CORNER>_LCA_AFT_CHASSIS`
-- `<CORNER>_LBJ`
-- `<CORNER>_WHEEL_CENTER`
-- `<CORNER>_CONTACT_PATCH`
+## Upright rígido
 
-Se utiliza `FWD/AFT`, no `FRONT/REAR`, para evitar confundir un pivot posterior con el eje trasero. El ID estable se almacena por separado de `hardpoints.displayName`, que es solo presentación.
+Son solidarios UBJ, LBJ, `TIE_ROD_OUTBOARD`, Wheel Center, Contact Patch y wheel axis. UBJ/LBJ/tie-rod-outboard deben ser distintos y no collineales. No existe compliance.
 
-IDs desconocidos se rechazan en el schema v0.1; una ampliación futura requiere actualizar schema, documentación y tests.
+## Wheel travel
 
-## Procedencia — DM-003 cerrada
+`wheelTravel = Z_WC,current - Z_WC,static`:
 
-La procedencia es `N×3`, alineada con las columnas X/Y/Z:
+- positivo: bump/jounce;
+- negativo: rebound/droop;
+- cero: estado estático.
 
-```matlab
-geometry.hardpoints.sourceKind  % N-by-3 string
-geometry.hardpoints.sourceNote  % N-by-3 string
-```
+## Wheel axis y camber
 
-`sourceKind` admite `KNOWN`, `ASSUMED`, `DERIVED` y `UNSPECIFIED`. `sourceNote` puede registrar, por coordenada, una referencia como CAD, packaging u optimización. Si la procedencia opcional no se proporciona se usa `UNSPECIFIED`; no se inventa conocimiento.
+El wheel axis unitario apunta interior→exterior. La pose actual lo obtiene rotando el eje estático con la misma matriz del upright.
 
-La procedencia no es el estado de diseño futuro `FIXED/RANGE/FREE`.
+Camber negativo significa parte superior hacia el centro; positivo, hacia fuera. El valor del núcleo está en radianes. La ecuación simétrica por lado está en `equations.md`.
 
-## Wheel axis — NM-003 cerrada
+## Solver
 
-`geometry.wheel.wheelAxis` es un vector real, finito, unitario `1×3` que apunta desde el interior del vehículo hacia el exterior de la rueda.
+v0.2 usa `fsolve` de Optimization Toolbox. Configuración central:
 
-- esquina izquierda: componente Y negativa;
-- esquina derecha: componente Y positiva.
+- continuation step máximo: `0.005 m`;
+- Function/Step/Optimality tolerance: `1e-12`;
+- máximo 200 iteraciones y 2000 evaluaciones por paso.
 
-El constructor normaliza cualquier vector no nulo y normalizable. El validador exige que la representación canónica ya sea unitaria y tenga una proyección lateral estrictamente hacia fuera. No se usa una matriz de rotación completa y no se representa el giro alrededor del eje.
+Son parámetros numéricos, no límites físicos. Pueden sobrescribirse mediante un options struct validado. La aceptación final sigue las tolerancias dimensionales de `fsd.model.numericTolerances`.
 
 ## Decisiones aún abiertas
 
-> **OPEN DECISION NM-001 — Actuation IDs:** elegir IDs genéricos `ACTUATION_*` o específicos `PUSHROD_*`/`PULLROD_*` cuando se diseñe actuación.
+> **OPEN DECISION NM-001 — Actuation IDs:** elegir IDs de actuación al diseñar pushrod/pullrod.
 
-> **OPEN DECISION NM-002 — Rocker representation:** decidir si el eje del rocker se define mediante punto y dirección o mediante dos puntos.
+> **OPEN DECISION NM-002 — Rocker representation:** definir el eje del rocker cuando se implemente actuación.
 

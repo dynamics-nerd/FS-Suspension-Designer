@@ -2,7 +2,7 @@
 
 ## Objetivo y límite actual
 
-FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.1 — Static Double Wishbone Geometry** implementa únicamente el modelo estático de una esquina, sus invariantes, operaciones geométricas elementales, visualización y persistencia MAT. No hay solver, reglas, optimización ni dinámica funcionales.
+FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.2 — Bump Kinematics** añade el primer solver real a la geometría estática: cierre UCA/LCA/tie rod, pose rígida del upright, pose de rueda y camber. Rules, optimización, dinámica y UI siguen sin implementación funcional.
 
 ## Capas
 
@@ -19,8 +19,8 @@ Solo el directorio `src` debe añadirse al path. MATLAB resuelve los subpaquetes
 |---|---|
 | `model` | Contratos de datos, IDs, unidades declaradas y validación estructural. |
 | `geometry` | Primitivas y operaciones geométricas estáticas. |
-| `kinematics` | Solvers de movimiento futuros; no contiene reglas. |
-| `analysis` | Métricas derivadas a partir de geometría o resultados ya calculados. |
+| `kinematics` | Solver de bump, continuation, pose del upright y camber v0.2; no contiene reglas. |
+| `analysis` | Métricas futuras ajenas al output mínimo de v0.2. |
 | `actuation` | Geometría y métricas de accionamiento futuras. |
 | `vehicle` | Composición de las cuatro esquinas y parámetros del vehículo. |
 | `tire` | Contrato sustituible para modelos de neumático futuros. |
@@ -56,6 +56,8 @@ Dependencias prohibidas:
 - ciclos entre módulos.
 
 Cuando dos módulos necesiten intercambiar información, compartirán un contrato de datos simple en `model` en lugar de llamarse mutuamente.
+
+v0.2 depende de Optimization Toolbox exclusivamente dentro de `kinematics`, mediante `fsolve`. `model` y `geometry` no dependen del toolbox. La cinemática no llama a `rules`, `app`, exporters ni módulos futuros.
 
 ## Flujo de datos
 

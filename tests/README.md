@@ -1,28 +1,35 @@
 # Testing strategy
 
-Flujo requerido:
-
 > Engineering change → Unit test → Known case → Validation → Merge
-
-Ejecute desde la raíz:
 
 ```matlab
 results = runProjectTests;
 ```
 
-`TestRepositoryFoundation` comprueba namespace y documentación. `TestStaticDoubleWishboneGeometry` cubre:
+La suite cubre:
 
-- construcción en m y mm y conversión explícita;
-- normalización de wheel axis y procedencia por coordenada;
-- matrices, IDs, corner, prefijos, NaN e Inf inválidos;
-- hardpoints ausentes o duplicados;
-- cuatro degeneraciones geométricas elementales;
-- wheel axis nulo, inválido o orientado hacia dentro;
-- consulta por ID y error para ID inexistente;
-- distancia y vector unitario analíticos;
-- métricas estáticas;
-- reflexión FL→FR, wheel axis y doble reflexión;
-- save/load MAT;
-- handles y escala del plot 3D.
+- foundation y documentación;
+- construcción estática m/mm, IDs, procedencia, reflexión, MAT y plot;
+- tie rod y upright no collinear;
+- rotation vector, ortonormalidad y transformación rígida;
+- estado estático exacto;
+- bump y rebound solicitados;
+- conservación de cuatro links UCA/LCA y tie rod;
+- rigidez interna del upright y wheel attachment;
+- norma del wheel axis;
+- simetría FL/FR y signo de camber;
+- sweep, continuidad y round trip a cero;
+- fallo explícito para travel imposible;
+- plot estático/desplazado.
 
-Los datos del fixture son ficticios. Las comprobaciones exactas de `0.280 m` y `[1,0,0]` se derivan directamente de sus coordenadas, no de la salida de la implementación.
+## Benchmark independiente
+
+El fixture `TestBumpKinematics.benchmarkGeometry` usa brazos iguales con ejes paralelos y tie rod compatible. Todos los puntos rígidos se trasladan sobre un arco de radio `0.3 m` sin rotación. Para travel `w`, el expected value es:
+
+```text
+deltaY = 0.3 - sqrt(0.3^2 - w^2)
+R = I
+camber = 0
+```
+
+La expectativa se deriva del círculo, no de la salida del solver.

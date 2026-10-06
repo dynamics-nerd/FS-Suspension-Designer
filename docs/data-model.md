@@ -1,100 +1,100 @@
-# Modelo de datos v0.1
+# Modelo de datos v0.2
 
-## Decisión
+## DoubleWishboneGeometry
 
-La geometría es un `struct` escalar. Los hardpoints se almacenan de forma columnar con matrices `double` y arrays `string`; no se crean clases, `SuspensionState` ni `KinematicResult`.
+Continúa siendo un struct escalar y serializable. Cambios respecto a v0.1:
 
-La representación favorece serialización MAT, validación explícita, acceso desde App Designer y una futura conversión a matrices densas para optimización.
-
-## Estructura exacta de `DoubleWishboneGeometry`
+- `schemaVersion = "0.2.0"`;
+- diez hardpoints obligatorios;
+- conectividad con miembro `TIE_ROD`;
+- `upright.pointIds` contiene UBJ, LBJ, tie-rod-outboard, Wheel Center y Contact Patch.
 
 ```matlab
-geometry.schemaVersion                 % "0.1.0"
-geometry.kind                          % "DoubleWishboneGeometry"
-geometry.cornerId                      % FL, FR, RL o RR
+geometry.hardpoints.ids          % 10-by-1 string
+geometry.hardpoints.xyz_m        % 10-by-3 double
+geometry.hardpoints.sourceKind   % 10-by-3 string
+geometry.hardpoints.sourceNote   % 10-by-3 string
+geometry.hardpoints.displayName  % 10-by-1 string
 
-geometry.referenceFrame.id             % "VEHICLE_GLOBAL"
-geometry.referenceFrame.originDescription
-geometry.referenceFrame.axisConvention % "X_REAR_Y_RIGHT_Z_UP"
-
-geometry.hardpoints.ids                % N-by-1 string, IDs completos
-geometry.hardpoints.xyz_m              % N-by-3 double
-geometry.hardpoints.sourceKind         % N-by-3 string
-geometry.hardpoints.sourceNote         % N-by-3 string
-geometry.hardpoints.displayName        % N-by-1 string
-
-geometry.connectivity.memberIds        % 6-by-1 string
-geometry.connectivity.pointIds         % 6-by-2 string
-
-geometry.upright.pointIds              % UBJ, LBJ y WHEEL_CENTER
-
+geometry.upright.pointIds        % 5-by-1 string
 geometry.wheel.centerId
 geometry.wheel.contactPatchId
-geometry.wheel.wheelAxis               % 1-by-3 unit vector
-
-geometry.metadata.lengthUnit           % "m"
-geometry.metadata.coordinateSystem     % "X_REAR_Y_RIGHT_Z_UP"
+geometry.wheel.wheelAxis         % 1-by-3 unit vector
 ```
 
-La conectividad describe dos legs de UCA, dos de LCA, el segmento UBJ–LBJ y la referencia Wheel Center–Contact Patch. No impone restricciones de movimiento.
+Las demás declaraciones de frame, metadata y procedencia se mantienen.
 
-## API pública — DM-001 cerrada
+## SuspensionState
 
-### Modelo
+Solo aparece ahora que existe movimiento:
 
 ```matlab
-geometry = fsd.model.createDoubleWishboneGeometry( ...
-    cornerId, ids, xyz, inputUnit, wheelAxis)
-
-geometry = fsd.model.createDoubleWishboneGeometry( ...
-    cornerId, ids, xyz, inputUnit, wheelAxis, provenance)
-
-isValid = fsd.model.validateDoubleWishboneGeometry(geometry)
-xyz_m = fsd.model.getPoint(geometry, pointId)
-tolerances = fsd.model.numericTolerances()
-roles = fsd.model.requiredHardpointRoles()
-fsd.model.saveGeometryMat(filePath, geometry)
-geometry = fsd.model.loadGeometryMat(filePath)
+state.schemaVersion       % "0.2.0"
+state.kind                % "SuspensionState"
+state.pointIds            % UBJ, LBJ, TIE_ROD_OUTBOARD, WC, CP
+state.xyz_m               % 5-by-3 current positions
+state.ubj_m
+state.lbj_m
+state.tieRodOutboard_m
+state.wheelCenter_m
+state.contactPatch_m
+state.wheelAxis
+state.wheelTravel_m
 ```
 
-`provenance.sourceKind` y `provenance.sourceNote` pueden ser escalares, `N×1` o `N×3`; el constructor los expande a `N×3`. Los índices de fila no forman parte del API.
-
-### Geometría estática
+## KinematicResult
 
 ```matlab
-vector_m = fsd.geometry.vectorBetweenPoints(geometry, fromId, toId)
-distance_m = fsd.geometry.distanceBetweenPoints(geometry, idA, idB)
-unitVector = fsd.geometry.unitVectorBetweenPoints(geometry, fromId, toId)
-metrics = fsd.geometry.staticMetrics(geometry)
-reflected = fsd.geometry.reflectDoubleWishboneGeometry(geometry)
-handles = fsd.geometry.plotDoubleWishboneGeometry(geometry)
-handles = fsd.geometry.plotDoubleWishboneGeometry(geometry, axesHandle)
+result.schemaVersion
+result.kind                       % "KinematicResult"
+result.requestedWheelTravel_m
+result.achievedWheelTravel_m
+result.converged
+result.status                     % CONVERGED / NO_CONVERGENCE / NOT_ATTEMPTED
+result.failureReason
+result.state                      % SuspensionState
+result.uprightPose.referencePointStatic_m
+result.uprightPose.translation_m
+result.uprightPose.rotationVector_rad
+result.uprightPose.rotationMatrix
+result.wheelAxis
+result.camber_rad
+result.diagnostics
 ```
 
-Todas las funciones son puras salvo las fronteras explícitas de plot y persistencia.
+Diagnostics incluyen solver/toolbox, IDs de constraints, errores dimensionales, residuos escalados, exit flag, iteraciones, evaluaciones, pasos de continuación y mensaje.
 
-## Error IDs públicos
+Si no converge, `converged=false` y la pose, puntos, wheel axis y camber son `NaN`; no se publica una configuración falsa.
 
-Los callers pueden distinguir fallos mediante IDs estables. Los principales son:
+## BumpSweepResult
 
-- `fsd:model:InvalidCorner`, `InvalidIds`, `DuplicateId`, `UnknownId`, `MissingRequiredId` y `CornerPrefixMismatch`;
-- `fsd:model:InvalidXyzType`, `InvalidXyzShape`, `NonFiniteCoordinate` e `InvalidInputUnit`;
-- `fsd:model:InvalidProvenanceShape` e `InvalidProvenanceKind`;
-- `fsd:model:CoincidentUBJLBJ`, `CoincidentUcaPivots`, `CoincidentLcaPivots` y `CoincidentWheelReferences`;
-- `fsd:model:InvalidWheelAxis`, `ZeroWheelAxis`, `WheelAxisNotUnit` y `WheelAxisNotOutward`;
-- `fsd:model:PointNotFound`, `InvalidMatPath` e `InvalidMatContents`;
-- `fsd:geometry:CoincidentPoints` e `InvalidAxes`.
+Contiene vectores de travel solicitado/logrado, camber, flags, tiempo total y cada `KinematicResult`. El orden de entrada se conserva y sirve como recorrido de continuation.
 
-El texto del mensaje puede mejorar; el identificador es el contrato para tests y futuras interfaces.
+## API pública nueva
 
-## Wheel y upright
+```matlab
+result = fsd.kinematics.solveBump(geometry, wheelTravel, unit)
+result = fsd.kinematics.solveBump(geometry, wheelTravel, unit, options)
 
-`upright` es conectividad mínima y no calcula pose. `wheel` referencia centro, contact patch y eje unitario. No se inventan radio, anchura ni un disco de rueda.
+sweep = fsd.kinematics.solveBumpSweep(geometry, travelVector, unit)
+sweep = fsd.kinematics.solveBumpSweep(geometry, travelVector, unit, options)
 
-## Persistencia — DM-002 cerrada
+camber_rad = fsd.kinematics.camberFromWheelAxis(wheelAxis, cornerId)
+handles = fsd.kinematics.plotBumpResult(geometry, result, axesHandle)
+settings = fsd.kinematics.solverSettings(overrides)
 
-MAT es el formato canónico de V1. `saveGeometryMat` guarda únicamente la variable `geometry`; `loadGeometryMat` exige esa variable y vuelve a validar el objeto. JSON queda reservado como posible intercambio futuro.
+R = fsd.geometry.rotationVectorToMatrix(rotationVector_rad)
+points = fsd.geometry.transformPointsRigid(points, reference, translation, R)
+```
 
-## Evolución
+La API v0.1 de construcción, consulta, reflexión, métricas y MAT permanece con las mismas firmas. `requiredHardpointRoles` devuelve ahora los diez roles v0.2.
 
-Todo cambio incompatible debe actualizar `schemaVersion` y aportar una migración explícita. No se serializan gráficos, resultados derivados ni caches.
+## Persistencia
+
+MAT sigue siendo el formato canónico. Solo se persiste `DoubleWishboneGeometry`; estados, resultados y caches no se guardan automáticamente. La carga revalida schema e invariantes.
+
+## Error IDs añadidos
+
+- modelo: `CoincidentTieRod`, `CoincidentUprightPoints`, `DegenerateUpright`, `ZeroLengthUcaLink`, `ZeroLengthLcaLink`;
+- geometría: `InvalidRotationVector`, `InvalidRotationMatrix`, `InvalidPoints`, `InvalidReferencePoint`, `InvalidTranslation`;
+- cinemática: `InvalidWheelTravel`, `InvalidOptions`, `MissingOptimizationToolbox`, `InvalidWheelAxisOrientation`, `InvalidResult`.

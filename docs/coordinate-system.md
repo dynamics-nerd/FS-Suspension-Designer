@@ -68,9 +68,17 @@ La matriz `diag([1,-1,1])` tiene determinante `-1`: es una reflexión y no una r
 
 Están centralizadas en `fsd.model.numericTolerances`. Solo sirven para comparaciones de coma flotante. No representan tolerancias de fabricación, montaje, diseño u optimización.
 
-Para coincidencia de dos puntos, v0.1 compara la distancia con:
+Para coincidencia de dos puntos, el núcleo compara la distancia con:
 
 `AbsTol + RelTol * max(norm(pA), norm(pB), 1 m)`
+
+## Wheel travel
+
+En v0.2 se define únicamente respecto del Wheel Center global:
+
+`wheelTravel = Z_WC,current - Z_WC,static`
+
+Bump es positivo en Z y rebound negativo. La reflexión izquierda/derecha conserva Z y, por tanto, conserva el mismo wheel travel solicitado.
 
 ## Prevención de errores de signo
 
@@ -79,4 +87,3 @@ Para coincidencia de dos puntos, v0.1 compara la distancia con:
 - Centralizar reflexión y conversión de unidades.
 - No inferir convenciones de ángulos todavía no especificados.
 - Probar reflexión, doble reflexión e invariancia de distancias.
-

@@ -1,5 +1,5 @@
 function result = staticDoubleWishboneExample(showPlots)
-%STATICDOUBLEWISHBONEEXAMPLE Reproducible v0.1 demonstration geometry.
+%STATICDOUBLEWISHBONEEXAMPLE Reproducible static v0.2 geometry.
 %   The values are fictitious demonstration data. They are not design
 %   recommendations and must not be used to manufacture a suspension.
 
@@ -19,12 +19,14 @@ xyz_mm = [ ...
     -220, -260, 100; ... % LCA forward chassis pivot
      130, -260, 110; ... % LCA aft chassis pivot
      -10, -530, 120; ... % LBJ
+      30, -280, 220; ... % Tie rod inboard
+      40, -500, 230; ... % Tie rod outboard
        0, -570, 250; ... % Wheel center
        0, -600,   0];    % Contact patch
 
 provenance = struct( ...
-    "sourceKind", repmat("ASSUMED", 8, 3), ...
-    "sourceNote", repmat("Fictitious demonstration value", 8, 3));
+    "sourceKind", repmat("ASSUMED", 10, 3), ...
+    "sourceNote", repmat("Fictitious demonstration value", 10, 3));
 
 geometryFL = fsd.model.createDoubleWishboneGeometry( ...
     corner, ids, xyz_mm, "mm", [0, -1, 0], provenance);
@@ -51,7 +53,7 @@ assert(max(abs(geometryFL.hardpoints.xyz_m - xyz_mm / 1000), [], "all") ...
 
 plotHandles = struct();
 if showPlots
-    figureHandle = figure("Name", "v0.1 static geometry demonstration");
+    figureHandle = figure("Name", "Static geometry demonstration");
     layout = tiledlayout(figureHandle, 1, 2);
     axesFL = nexttile(layout);
     plotHandles.FL = fsd.geometry.plotDoubleWishboneGeometry(geometryFL, axesFL);
@@ -68,4 +70,3 @@ result = struct( ...
     "doubleReflectionError_m", doubleReflectionError_m, ...
     "plotHandles", plotHandles);
 end
-

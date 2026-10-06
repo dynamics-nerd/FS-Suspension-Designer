@@ -1,5 +1,5 @@
 function metrics = staticMetrics(geometry)
-%STATICMETRICS Compute only elementary static v0.1 dimensions.
+%STATICMETRICS Compute elementary static dimensions.
 
 fsd.model.validateDoubleWishboneGeometry(geometry);
 prefix = geometry.cornerId + "_";
@@ -13,5 +13,6 @@ metrics.ubjLbjDistance_m = fsd.geometry.distanceBetweenPoints( ...
 metrics.wheelCenterContactPatchDistance_m = ...
     fsd.geometry.distanceBetweenPoints(geometry, ...
     prefix + "WHEEL_CENTER", prefix + "CONTACT_PATCH");
+metrics.tieRodLength_m = fsd.geometry.distanceBetweenPoints(geometry, ...
+    prefix + "TIE_ROD_INBOARD", prefix + "TIE_ROD_OUTBOARD");
 end
-

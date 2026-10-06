@@ -1,5 +1,5 @@
 function isValid = validateDoubleWishboneGeometry(geometry)
-%VALIDATEDOUBLEWISHBONEGEOMETRY Validate the canonical v0.1 geometry.
+%VALIDATEDOUBLEWISHBONEGEOMETRY Validate the canonical v0.2 geometry.
 %   Throws errors with stable fsd:model:* identifiers. Returns true when
 %   the complete structure is valid.
 
@@ -12,7 +12,7 @@ requiredTopFields = ["schemaVersion", "kind", "cornerId", ...
     "wheel", "metadata"];
 requireFields(geometry, requiredTopFields, "fsd:model:InvalidSchema");
 
-if string(geometry.schemaVersion) ~= "0.1.0" || ...
+if string(geometry.schemaVersion) ~= "0.2.0" || ...
         string(geometry.kind) ~= "DoubleWishboneGeometry"
     error("fsd:model:InvalidSchema", ...
         "Unsupported or invalid DoubleWishboneGeometry schema.");
@@ -131,11 +131,11 @@ end
 unknown = ids(~ismember(ids, requiredIds));
 if ~isempty(unknown)
     error("fsd:model:UnknownId", ...
-        "Unknown v0.1 hardpoint ID: %s", unknown(1));
+        "Unknown v0.2 hardpoint ID: %s", unknown(1));
 end
 if numel(ids) ~= numel(requiredIds)
     error("fsd:model:InvalidIds", ...
-        "v0.1 requires exactly one row for each required hardpoint ID.");
+        "v0.2 requires exactly one row for each required hardpoint ID.");
 end
 end
 
@@ -189,10 +189,12 @@ if ~isstruct(value) || ~isscalar(value) || ~isfield(value, "pointIds") || ...
     error("fsd:model:InvalidUpright", ...
         "upright.pointIds must be a string column vector.");
 end
-required = cornerId + "_" + ["UBJ"; "LBJ"; "WHEEL_CENTER"];
+required = cornerId + "_" + [ ...
+    "UBJ"; "LBJ"; "TIE_ROD_OUTBOARD"; ...
+    "WHEEL_CENTER"; "CONTACT_PATCH"];
 if ~isequal(value.pointIds, required) || any(~ismember(value.pointIds, ids))
     error("fsd:model:InvalidUpright", ...
-        "Upright references must be UBJ, LBJ, and WHEEL_CENTER.");
+        "Upright references do not match the canonical rigid body.");
 end
 end
 
@@ -245,6 +247,40 @@ assertDistinct(ids, xyz_m, cornerId + "_LCA_FWD_CHASSIS", ...
 assertDistinct(ids, xyz_m, cornerId + "_WHEEL_CENTER", ...
     cornerId + "_CONTACT_PATCH", ...
     "fsd:model:CoincidentWheelReferences");
+assertDistinct(ids, xyz_m, cornerId + "_TIE_ROD_INBOARD", ...
+    cornerId + "_TIE_ROD_OUTBOARD", "fsd:model:CoincidentTieRod");
+assertDistinct(ids, xyz_m, cornerId + "_UBJ", ...
+    cornerId + "_TIE_ROD_OUTBOARD", ...
+    "fsd:model:CoincidentUprightPoints");
+assertDistinct(ids, xyz_m, cornerId + "_LBJ", ...
+    cornerId + "_TIE_ROD_OUTBOARD", ...
+    "fsd:model:CoincidentUprightPoints");
+assertDistinct(ids, xyz_m, cornerId + "_UCA_FWD_CHASSIS", ...
+    cornerId + "_UBJ", "fsd:model:ZeroLengthUcaLink");
+assertDistinct(ids, xyz_m, cornerId + "_UCA_AFT_CHASSIS", ...
+    cornerId + "_UBJ", "fsd:model:ZeroLengthUcaLink");
+assertDistinct(ids, xyz_m, cornerId + "_LCA_FWD_CHASSIS", ...
+    cornerId + "_LBJ", "fsd:model:ZeroLengthLcaLink");
+assertDistinct(ids, xyz_m, cornerId + "_LCA_AFT_CHASSIS", ...
+    cornerId + "_LBJ", "fsd:model:ZeroLengthLcaLink");
+assertNoncollinearUpright(ids, xyz_m, cornerId);
+end
+
+function assertNoncollinearUpright(ids, xyz_m, cornerId)
+ubj = xyz_m(ids == cornerId + "_UBJ", :);
+lbj = xyz_m(ids == cornerId + "_LBJ", :);
+tieOut = xyz_m(ids == cornerId + "_TIE_ROD_OUTBOARD", :);
+v1 = lbj - ubj;
+v2 = tieOut - ubj;
+areaMeasure_m2 = norm(cross(v1, v2), 2);
+tolerances = fsd.model.numericTolerances();
+scale_m = max([norm(v1, 2), norm(v2, 2), 1]);
+threshold_m2 = tolerances.AbsTol_m * scale_m + ...
+    tolerances.RelTol * norm(v1, 2) * norm(v2, 2);
+if areaMeasure_m2 <= threshold_m2
+    error("fsd:model:DegenerateUpright", ...
+        "UBJ, LBJ, and TIE_ROD_OUTBOARD must not be collinear.");
+end
 end
 
 function assertDistinct(ids, xyz_m, idA, idB, errorId)

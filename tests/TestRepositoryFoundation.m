@@ -1,5 +1,5 @@
 classdef TestRepositoryFoundation < matlab.unittest.TestCase
-    % Tests only the repository foundation implemented before v0.1.
+    % Tests the repository foundation shared by all milestones.
 
     properties (TestParameter)
         RequiredDocument = { ...
@@ -27,7 +27,7 @@ classdef TestRepositoryFoundation < matlab.unittest.TestCase
 
     methods (Test)
         function packageIsReachable(testCase)
-            testCase.verifyEqual(fsd.version(), "0.1.0");
+            testCase.verifyEqual(fsd.version(), "0.2.0");
         end
 
         function requiredDocumentationExists(testCase, RequiredDocument)

@@ -1,4 +1,6 @@
 # Examples
 
-Future examples must be small, reproducible MATLAB scripts that call the public `fsd` API. They must not duplicate engineering calculations or act as the only specification of expected behavior.
+- `staticDoubleWishboneExample`: construcción, consulta, reflexión y plot estático con diez hardpoints.
+- `bumpKinematicsExample`: estado cero, bump, rebound, sweep, Camber(WheelTravel) y comparación 3D.
 
+Todos los hardpoints son ficticios y no constituyen targets ni recomendaciones de Formula Student.
