@@ -17,7 +17,7 @@ Solo el directorio `src` debe añadirse al path. MATLAB resuelve los subpaquetes
 
 | Módulo | Responsabilidad prevista |
 |---|---|
-| `model` | Contratos de datos, IDs, unidades declaradas y validación estructural. |
+| `model` | Contratos de datos, IDs, unidades, geometría e identidad canónica. |
 | `geometry` | Primitivas y operaciones geométricas estáticas. |
 | `kinematics` | Solver de bump, continuation y pose física del upright; no contiene reglas ni interpreta toe/caster/KPI. |
 | `analysis` | Camber, toe, bump steer, caster, KPI y curvas derivadas de estados resueltos. |
@@ -59,7 +59,19 @@ Cuando dos módulos necesiten intercambiar información, compartirán un contrat
 
 v0.2 depende de Optimization Toolbox exclusivamente dentro de `kinematics`, mediante `fsolve`. `model` y `geometry` no dependen del toolbox. La cinemática no llama a `rules`, `app`, exporters ni módulos futuros.
 
-Por compatibilidad, `KinematicResult.camber_rad` y `fsd.kinematics.camberFromWheelAxis` continúan disponibles. La implementación canónica de esa interpretación reside desde v0.3 en `fsd.analysis.camberFromWheelAxis`; el wrapper legado es la única dependencia estrecha `kinematics → analysis`. No se añaden toe, caster ni KPI al solver.
+Por compatibilidad, `KinematicResult.camber_rad` y `fsd.kinematics.camberFromWheelAxis` continúan disponibles. La fórmula canónica reside en `fsd.geometry.camberFromWheelAxis`; los wrappers de `kinematics` y `analysis` aplican sus contratos públicos y llaman a esa primitiva. No se añaden toe, caster ni KPI al solver.
+
+La dirección queda acíclica: `analysis → kinematics` para validar resultados, mientras `analysis → geometry` y `kinematics → geometry` consumen primitivas compartidas. `kinematics` no llama a `analysis`.
+
+## Integridad geometry/result
+
+`fsd.model.geometryIdentity` genera una representación canónica versionada con todos los inputs geométricos consumidos por el solver: schema de geometría, `cornerId`, IDs de hardpoints en orden canónico, coordenadas XYZ y wheel axis estático. No incluye display names ni procedencia porque no alteran el mecanismo.
+
+La identidad completa viaja en `KinematicResult`, `BumpSweepResult` y sus análisis derivados. Se compara con igualdad exacta sobre datos canónicos; no es un hash y, por tanto, no introduce colisiones ni dependencias externas. Dos structs de geometría con diferente orden interno pero los mismos IDs y datos físicos producen la misma identidad.
+
+La identidad declara contra qué geometría debe ser coherente el payload; no demuestra criptográficamente qué llamada lo creó. Para impedir una identity sustituida sobre una pose incompatible, el validador reconstruye desde ella las cinco longitudes UCA/LCA/tie rod y comprueba el estado actual, además de Wheel Center travel y wheel axis transformado.
+
+Los validadores `fsd.kinematics.validateSuspensionState`, `validateKinematicResult` y `validateBumpSweepResult` son propietarios del contrato del solver. `analysis` valida primero ese contrato y después exige identidad exacta con la geometría recibida. Un mismatch termina con `fsd:analysis:GeometryMismatch`, antes de calcular métricas.
 
 ## Flujo de datos
 

@@ -58,6 +58,23 @@ bumpSteer(z) = toe(z) - toe(0)
 
 Se conservan por separado `staticToe_rad`, `toe_rad` y `bumpSteer_rad`. `toe(0)` procede de la geometría estática, aunque el sweep solicitado no incluya cero.
 
+El primer punto y el punto más próximo a cero nunca sustituyen a `toe(0)`. Esto aplica igualmente a sweeps solo positivos, solo negativos o que salten directamente de rebound a bump.
+
+## Convergencia y status
+
+- `converged=true` exige exclusivamente `status="CONVERGED"` y payload físico finito y coherente.
+- `converged=false` admite exclusivamente `NO_CONVERGENCE` o `NOT_ATTEMPTED`.
+- Un resultado no convergido conserva target, causa, diagnósticos y referencia estática, pero estado móvil, pose calculada, wheel axis, travel logrado y métricas permanecen en `NaN`.
+- Strings desconocidos o contradicciones entre flag y status invalidan el resultado completo.
+
+`diagnostics.attempted` es booleano y no se deduce de iteraciones:
+
+- `CONVERGED`: `attempted=true`, incluso para un estado exacto reutilizado;
+- `NO_CONVERGENCE`: `attempted=true`, aunque el fallo ocurra antes de completar una iteración formal;
+- `NOT_ATTEMPTED`: `attempted=false` y cero iteraciones, evaluaciones, pasos de continuation y exit flag.
+
+Los corner IDs admiten un char row como `'FL'` o un string escalar no missing. Matrices char, arrays string y valores multidimensionales se rechazan.
+
 ## Solver
 
 v0.2 usa `fsolve` de Optimization Toolbox. Configuración central:

@@ -13,5 +13,5 @@ end
 settings = fsd.kinematics.solverSettings(options);
 results = solveBumpPath(geometry, wheelTravel_m, settings);
 result = results(1);
+fsd.kinematics.validateKinematicResult(result);
 end
-

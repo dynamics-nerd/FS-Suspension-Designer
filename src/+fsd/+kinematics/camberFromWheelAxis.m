@@ -1,7 +1,7 @@
 function camber_rad = camberFromWheelAxis(wheelAxis, cornerId)
 %CAMBERFROMWHEELAXIS Return side-independent camber in radians.
-%   Compatibility wrapper retained for the public v0.2 API. New code may
-%   call fsd.analysis.camberFromWheelAxis directly.
+%   Compatibility wrapper retained for the public v0.2 API. The canonical
+%   equation is implemented by fsd.geometry.camberFromWheelAxis.
 
 if ~isnumeric(wheelAxis) || ~isreal(wheelAxis) || ...
         ~isequal(size(wheelAxis), [1, 3]) || any(~isfinite(wheelAxis))
@@ -17,16 +17,15 @@ end
 wheelAxis = double(wheelAxis) ./ axisNorm;
 
 try
-    camber_rad = fsd.analysis.camberFromWheelAxis(wheelAxis, cornerId);
+    camber_rad = fsd.geometry.camberFromWheelAxis(wheelAxis, cornerId);
 catch cause
     switch cause.identifier
-        case {"fsd:analysis:InvalidWheelAxis", ...
-                "fsd:analysis:DegenerateWheelAxis"}
+        case "fsd:geometry:InvalidWheelAxis"
             error("fsd:kinematics:InvalidWheelAxis", "%s", cause.message);
-        case "fsd:analysis:InvalidWheelAxisOrientation"
+        case "fsd:geometry:InvalidWheelAxisOrientation"
             error("fsd:kinematics:InvalidWheelAxisOrientation", ...
                 "%s", cause.message);
-        case "fsd:analysis:InvalidCorner"
+        case "fsd:geometry:InvalidCorner"
             error("fsd:model:InvalidCorner", "%s", cause.message);
         otherwise
             rethrow(cause)

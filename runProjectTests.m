@@ -3,7 +3,7 @@ function results = runProjectTests()
 
 projectRoot = fileparts(mfilename("fullpath"));
 originalPath = path;
-pathCleanup = onCleanup(@() path(originalPath)); %#ok<NASGU>
+pathCleanup = onCleanup(@() path(originalPath));
 addpath(fullfile(projectRoot, "src"));
 
 suite = matlab.unittest.TestSuite.fromFolder( ...
@@ -15,4 +15,3 @@ if ~isempty(results) && any(~[results.Passed])
     error("fsd:tests:Failed", "One or more project tests did not pass.");
 end
 end
-

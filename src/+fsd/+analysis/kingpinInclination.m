@@ -32,17 +32,5 @@ if abs(axisNorm - 1) > tolerances.AbsTol_m + tolerances.RelTol
 end
 steeringAxis = double(value) ./ axisNorm;
 
-if ~(ischar(cornerId) || (isstring(cornerId) && isscalar(cornerId)))
-    error("fsd:analysis:InvalidCorner", ...
-        "Corner must be one of FL, FR, RL, or RR.");
-end
-cornerId = upper(strtrim(string(cornerId)));
-if ~ismember(cornerId, ["FL", "FR", "RL", "RR"])
-    error("fsd:analysis:InvalidCorner", ...
-        "Corner must be one of FL, FR, RL, or RR.");
-end
-sideSign = 1;
-if ismember(cornerId, ["FL", "RL"])
-    sideSign = -1;
-end
+[~, sideSign] = normalizeCornerId(cornerId);
 end

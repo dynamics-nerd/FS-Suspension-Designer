@@ -14,6 +14,8 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 - camber, toe absoluto, bump steer, caster y kingpin inclination (KPI) con
   signo coherente FL/FR;
 - análisis de un estado y de un sweep completo, conservando fallos como `NaN`;
+- identidad canónica que impide analizar un resultado con otra geometría;
+- validación completa de estados, status, campos redundantes y cinco constraints contra la identidad declarada;
 - cinco curvas frente a wheel travel y tiempos separados de solver/análisis;
 - diagnóstico explícito de convergencia;
 - visualización estática/desplazada y persistencia MAT de la geometría.
@@ -60,6 +62,10 @@ analysis = fsd.analysis.analyzeBumpSweep(geometry, sweep);
 
 Si `result.converged` es falso, sus puntos y camber son `NaN`; la causa y los residuos permanecen en `result.diagnostics` y `result.failureReason`.
 
+Cada `KinematicResult` y `BumpSweepResult` contiene `geometryIdentity`. Las APIs de análisis rechazan con `fsd:analysis:GeometryMismatch` cualquier combinación geometry/result que no tenga identidad exacta; nunca adaptan el resultado silenciosamente.
+
+Además de comparar identidades, cada resultado convergido se valida físicamente contra las longitudes UCA FWD/AFT, LCA FWD/AFT y tie rod reconstruidas desde esa identidad. `diagnostics.attempted` distingue un solve fallido de un target no intentado.
+
 ## Estructura
 
 - `src/+fsd/+model`: schema, validación, unidades y persistencia.
@@ -72,7 +78,7 @@ Si `result.converged` es falso, sus puntos y camber son `NaN`; la causa y los re
 
 ## Compatibilidad
 
-El constructor conserva su firma de v0.1, pero el schema canónico pasa a `0.2.0` y exige `TIE_ROD_INBOARD` y `TIE_ROD_OUTBOARD`. Un MAT de schema 0.1 no se interpreta silenciosamente porque carece del constraint necesario para determinar la pose del upright.
+El constructor conserva su firma de v0.1. `DoubleWishboneGeometry` y `SuspensionState` mantienen schema `0.2.0`; `KinematicResult`, `BumpSweepResult` y los resultados de análisis usan schema `0.3.0`. La geometría exige `TIE_ROD_INBOARD` y `TIE_ROD_OUTBOARD`. Un MAT de schema 0.1 no se interpreta silenciosamente porque carece del constraint necesario para determinar la pose del upright.
 
 ## Aviso
 

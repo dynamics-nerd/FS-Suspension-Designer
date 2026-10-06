@@ -27,6 +27,12 @@
 - **CAS-001:** caster se obtiene en XZ; positivo cuando el extremo UBJ está hacia `+X`.
 - **KPI-001:** `kingpinInclination` se obtiene en YZ; positivo hacia el centro y simétrico por lado.
 - **ANA-001:** estados no convergidos se conservan sin interpolación, con métricas `NaN` y status original.
+- **ID-001:** resultados cinemáticos vinculados mediante identidad canónica versionada, sin hash: schema, corner, IDs/XYZ canónicos y wheel axis.
+- **VAL-001:** `kinematics` posee los validadores de `SuspensionState`, `KinematicResult` y `BumpSweepResult`; `analysis` añade la comprobación contra la geometría recibida.
+- **VAL-002:** `converged` y `status` forman una invariante cerrada; no se admiten statuses libres.
+- **ID-002:** la identidad es una declaración canónica, no provenance criptográfica; la coherencia se demuestra verificando pose, travel, wheel axis y cinco constraints externos.
+- **VAL-003:** `diagnostics.attempted` distingue solve ejecutado de target no intentado sin inferirlo de los contadores de `fsolve`.
+- **ARCH-001:** la fórmula única de camber reside en `geometry`; `kinematics` y `analysis` son wrappers sin dependencia circular.
 
 ## Abiertas
 

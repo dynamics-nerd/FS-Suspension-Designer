@@ -42,11 +42,21 @@ state.wheelAxis
 state.wheelTravel_m
 ```
 
+El contrato exige todos esos campos. `pointIds` sigue el orden canónico UBJ, LBJ, tie-rod-outboard, Wheel Center y Contact Patch. Cada campo conveniente debe coincidir con su fila en `xyz_m`; `state.wheelAxis` debe ser unitario y `state.wheelTravel_m` escalar.
+
+El payload tiene dos modos válidos:
+
+- `FINITE`: todos los datos móviles son finitos para un resultado convergido;
+- `NAN`: todas las coordenadas, wheel axis y wheel travel son `NaN` para un resultado no convergido.
+
+No se admiten estados parciales ni mezclas finite/NaN.
+
 ## KinematicResult
 
 ```matlab
-result.schemaVersion
+result.schemaVersion               % "0.3.0"
 result.kind                       % "KinematicResult"
+result.geometryIdentity
 result.requestedWheelTravel_m
 result.achievedWheelTravel_m
 result.converged
@@ -62,15 +72,48 @@ result.camber_rad
 result.diagnostics
 ```
 
-Diagnostics incluyen solver/toolbox, IDs de constraints, errores dimensionales, residuos escalados, exit flag, iteraciones, evaluaciones, pasos de continuación y mensaje.
+Diagnostics incluyen solver/toolbox, `attempted`, IDs de constraints, errores dimensionales, residuos escalados, exit flag, iteraciones, evaluaciones, pasos de continuación y mensaje.
 
-Si no converge, `converged=false` y la pose, puntos, wheel axis y camber son `NaN`; no se publica una configuración falsa.
+Invariantes:
+
+- `converged=true` implica `status="CONVERGED"`, state/pose/wheel axis/camber finitos y `failureReason` vacío;
+- `converged=false` implica `NO_CONVERGENCE` o `NOT_ATTEMPTED`, `failureReason` no vacío y payload móvil `NaN`;
+- `state.wheelAxis == result.wheelAxis`;
+- campos convenientes del state, pose, matriz/rotation vector, wheel travel y camber deben ser mutuamente coherentes;
+- las cinco longitudes externas UCA FWD/AFT, LCA FWD/AFT y tie rod deben satisfacer la geometría de `geometryIdentity`;
+- `geometryIdentity` debe ser válida.
+
+Relación obligatoria con diagnostics:
+
+```text
+CONVERGED       <=> converged=true  y attempted=true
+NO_CONVERGENCE  <=> converged=false y attempted=true
+NOT_ATTEMPTED   <=> converged=false y attempted=false, sin actividad solver
+```
 
 ## BumpSweepResult
 
-Contiene vectores de travel solicitado/logrado, camber, flags, tiempo total y cada `KinematicResult`. El orden de entrada se conserva y sirve como recorrido de continuation.
+Contiene schema `0.3.0`, `geometryIdentity`, vectores de travel solicitado/logrado, camber, flags, tiempo total y cada `KinematicResult`. El orden de entrada se conserva y sirve como recorrido de continuation.
 
-Su schema permanece en `0.2.0`: v0.3 no cambia el solver ni la geometría persistida.
+Todos los resultados contenidos deben tener la misma identidad, cardinalidad y valores agregados que el sweep.
+
+## DoubleWishboneGeometryIdentity
+
+Representación canónica versionada generada por `fsd.model.geometryIdentity`:
+
+```matlab
+identity.schemaVersion            % "1.0.0"
+identity.kind                     % "DoubleWishboneGeometryIdentity"
+identity.geometrySchemaVersion    % "0.2.0"
+identity.cornerId
+identity.hardpointIds             % 10-by-1, orden canónico
+identity.hardpointXyz_m           % 10-by-3, alineado con los IDs
+identity.wheelAxis                % 1-by-3
+```
+
+Estos son exactamente los datos de geometría consumidos por el solver. Connectivity, nombres, metadata descriptiva y procedencia quedan fuera porque no alteran el cálculo. La comparación es exacta entre representaciones ya validadas y canónicas.
+
+La identidad no es una prueba criptográfica de procedencia. `validateKinematicResult` demuestra en cambio que el payload satisface la pose rígida, el travel, el wheel axis y las cinco restricciones físicas de la geometría declarada.
 
 ## CornerKinematicAnalysis
 
@@ -79,6 +122,7 @@ Struct escalar, sin estado oculto, derivado de un `KinematicResult`:
 ```matlab
 analysis.schemaVersion                % "0.3.0"
 analysis.kind                         % "CornerKinematicAnalysis"
+analysis.geometryIdentity
 analysis.cornerId
 analysis.requestedWheelTravel_m
 analysis.wheelTravel_m                % achieved; NaN si no convergió
@@ -101,6 +145,7 @@ Mantiene exactamente el orden y cardinalidad del `BumpSweepResult`:
 
 ```matlab
 sweepAnalysis.requestedWheelTravel_m
+sweepAnalysis.geometryIdentity
 sweepAnalysis.wheelTravel_m
 sweepAnalysis.camber_rad
 sweepAnalysis.staticToe_rad
@@ -141,6 +186,12 @@ stateAnalysis = fsd.analysis.analyzeCornerState(geometry, result)
 sweepAnalysis = fsd.analysis.analyzeBumpSweep(geometry, sweep)
 handles = fsd.analysis.plotBumpSweepAnalysis(sweepAnalysis)
 
+identity = fsd.model.geometryIdentity(geometry)
+fsd.model.validateGeometryIdentity(identity)
+fsd.kinematics.validateSuspensionState(state, identity, payloadKind)
+fsd.kinematics.validateKinematicResult(result)
+fsd.kinematics.validateBumpSweepResult(sweep)
+
 R = fsd.geometry.rotationVectorToMatrix(rotationVector_rad)
 points = fsd.geometry.transformPointsRigid(points, reference, translation, R)
 ```
@@ -156,4 +207,6 @@ MAT sigue siendo el formato canónico. Solo se persiste `DoubleWishboneGeometry`
 - modelo: `CoincidentTieRod`, `CoincidentUprightPoints`, `DegenerateUpright`, `ZeroLengthUcaLink`, `ZeroLengthLcaLink`;
 - geometría: `InvalidRotationVector`, `InvalidRotationMatrix`, `InvalidPoints`, `InvalidReferencePoint`, `InvalidTranslation`;
 - cinemática: `InvalidWheelTravel`, `InvalidOptions`, `MissingOptimizationToolbox`, `InvalidWheelAxisOrientation`, `InvalidResult`.
-- análisis: `InvalidGeometry`, `InvalidKinematicResult`, `InvalidBumpSweep`, `InvalidSweepAnalysis`, `InvalidWheelAxis`, `DegenerateWheelAxis`, `NonUnitWheelAxis`, `InvalidWheelAxisOrientation`, `DegenerateToeProjection`, `InvalidPoint`, `InvalidSteeringAxis`, `DegenerateSteeringAxis`, `NonUnitSteeringAxis`, `DegenerateCasterProjection`, `DegenerateKingpinProjection`, `InvalidCorner`, `InvalidFigure`.
+- identidad/modelo: `InvalidGeometryIdentity`;
+- contratos cinemáticos: `InvalidSuspensionState`, `InvalidKinematicResult`, `InvalidBumpSweepResult`;
+- análisis: `InvalidGeometry`, `GeometryMismatch`, `InvalidKinematicResult`, `InvalidBumpSweep`, `InvalidSweepAnalysis`, `InvalidWheelAxis`, `DegenerateWheelAxis`, `NonUnitWheelAxis`, `InvalidWheelAxisOrientation`, `DegenerateToeProjection`, `InvalidPoint`, `InvalidSteeringAxis`, `DegenerateSteeringAxis`, `NonUnitSteeringAxis`, `DegenerateCasterProjection`, `DegenerateKingpinProjection`, `InvalidCorner`, `InvalidFigure`.

@@ -118,7 +118,7 @@ camber = -atan2(a_z, a_out)
 
 Camber se devuelve en radianes. Toe no se calcula ni se publica en v0.2.
 
-Desde v0.3, `fsd.analysis.camberFromWheelAxis` es la implementación canónica. La función homónima de `fsd.kinematics` permanece como wrapper de compatibilidad v0.2.
+Desde v0.3, `fsd.geometry.camberFromWheelAxis` contiene la única implementación de la ecuación. `fsd.analysis.camberFromWheelAxis` aplica la validación estricta v0.3 y `fsd.kinematics.camberFromWheelAxis` permanece como wrapper compatible con v0.2.
 
 ## Toe
 
@@ -180,7 +180,7 @@ Para wheel travel `z`:
 bumpSteer(z) = toe(z) - toe(0)
 ```
 
-`toe(0)` es el toe de la geometría estática canónica, no el primer punto del sweep. Así se preservan separadamente el toe estático, el toe instantáneo y el cambio debido al movimiento. No se interpola sobre estados no convergidos.
+`toe(0)` es el toe de la geometría estática canónica, no el primer punto del sweep. Si cero no está solicitado, tampoco se sustituye por el target más próximo a cero. Así se preservan separadamente el toe estático, el toe instantáneo y el cambio debido al movimiento. No se interpola sobre estados no convergidos.
 
 ## Reflexión lateral
 
