@@ -58,9 +58,37 @@
 - **FAIL-001:** un estado de sweep no convergido se construye como payload
   inválido nuevo; no hereda geometría dinámica de un análisis estático válido.
 
+## Cerradas en v0.5
+
+- **RACK-001:** el eje positivo del rack va de
+  `FL_TIE_ROD_INBOARD` a `FR_TIE_ROD_INBOARD`; ambos joints reciben la misma
+  traslación `q*u_rack`. El signo de `q` no define el sentido del giro.
+- **STR-001:** continuation canónica en dos etapas: wheel travel con rack cero
+  y rack travel manteniendo el wheel travel objetivo.
+- **HDG-001:** el heading delantero se deriva del wheel axis proyectado; recto
+  es `[-1,0,0]` y road-wheel angle positivo apunta a `+Y` para ambos lados.
+- **ANG-001:** diferencias angulares mediante
+  `atan2(sin(delta),cos(delta))`.
+- **SCR-001:** `scrub=sideSign*(C_y-S_y)`; positivo es contacto más outboard.
+- **TRL-001:** `mechanicalTrail=C_x-S_x`; positivo es intersección por delante
+  con X global positivo hacia atrás.
+- **ACK-001:** ICR por heading/contacto real sobre `X=rearAxleX`; no se usa la
+  fórmula simétrica clásica como definición general.
+- **ACK-002:** `ackermannAngleError=wrap(actualOuter-idealOuter)` y no se
+  publica porcentaje Ackermann.
+- **ACK-003:** el turn se deduce del steering inducido por rack, no del signo
+  del rack; cerca de recto se publica un status y un ICR proyectivo infinito.
+- **VAL-004:** la validez del análisis de steering es bilateral; un fallo
+  unilateral invalida métricas de ambos lados pero conserva diagnostics por
+  esquina.
+- **PERF-001:** las APIs públicas validan y delegan en un core de análisis
+  privado; un rack sweep validado no revalida cada estado durante analysis.
+- **REG-001:** la compatibilidad rack cero se protege además con constantes
+  golden obtenidas de v0.4.0 commit `6cf64c5c0a23d4c4deb396681a8dfdf2d2f4443d`.
+
 ## Abiertas
 
 - **OPEN DECISION NM-001:** nomenclatura de endpoints de actuación.
 - **OPEN DECISION NM-002:** representación del eje del rocker.
 
-No han aparecido decisiones humanas nuevas que bloqueen v0.4.
+No han aparecido decisiones humanas nuevas que bloqueen v0.5.

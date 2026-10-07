@@ -63,7 +63,7 @@ No incluye:
 
 ## v0.4 — Axle Geometry, Front-View Instant Centers & Roll Center
 
-Estado: **implementada, pendiente de auditoría independiente**.
+Estado: **implementada**.
 
 Incluye composición FRONT/REAR asimétrica, identity de eje, restricciones
 frontales derivadas de la velocidad instantánea 3D, FVIC proyectivo con
@@ -94,6 +94,68 @@ ni App Designer.
 10. Los puntos fallidos del sweep no contienen una copia de datos dinámicos
     pertenecientes al estado estático.
 
+## v0.5 — Steering Geometry, Rack Kinematics, Scrub Radius, Mechanical Trail & Ackermann
+
+Estado: **implementada**.
+
+Incluye:
+
+- `SteeringSystemGeometry` exclusivamente para `FRONT`, con identity propia y
+  referencia mínima `rearAxleX`;
+- rack rígido definido por los inner tie-rod joints reales, con eje oblicuo
+  permitido y travel en m/mm;
+- núcleo de esquina generalizado con tie-rod inboard prescrito, reutilizado
+  por bump y steering sin duplicar el solver;
+- wheel travel simétrico o `[left,right]` combinado con rack travel;
+- continuation en dos etapas: wheel travel con rack cero y después rack a
+  wheel travel constante;
+- road-wheel heading/angle, deflexión desde estático y steering inducido por
+  rack, separados de toe y bump steer;
+- intersección eje de dirección–plano de contacto, scrub radius y mechanical
+  trail con signos globales documentados;
+- Ackermann por ICR sobre la línea del eje trasero, compatible con static toe,
+  wheel stagger y contactos reales, con tratamiento proyectivo near-straight;
+- rack sweeps, análisis, visualización 3D y curvas en mm/grados;
+- propagación explícita de fallos e integridad system/result/sweep.
+
+No incluye steering wheel/column, pinion ratio, fuerzas de dirección,
+compliance, pneumatic trail, body roll, full vehicle, actuación, packaging,
+rules, neumáticos de fuerzas, dinámica, optimización, Adams ni App Designer.
+
+### Criterios de aceptación v0.5
+
+1. Rack cero reproduce `solveBump` para el mismo wheel travel.
+2. Ambos inner joints reciben la misma traslación sobre el eje FL→FR y
+   conservan su separación, incluso con rack oblicuo.
+3. El solver combinado cierra cuatro links UCA/LCA y tie rod, preserva upright,
+   wheel attachment, travel, wheel axis y contacto.
+4. Heading recto es `[-1,0,0]`; ángulo positivo apunta a `+Y`; las diferencias
+   son robustas en ±pi.
+5. Scrub/trail reproducen casos analíticos cero, positivos, negativos y espejo.
+6. Ackermann ideal produce ICR común/error cero; parallel steering y casos a
+   ambos lados del ideal producen error con signo documentado.
+7. Rack cero con static toe no se publica como giro Ackermann y conserva las
+   curvas toe/bump-steer v0.3.
+8. Round trips, giros espejo, wheel stagger, bump+steering y rack imposible
+   tienen tests independientes.
+9. Ningún análisis bilateral se publica válido con una esquina fallida.
+10. Pasan la suite histórica y nueva, todos los ejemplos, Code Analyzer,
+    comprobación de dependencias y `git diff --check`.
+
+## Futuro — Longitudinal Anti-Geometry
+
+Milestone no iniciada. Deberá tratar por separado y con terminología aprobada:
+
+- anti-dive;
+- anti-lift / anti-rise según condición y eje;
+- anti-squat.
+
+Como mínimo requerirá geometría side-view, wheelbase, posición/altura de CG,
+definición del camino de fuerzas, brake-force distribution cuando corresponda
+y driven axle/drive-force assumptions cuando corresponda. Antes de implementar
+habrá que fijar explícitamente terminología, ecuaciones, signos y definición de
+cualquier porcentaje. v0.5 no calcula ninguna de estas magnitudes.
+
 ## Milestone siguiente
 
-No se define ni se inicia v0.5 en este cambio.
+No se define ni se inicia v0.6 en este cambio.

@@ -28,7 +28,10 @@ No representa damper travel, movimiento de ball joints ni heave del vehículo.
 
 La pose del upright no queda determinada solo por UBJ y LBJ: esos puntos permiten una rotación libre alrededor de su línea. v0.2 añade `TIE_ROD_INBOARD` fijo al chasis y `TIE_ROD_OUTBOARD` rígidamente unido al upright. Con steering input fijo, la longitud del tie rod es constante y elimina ese grado de libertad.
 
-Los pivotes interiores UCA/LCA y `TIE_ROD_INBOARD` permanecen fijos. El upright rígido contiene UBJ, LBJ, `TIE_ROD_OUTBOARD`, Wheel Center, Contact Patch y wheel axis.
+Los pivotes interiores UCA/LCA permanecen fijos. En bump aislado,
+`TIE_ROD_INBOARD` también permanece fijo; en steering v0.5 su posición es un
+input prescrito por el rack. El upright rígido contiene UBJ, LBJ,
+`TIE_ROD_OUTBOARD`, Wheel Center, Contact Patch y wheel axis.
 
 ## Variables del solver
 
@@ -98,6 +101,124 @@ Se utiliza `fsolve` de Optimization Toolbox con algoritmo trust-region-dogleg. L
 Para un target no nulo se avanza desde la última solución convergida mediante pasos internos de wheel travel de tamaño máximo configurable, por defecto `5 mm`. Cada solución es el initial guess del paso siguiente. Un sweep conserva la continuación entre targets consecutivos. Esta estrategia selecciona la rama conectada continuamente con la geometría estática; no selecciona una raíz arbitraria.
 
 Una solución solo se acepta cuando `fsolve` informa convergencia y el error dimensional máximo de las cinco longitudes cumple las tolerancias numéricas del proyecto. Un fallo devuelve `converged=false` y no expone una pose como si fuera válida.
+
+## Rack y cierre combinado v0.5
+
+Sean los inner joints estáticos `P_L` y `P_R`. El rack unitario y las
+posiciones actuales son:
+
+```text
+u_rack = (P_R-P_L) / norm(P_R-P_L)
+P_L(q) = P_L + q*u_rack
+P_R(q) = P_R + q*u_rack
+```
+
+Ambos puntos tienen la misma traslación, su separación permanece constante y
+el rack no rota. No se exige `u_rack=[0,1,0]`.
+
+El núcleo generalizado resuelve exactamente las cinco restricciones anteriores
+sustituyendo la última por:
+
+```text
+|P_tie,inboard,prescribed - TIE_ROD_OUTBOARD(q_pose,w)| = L_TIE_ROD
+```
+
+`solveBump` prescribe el inboard estático y mantiene su API histórica. Para
+steering, la continuation determinista es: (1) desde `[wheelTravel=0,rack=0]`
+hasta el wheel travel objetivo con rack cero; (2) mantener ese wheel travel y
+avanzar el rack hasta el target. El tamaño de paso se limita usando el máximo
+entre incremento absoluto de wheel travel y norma de la traslación del inner
+joint.
+
+## Road-wheel heading y ángulos
+
+Para wheel axis unitario `a=[a_x,a_y,a_z]` interior→exterior y
+`s=sideSign`, se proyecta primero al plano horizontal y se normaliza como
+`b=[a_x,a_y,0]/norm([a_x,a_y])`. Rotarla 90 grados y escoger el sentido
+delantero produce:
+
+```text
+h = s * [-b_y, b_x, 0]
+roadWheelAngle = atan2(h_y, -h_x)
+```
+
+Con rueda recta, `a=[0,s,0]` y `h=[-1,0,0]`. Por tanto, ángulo positivo
+apunta a `+Y`. Las diferencias angulares usan siempre:
+
+```text
+wrap(delta) = atan2(sin(delta), cos(delta))
+steerDeflectionFromStatic = wrap(psi_current-psi_static)
+rackInducedSteer = wrap(psi(w,q)-psi(w,0))
+```
+
+Toe conserva su definición v0.3 independiente; no se sustituye por estos
+ángulos.
+
+## Intersección del steering axis con el plano horizontal
+
+Con `k=UBJ-LBJ` y plano `Z=z_road`, la recta es `LBJ+t*k`. Si `k_z` es no
+nulo:
+
+```text
+t = (z_road-LBJ_z)/k_z
+S = LBJ+t*k
+conditioning = abs(k_z/norm(k))
+```
+
+Si el eje es degenerado se publica `DEGENERATE`; si es paralelo o
+numéricamente indistinguible del plano, `PARALLEL`. Una solución finita puede
+marcarse ill-conditioned sin inventar un punto distante.
+
+## Scrub radius y mechanical trail
+
+Para contacto geométrico actual `C`, intersección `S` y `s=sideSign`:
+
+```text
+scrubRadius = s*(C_y-S_y)
+mechanicalTrail = C_x-S_x
+```
+
+Scrub positivo significa que el contacto está más outboard. Con X positivo
+hacia atrás, trail positivo significa que `S` está por delante de `C`. Ambos
+usan el steering axis y contacto actuales en bump, rebound o steering. Trail
+es exclusivamente mecánico, no neumático.
+
+## Ackermann por ICR geométrico
+
+La referencia mínima del eje trasero es `I_x=rearAxleX`. Para cada contacto
+`C` y heading horizontal `h`, el ICR sobre esa línea satisface
+`h dot (I-C)=0`, luego:
+
+```text
+I_y = C_y - h_x*(rearAxleX-C_x)/h_y
+```
+
+Una forma proyectiva unidimensional equivalente, usada para razonar sin
+forzar la división, es:
+
+```text
+[numerator, denominator]
+numerator   = h_y*C_y - h_x*(rearAxleX-C_x)
+denominator = h_y
+```
+
+Si `h_y` es casi cero, el ICR es `INFINITE`; sus coordenadas euclídeas son
+`NaN`. `conditioning=abs(h_y)` para un heading unitario. Esto evita presentar
+una distancia enorme como un ICR fiable cerca de recto.
+
+Para un giro definido por `rackInducedSteer`, FR es inner en giro derecho y
+FL en giro izquierdo. Se toma el ICR de la rueda inner y se construye para el
+contacto exterior real —incluido wheel stagger— el heading tangente al radio
+contacto–ICR y orientado hacia `-X`. El error adoptado es:
+
+```text
+ackermannAngleError = wrap(actualOuterAngle-idealOuterAngle)
+icrMismatch = ICR_left_y-ICR_right_y
+```
+
+No se define porcentaje Ackermann. En rack cero/steering despreciable se
+publica `NEAR_STRAIGHT`; el toe estático por sí solo no convierte ese estado
+en un turn válido.
 
 ## Camber
 
@@ -416,8 +537,9 @@ Este resultado se deriva de la ecuación del círculo y no del solver.
 ## Límites geométricos
 
 `CONTACT_PATCH` continúa rígidamente unido al upright en el estado cinemático.
-v0.4 añade un contacto circular ideal solo para la construcción de roll center.
-No se publican scrub radius ni mechanical/pneumatic trail.
+v0.4 añade un contacto circular ideal para la construcción de roll center;
+v0.5 reutiliza ese contacto para scrub y mechanical trail. No se publica
+pneumatic trail.
 
 La geometría proyectiva YZ de v0.4 conserva un IC en infinito como dirección.
 Por ello puede construir su línea contacto–IC y, junto al otro lado, producir
@@ -432,5 +554,5 @@ tolerancia física.
 ## Pending mathematical specifications
 
 No están especificados ni implementados body roll, roll axis de vehículo,
-steering input/rack motion, Ackermann, scrub radius, trail, anti geometry,
-actuation, compliance, neumáticos de fuerzas ni dinámica.
+steering wheel/column, pinion ratio, fuerzas o compliance de dirección,
+pneumatic trail, anti geometry, actuation, neumáticos de fuerzas ni dinámica.

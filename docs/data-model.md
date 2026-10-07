@@ -1,4 +1,4 @@
-# Modelo de datos v0.4
+# Modelo de datos v0.5
 
 ## DoubleWishboneGeometry
 
@@ -295,8 +295,85 @@ handles = fsd.analysis.plotRollCenterMigration(migration)
 ## Persistencia
 
 MAT sigue siendo el formato canónico. La persistencia automática continúa
-limitada a `DoubleWishboneGeometry`; axle, estados, resultados y caches no se
-guardan automáticamente en v0.4.
+limitada a `DoubleWishboneGeometry`; axle, steering, estados, resultados y
+caches no se guardan automáticamente en v0.5.
+
+## SteeringSystemGeometry
+
+Es un struct escalar serializable, no una clase. Compone el eje delantero sin
+duplicar sus hardpoints:
+
+```matlab
+steering.schemaVersion                 % "0.5.0"
+steering.kind                          % "SteeringSystemGeometry"
+steering.frontAxleGeometry             % AxleGeometry FRONT
+steering.rackGeometry.leftInnerStatic_m
+steering.rackGeometry.rightInnerStatic_m
+steering.rackGeometry.axisDirection    % unitario, FL -> FR
+steering.rackGeometry.jointSeparation_m
+steering.rearAxleX_m                   % referencia mínima Ackermann
+steering.identity                      % SteeringSystemGeometryIdentity
+```
+
+La identity contiene la identity completa del eje delantero, los extremos y
+eje canónico del rack y `rearAxleX_m`. Cambiar una esquina, intercambiar
+FL/FR o cambiar la referencia trasera produce otra identity.
+
+## SteeringCornerResult y SteeringAxleResult
+
+Cada esquina conserva state, pose, wheel axis, camber y diagnostics del
+solver, y añade rack solicitado/logrado, inboard estático/actual, contacto
+geométrico y un `rackZeroKinematicResult` a igual wheel travel. Esta referencia
+permite separar steering de rack y bump steer sin repetir el solve en analysis.
+
+`SteeringAxleResult` compone FL/FR, la identity del sistema, targets de rack y
+wheel travel, flags/status por lado, diagnostics agregados y tiempo. Solo es
+`CONVERGED` si ambas esquinas convergen. Un corner fallido usa `NaN` en su
+payload móvil y el análisis bilateral queda inválido.
+
+## RackSweepResult y análisis
+
+`RackSweepResult` conserva el orden exacto de rack travel, wheel travel FL/FR,
+un `SteeringAxleResult` por target, convergencia/status y tiempo del solver.
+La continuation se realiza sobre el recorrido ordenado, no mediante solves
+independientes.
+
+`SteeringAxleAnalysis` contiene por lado heading, ángulo absoluto, deflexión
+desde estático, steering inducido por rack, toe, bump steer, eje de dirección,
+contacto, intersección con el plano de contacto, scrub y mechanical trail. Su
+bloque Ackermann contiene ICR FL/FR, dirección, inner/outer, mismatch, ángulos
+actuales/ideal, error angular, status y conditioning.
+
+`RackSweepAnalysis` agrega esas magnitudes en vectores sin aplanar ni perder
+los states completos. No interpola fallos.
+
+La validez de esas métricas es bilateral. Si solo converge una esquina, los
+dos bloques laterales tienen status `KINEMATICS_NOT_CONVERGED` y magnitudes,
+contacto e intersección derivados en `NaN`. Cada bloque conserva
+`kinematicConverged`, `kinematicStatus`, `kinematicFailureReason` y
+`solverDiagnostics`, por lo que invalidar el análisis no elimina el diagnóstico
+individual.
+
+## API pública v0.5
+
+```matlab
+steering = fsd.model.createSteeringSystem(frontAxle, rearAxleX, unit)
+fsd.model.validateSteeringSystemGeometry(steering)
+identity = fsd.model.steeringSystemIdentity(steering)
+
+result = fsd.kinematics.solveSteering( ...
+    steering, rackTravel, wheelTravel, unit)
+sweep = fsd.kinematics.solveRackSweep( ...
+    steering, rackTravelVector, wheelTravel, unit)
+
+analysis = fsd.analysis.analyzeSteering(steering, result)
+sweepAnalysis = fsd.analysis.analyzeRackSweep(steering, sweep)
+handles = fsd.analysis.plotSteeringSystem(steering, result, analysis)
+handles = fsd.analysis.plotSteeringSweep(sweepAnalysis)
+```
+
+`wheelTravel` puede ser escalar o `[left,right]`. Longitudes públicas aceptan
+`"m"` o `"mm"`; el modelo y todos los resultados almacenan metros/radianes.
 
 ## Error IDs añadidos
 

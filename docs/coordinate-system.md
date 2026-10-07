@@ -97,3 +97,17 @@ almacena un plano `X=constante`: cada restricción frontal procede de proyectar
 la velocidad instantánea 3D de su ball joint al plano matemático YZ. Así, el
 resultado conserva correctamente ejes interiores oblicuos y longitudinal
 stagger sin introducir una referencia artificial compartida.
+
+## Dirección y referencia trasera
+
+La dirección longitudinal de avance es `-X`. Un heading horizontal de rueda
+recta es, por tanto, `[-1,0,0]`. Un heading con componente Y positiva apunta
+hacia la derecha del vehículo y tiene road-wheel angle positivo; una
+componente Y negativa apunta hacia la izquierda y tiene ángulo negativo.
+Esta definición global no cambia entre FL y FR.
+
+El rack tiene sentido canónico desde el inner joint FL hacia el FR. Su signo
+es geométrico y no codifica left/right turn. La línea de referencia trasera
+para Ackermann es `X=rearAxleX`; con el origen nominal delantero se espera
+habitualmente `rearAxleX>0`, pero v0.5 no impone esa expectativa como límite
+físico. Wheel stagger permanece permitido: cada contacto conserva su X real.

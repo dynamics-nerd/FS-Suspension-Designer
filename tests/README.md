@@ -83,3 +83,35 @@ Los tests sin cero verifican directamente `bumpSteer=toe-staticToe`, además de 
   de puntos sin convergencia bilateral, con payload fallido completamente
   inválido y sin datos dinámicos clonados del estado estático;
 - plots de vista frontal y migración en unidades de presentación.
+
+## Cobertura v0.5
+
+- construcción FRONT, identity, unidades m/mm, rack oblicuo y rechazo de eje
+  trasero o joints coincidentes;
+- compatibilidad exacta `rack=0` con `solveBump` para distintos wheel travels;
+- traslación rígida de ambos inner joints y conservación de separación;
+- cierre combinado con wheel travel asimétrico y rack travel;
+- round trips `0 -> +rack -> 0` y `0 -> -rack -> 0`;
+- heading/road-wheel angle analíticos y wrapping alrededor de ±pi;
+- intersección de steering axis finita, paralela y condicionamiento;
+- scrub y mechanical trail cero, positivos, negativos y espejo FL/FR;
+- Ackermann clásico ideal con ICR común, parallel steering, signo del error a
+  ambos lados del ideal, near-straight, static toe y wheel stagger;
+- curvas toe/bump-steer preservadas con rack cero;
+- giros espejo para racks opuestos, contactos y métricas laterales;
+- rack imposible, payload `NaN`, Ackermann inválido e integrity mismatch;
+- fallo unilateral FL/FR: invalida ambos lados del análisis, conserva
+  diagnostics individuales y propaga `NaN` en sweeps sin reutilizar datos;
+- rechazo de un rack sweep manipulado antes de entrar al core privado;
+- sweep ordenado, análisis agregado y cinco visualizaciones en unidades de
+  presentación.
+
+Los expected de heading, scrub, trail e ICR se obtienen mediante geometría
+analítica y relaciones independientes, no realimentando outputs del solver.
+
+`TestV04GoldenRegression` añade referencias numéricas generadas con MATLAB
+R2025b desde el commit v0.4.0
+`6cf64c5c0a23d4c4deb396681a8dfdf2d2f4443d`, anterior a la generalización del
+solver. Cubre FL a 0/+20/-20 mm, FR a +20/-20 mm y una geometría 3D a +12 mm;
+compara UBJ, LBJ, tie-rod outboard, Wheel Center, wheel axis, camber y toe sin
+llamar a `solveBump` actual como expected.

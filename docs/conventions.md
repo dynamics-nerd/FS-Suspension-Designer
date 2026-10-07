@@ -13,7 +13,7 @@ Cada ID es `<CORNER>_<POINT_ROLE>`, con corner `FL`, `FR`, `RL` o `RR`. Son obli
 - `TIE_ROD_INBOARD`, `TIE_ROD_OUTBOARD`;
 - `WHEEL_CENTER`, `CONTACT_PATCH`.
 
-`TIE_ROD` es el nombre técnico genérico también para una futura toe link trasera. `TIE_ROD_INBOARD` permanece fijo en v0.2 y `TIE_ROD_OUTBOARD` forma parte del upright rígido.
+`TIE_ROD` es el nombre técnico genérico también para una futura toe link trasera. `TIE_ROD_INBOARD` permanece fijo en la cinemática de esquina aislada y `TIE_ROD_OUTBOARD` forma parte del upright rígido. En `SteeringSystemGeometry` delantero, los dos inboards son los joints de un rack rígido y se trasladan juntos.
 
 IDs estables y `displayName` continúan separados.
 
@@ -121,6 +121,45 @@ respecto al chasis fijo. No representa body heave ni body roll.
 
 El roll center de v0.4 es una construcción cinemática frontal. No implica una
 línea de acción de fuerza, compliance ni un centro de fuerza.
+
+## Dirección por rack v0.5
+
+Los puntos estáticos `P_L=FL_TIE_ROD_INBOARD` y
+`P_R=FR_TIE_ROD_INBOARD` definen el eje unitario canónico
+`u_rack=(P_R-P_L)/norm(P_R-P_L)`. Su sentido positivo es siempre izquierda
+hacia derecha, aunque tenga componentes X o Z. Un rack travel `q` positivo
+desplaza ambos puntos mediante `P_current=P_static+q*u_rack`; no presupone un
+sentido de giro. La separación de joints es constante y el rack no rota.
+
+El road-wheel heading es una dirección horizontal unitaria orientada hacia el
+frente. Recto equivale a `[-1,0,0]`. El ángulo absoluto se mide respecto a
+`-X`: positivo apunta hacia `+Y` (giro a la derecha), negativo hacia `-Y`
+(giro a la izquierda), igual para FL y FR. Todos los ángulos internos están
+en radianes y las diferencias se envuelven con `atan2(sin(delta),cos(delta))`.
+
+Se conservan por separado:
+
+- `toe`: orientación del wheel axis con positivo toe-in;
+- `steerDeflectionFromStatic`: heading actual menos heading estático;
+- `rackInducedSteer`: heading actual menos el heading a igual wheel travel y
+  rack cero.
+
+El scrub radius usa el contacto geométrico actual `C` y la intersección `S`
+del eje LBJ→UBJ con el plano horizontal `Z=C_z`:
+`scrub=sideSign*(C_y-S_y)`. Positivo significa contacto más outboard que la
+intersección en ambos lados. Mechanical trail es `C_x-S_x`; con X hacia atrás,
+es positivo cuando el eje corta el suelo por delante del contacto. No es
+pneumatic trail.
+
+Ackermann usa la línea trasera `X=rearAxleX` y los contactos/headings reales.
+El sentido y las ruedas inner/outer se deducen del steering inducido por rack,
+nunca del signo de `q`. Cerca de recto, un ICR se representa como infinito y
+el análisis devuelve status explícito; no publica un porcentaje Ackermann.
+
+Un `SteeringAxleResult` no convergido invalida las métricas derivadas de ambos
+lados, aunque una esquina haya convergido individualmente. Los payloads de
+análisis usan `KINEMATICS_NOT_CONVERGED` y `NaN`; conservan por separado el
+flag, status, failure reason y diagnostics cinemáticos de FL y FR.
 
 ## Decisiones aún abiertas
 

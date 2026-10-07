@@ -4,7 +4,8 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
-**v0.4 — Axle Geometry, Front-View Instant Centers & Roll Center** implementa:
+**v0.5 — Steering Geometry, Rack Kinematics, Scrub, Trail & Ackermann**
+conserva v0.1–v0.4 e implementa además:
 
 - geometría double wishbone de una esquina con diez hardpoints, incluido tie rod/toe link;
 - cierre físico del mecanismo mediante UCA, LCA y tie rod rígidos;
@@ -27,9 +28,24 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 - roll center estático, coordenada Z y altura respecto al nivel común de contacto;
 - heave simétrico y migración de roll center, conservando convergencia por lado;
 - visualización frontal YZ y curvas de migración en mm.
+- `SteeringSystemGeometry` limitado al eje `FRONT`, con rack axis 3D derivado
+  de los inner tie-rod joints y referencia mínima del eje trasero;
+- rack travel común en m/mm, inner joints móviles y separación rígida;
+- steering combinado con wheel travel simétrico o asimétrico;
+- continuation determinista: wheel travel primero y rack travel después;
+- road-wheel angle absoluto, deflection desde estático y steering inducido
+  exclusivamente por rack;
+- scrub radius, mechanical trail y cruce steering-axis/plano de contacto;
+- Ackermann geométrico mediante ICR sobre `X=rearAxleX`, incluyendo wheel
+  stagger, static toe y estados near-straight;
+- rack sweeps, visualización 3D y cinco curvas de steering.
+- invalidez bilateral explícita ante fallo unilateral, conservando los
+  diagnósticos de solver de cada esquina;
+- golden regression de rack cero contra resultados independientes de v0.4.0.
 
-No calcula body roll, steering input, rack travel, Ackermann, scrub radius,
-trail, anti geometry, actuación, dinámica ni optimización.
+No calcula body roll, columna/volante/pinion, fuerzas o compliance de
+dirección, pneumatic trail, anti geometry, actuación, dinámica ni
+optimización.
 
 ## Convención
 
@@ -58,6 +74,7 @@ results = runProjectTests;
 addpath("examples")
 example = bumpKinematicsExample(true);
 analysisExample = singleCornerAnalysisExample(true);
+steeringExample = steeringKinematicsExample(true);
 ```
 
 API principal:
@@ -72,6 +89,14 @@ staticRollCenter = fsd.analysis.rollCenter(axle);
 leftFvic = fsd.analysis.frontViewInstantCenter(geometryFL);
 axleSweep = fsd.kinematics.solveAxleHeaveSweep(axle, -30:5:30, "mm");
 migration = fsd.analysis.analyzeAxleHeaveSweep(axle, axleSweep);
+
+steering = fsd.model.createSteeringSystem(axle, 1600, "mm");
+steeringResult = fsd.kinematics.solveSteering( ...
+    steering, 8, [15, 10], "mm");
+steeringAnalysis = fsd.analysis.analyzeSteering(steering, steeringResult);
+rackSweep = fsd.kinematics.solveRackSweep( ...
+    steering, -20:2:20, 0, "mm");
+rackAnalysis = fsd.analysis.analyzeRackSweep(steering, rackSweep);
 ```
 
 Si `result.converged` es falso, sus puntos y camber son `NaN`; la causa y los residuos permanecen en `result.diagnostics` y `result.failureReason`.
@@ -101,6 +126,10 @@ circular ideal documentada en `docs/equations.md`.
 
 El FVIC y el roll center de v0.4 son construcciones cinemáticas en YZ. No son
 centros de fuerza ni dependen de un plano longitudinal de referencia.
+
+Los contratos nuevos de steering usan schema `0.5.0`; los schemas de
+v0.1–v0.4 permanecen sin cambios. El análisis de Ackermann no publica un
+porcentaje y el mechanical trail no incluye pneumatic trail.
 
 ## Aviso
 

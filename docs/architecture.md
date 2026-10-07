@@ -2,7 +2,7 @@
 
 ## Objetivo y límite actual
 
-FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.4** compone dos esquinas compatibles en un eje y calcula FVIC, roll center y su migración en heave simétrico. Rules, optimización, dinámica, vehículo completo y UI siguen sin implementación funcional.
+FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.5** añade al eje delantero un rack rígido, cinemática combinada de wheel travel y rack travel, y análisis geométrico de dirección. Rules, optimización, dinámica, vehículo completo y UI siguen sin implementación funcional.
 
 ## Capas
 
@@ -19,8 +19,8 @@ Solo el directorio `src` debe añadirse al path. MATLAB resuelve los subpaquetes
 |---|---|
 | `model` | Contratos de datos, IDs, unidades, geometría e identidad canónica. |
 | `geometry` | Primitivas 3D/2D, intersecciones y contacto circular ideal. |
-| `kinematics` | Solver de esquina y composición de dos sweeps para heave simétrico. |
-| `analysis` | Métricas de esquina, FVIC, roll center y curvas derivadas. |
+| `kinematics` | Cierre no lineal de esquina; composición de heave y dirección por rack. |
+| `analysis` | Métricas interpretativas de esquina/eje, roll center y dirección. |
 | `actuation` | Geometría y métricas de accionamiento futuras. |
 | `vehicle` | Composición de las cuatro esquinas y parámetros del vehículo. |
 | `tire` | Contrato sustituible para modelos de neumático futuros. |
@@ -72,6 +72,21 @@ velocidad instantánea 3D del ball joint; `analysis` combina después esas
 líneas mediante geometría proyectiva YZ. Ninguna capa necesita un plano X de
 referencia compartido.
 
+v0.5 conserva exactamente la misma dirección de dependencias:
+
+```text
+model
+geometry -> model
+kinematics -> geometry, model
+analysis -> kinematics, geometry, model
+```
+
+`model` define `SteeringSystemGeometry`; `geometry` contiene el wrapping
+angular y la intersección eje de dirección–plano horizontal; `kinematics`
+generaliza el cierre existente para recibir la posición prescrita del inner
+tie-rod; `analysis` interpreta headings, scrub, trail y Ackermann. No existe
+ninguna llamada `kinematics -> analysis`.
+
 ## Integridad geometry/result
 
 `fsd.model.geometryIdentity` genera una representación canónica versionada con todos los inputs geométricos consumidos por el solver: schema de geometría, `cornerId`, IDs de hardpoints en orden canónico, coordenadas XYZ y wheel axis estático. No incluye display names ni procedencia porque no alteran el mecanismo.
@@ -101,6 +116,30 @@ left/right DoubleWishboneGeometry -> AxleGeometry
 fallidos. Un punto sin convergencia bilateral publica métricas de roll center
 como `NaN` y conserva el status de la cinemática. Su payload se crea inválido
 desde cero y no reutiliza datos dinámicos de un estado estático válido.
+
+El flujo de dirección v0.5 es:
+
+```text
+FL/FR DoubleWishboneGeometry -> FRONT AxleGeometry
+    -> SteeringSystemGeometry(rearAxleX)
+    -> solveSteering / solveRackSweep
+       stage 1: wheel travel con rack=0
+       stage 2: rack travel a wheel travel constante
+    -> SteeringAxleResult / RackSweepResult
+    -> analyzeSteering / analyzeRackSweep
+    -> headings, toe, scrub, trail y Ackermann
+    -> plot/report/UI
+```
+
+El rack desplaza ambos inner joints con una traslación común y no rota. El
+análisis bilateral solo es válido si convergen ambas esquinas. Un fallo no
+publica ángulos ni magnitudes geométricas con apariencia válida.
+
+Las APIs públicas `analyzeSteering` y `analyzeRackSweep` validan sus contratos
+completos antes de analizar. Ambas delegan después en un core privado; el
+sweep valida una sola vez el conjunto y no vuelve a validar individualmente
+cada resultado durante el análisis. El core privado no es una API accesible
+para saltarse integridad.
 
 ## Integración futura con Adams Car
 
