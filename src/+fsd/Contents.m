@@ -3,8 +3,8 @@
 % Namespaces
 %   fsd.model        - Canonical data contracts and validation.
 %   fsd.geometry     - Geometry primitives and static geometry operations.
-%   fsd.kinematics   - Bump, axle-heave and front-rack steering solving.
-%   fsd.analysis     - Kinematics, roll-center and steering analysis.
+%   fsd.kinematics   - Bump, asymmetric axle, body-roll and steering solving.
+%   fsd.analysis     - Corner, roll-center, body-roll and steering analysis.
 %   fsd.actuation    - Future spring/damper actuation geometry.
 %   fsd.vehicle      - Future whole-vehicle composition.
 %   fsd.tire         - Future replaceable tire-model contracts.

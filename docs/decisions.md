@@ -86,9 +86,43 @@
 - **REG-001:** la compatibilidad rack cero se protege además con constantes
   golden obtenidas de v0.4.0 commit `6cf64c5c0a23d4c4deb396681a8dfdf2d2f4443d`.
 
+## Cerradas en v0.6
+
+- **AXT-001:** recorrido de eje general usa `[left,right]`; heave histórico es
+  el subconjunto `[z,z]` y conserva schema `0.4.0` mediante wrapper.
+- **ROL-001:** `phi` es rotación de mano derecha alrededor de `+X`; `phi>0`
+  produce carretera descendente hacia `+Y` en el frame del chasis.
+- **ROL-002:** `h=(zLeft+zRight)/2`; la incógnita es Delta con
+  `zLeft=h+Delta`, `zRight=h-Delta`.
+- **ROL-003:** cierre escalar por contactos reales, root `fzero` bracketed y
+  continuation canónica heave-first/roll-second.
+- **ROL-004:** `abs(phi)<pi/2` preserva dirección left→right y normal +Z; no es
+  un límite físico del vehículo.
+- **ROAD-001:** road line YZ normalizada con normal +Z; se distinguen target
+  orientation y línea resuelta desde contactos.
+- **CAM-002:** road-relative camber aplica `Rx(+phi)` al wheel axis y después
+  la ecuación histórica sin redefinir su signo.
+- **RC-003:** `rollCenterHeight_m` conserva semántica v0.4;
+  `rollCenterRoadHeight_m` es una métrica nueva de distancia firmada.
+- **TRK-001:** wheel-center track usa diferencia Y del chasis; contact track
+  proyecta sobre `dRoad`; migración referencia `h=0,phi=0`.
+- **INT-001:** steering puede consumir los wheel travels de roll, pero no se
+  afirma cierre exacto de carretera después de steering ni Ackermann en roll.
+- **PERF-002:** análisis de sweep valida públicamente una vez y usa core privado.
+- **ROL-005:** el bracket explora ambos sentidos independientemente, refina el
+  límite válido por bisección y selecciona el intervalo válido adyacente más
+  próximo al Delta previo; no realiza búsqueda global de raíces.
+- **FAIL-002:** `ROOT_NOT_BRACKETED`, `KINEMATIC_NONCONVERGENCE` y
+  `SCALAR_NO_CONVERGENCE` describen respectivamente falta de cambio de signo
+  en dominio válido, dominio cinemático insuficiente y fallo tras bracket.
+- **ANA-002:** los sweeps publican `kinematicStatus` y `analysisStatus`
+  separados; un gap cinemático válido no invalida el contrato del análisis.
+- **PERF-003:** `solveAxleTravelCore` es privado y asume axle, target SI y
+  settings ya validados; las APIs públicas conservan validación completa.
+
 ## Abiertas
 
 - **OPEN DECISION NM-001:** nomenclatura de endpoints de actuación.
 - **OPEN DECISION NM-002:** representación del eje del rocker.
 
-No han aparecido decisiones humanas nuevas que bloqueen v0.5.
+No han aparecido decisiones humanas nuevas que bloqueen v0.6.

@@ -1,5 +1,68 @@
 # Convenciones y formulación matemática
 
+## Body-roll closure v0.6
+
+Para `phi` finito con `abs(phi)<pi/2`, la carretera horizontal del mundo se
+expresa en YZ del chasis mediante:
+
+```text
+dRoad = [cos(phi), -sin(phi)]
+nRoad = [sin(phi),  cos(phi)]
+dRoad dot nRoad = 0
+```
+
+Con contactos geométricos actuales `CL` y `CR`, el cierre es:
+
+```text
+F(Delta) = nRoad dot (CR(Delta)-CL(Delta)) = 0
+zLeft  = h + Delta
+zRight = h - Delta
+h = (zLeft+zRight)/2
+```
+
+Se evalúan los contactos del mecanismo resuelto; no se sustituye este problema
+por `Delta=(track/2)*tan(phi)`. `fzero` usa un bracket expandido alrededor del
+Delta del paso anterior. La trayectoria canónica lleva primero `h:0->target`
+con `phi=0` y después `phi:0->target` manteniendo h.
+
+El bracket se construye solo con muestras cinemáticamente válidas. Centro,
+lado negativo y lado positivo se evalúan independientemente; después se buscan
+cambios de signo entre muestras válidas adyacentes. Si una expansión cruza el
+límite alcanzable de un lado, se biseca entre su última muestra válida y la
+primera inválida, mientras el otro lado puede seguir expandiéndose. Un extremo
+inválido no descarta un bracket `center↔endpoint` válido del lado opuesto.
+
+Si hay varios brackets, se elige determinísticamente el más próximo al Delta
+anterior: primero distancia del intervalo al estado previo, después distancia
+de su punto medio, anchura y extremo inferior. El solver busca únicamente la
+raíz alcanzable localmente conectada a la rama de continuation. No garantiza
+encontrar todas las raíces; bifurcaciones, múltiples soluciones o
+singularidades pueden producir selección de otra rama o fallo conservador.
+
+La road line normalizada es `aY+bZ+c=0`, con `sqrt(a^2+b^2)=1`, `b>0` y
+`[a,b]=nRoad`. Para RC finito:
+
+```text
+rollCenterRoadHeight = a*Y_RC + b*Z_RC + c
+```
+
+El frame alineado con carretera se obtiene con `Rx(+phi)` aplicado a vectores
+del chasis. El road-relative camber es la ecuación histórica de camber aplicada
+al wheel axis transformado.
+
+### Benchmark analítico de traslación
+
+La fixture v0.6 usa brazos paralelos de radio `r=0.30 m`, wheel axis constante
+y contacto estático a semitrack `T/2=0.65 m`. Para `h=0`, sea
+`A=T/2-r=0.35 m` y `t=tan(phi)`. La rama continua desde cero cumple exactamente:
+
+```text
+Delta = t*(A + sqrt(r^2 + t^2*(r^2-A^2))) / (1+t^2)
+```
+
+Este expected procede del arco circular y del plano de carretera, no del
+solver bajo test.
+
 ## Sistema y unidades
 
 El marco global es diestro: X hacia atrás, Y hacia la derecha y Z hacia arriba. Posiciones y wheel travel se almacenan en metros; rotaciones y métricas angulares, en radianes.

@@ -161,6 +161,56 @@ lados, aunque una esquina haya convergido individualmente. Los payloads de
 análisis usan `KINEMATICS_NOT_CONVERGED` y `NaN`; conservan por separado el
 flag, status, failure reason y diagnostics cinemáticos de FL y FR.
 
+## Body roll y carretera v0.6
+
+`bodyRollAngle=phi` es una rotación de mano derecha alrededor de `+X`. Como X
+apunta hacia atrás, `phi>0` hace subir el lado derecho del chasis y bajar el
+izquierdo respecto al mundo. Equivalentemente, una carretera horizontal en el
+mundo aparece en coordenadas del chasis descendiendo hacia `+Y`.
+
+En YZ del chasis:
+
+```text
+dRoad = [cos(phi), -sin(phi)]       % izquierda -> derecha
+nRoad = [sin(phi),  cos(phi)]       % normal orientada hacia +Z
+```
+
+Se exige `abs(phi)<pi/2` para conservar sin ambigüedad la orientación
+izquierda→derecha (`dRoad_Y>0`) y una normal con componente Z positiva. No es
+un límite físico de Formula Student.
+
+Recorrido asimétrico significa un input directo `[zLeft,zRight]`. Body roll es
+un problema distinto: recibe `phi` y
+`axleHeave=(zLeft+zRight)/2`, y resuelve el diferencial requerido por los
+contactos reales. Este axle heave es el recorrido vertical medio de los Wheel
+Centers respecto al chasis, no una coordenada de vehículo completo.
+
+Camber histórico pasa a denominarse explícitamente **chassis-relative
+camber**. **Road-relative camber** rota el wheel axis mediante `Rx(+phi)` a un
+frame road-aligned y aplica después exactamente la misma convención histórica.
+
+`rollCenterZ_m` sigue siendo la coordenada Z del chasis. La métrica histórica
+`rollCenterHeight_m` solo existe para contactos al mismo Z. La nueva
+`rollCenterRoadHeight_m` es distancia perpendicular firmada respecto a la
+road line normalizada y queda `NaN` si el RC no es finito.
+
+Se distinguen:
+
+- `wheelCenterTrack = Y_WC,right - Y_WC,left` en el frame del chasis;
+- `geometricContactTrack = dRoad dot (C_right-C_left)` sobre la carretera;
+- sus cambios respecto al estado estático de la misma geometría `h=0,phi=0`.
+
+El Ackermann v0.5 sigue definido en plan view del frame del chasis. No se
+publica como Ackermann exacto durante roll; una formulación futura deberá
+trabajar en un frame alineado con carretera.
+
+Los fallos de cierre distinguen `ROOT_NOT_BRACKETED` cuando existen muestras
+válidas pero no encierran raíz, `KINEMATIC_NONCONVERGENCE` cuando no existe
+dominio válido suficiente para evaluarla, y `SCALAR_NO_CONVERGENCE` cuando un
+bracket válido no supera el root solve o su post-check. En análisis de sweep,
+estos statuses se conservan como `kinematicStatus`; el status genérico de que
+no hay métricas se publica separadamente como `analysisStatus`.
+
 ## Decisiones aún abiertas
 
 > **OPEN DECISION NM-001 — Actuation IDs:** elegir IDs de actuación al diseñar pushrod/pullrod.

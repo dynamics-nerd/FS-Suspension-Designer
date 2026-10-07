@@ -2,7 +2,7 @@
 
 ## Objetivo y límite actual
 
-FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.5** añade al eje delantero un rack rígido, cinemática combinada de wheel travel y rack travel, y análisis geométrico de dirección. Rules, optimización, dinámica, vehículo completo y UI siguen sin implementación funcional.
+FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.6** añade recorrido asimétrico de eje, cierre geométrico de body roll y análisis relativo a carretera sobre las capacidades de dirección v0.5. Rules, optimización, dinámica, vehículo completo y UI siguen sin implementación funcional.
 
 ## Capas
 
@@ -144,6 +144,47 @@ para saltarse integridad.
 ## Integración futura con Adams Car
 
 Adams Car será una herramienta de validación de mayor fidelidad, no la definición interna del modelo. Un adaptador futuro mapeará IDs y unidades canónicos a su formato. El exportador no resolverá cinemática ni modificará la geometría para hacerla aceptable; cualquier transformación necesaria será explícita, probada y trazable. La comparación de resultados pertenecerá a un flujo de validación separado.
+
+## Flujo de body roll v0.6
+
+La jerarquía de dependencias no cambia:
+
+```text
+model
+geometry -> model
+kinematics -> geometry, model
+analysis -> kinematics, geometry, model
+```
+
+`geometry` define el frame de carretera, líneas normalizadas YZ y distancias
+firmadas. `kinematics` compone dos solves de esquina y resuelve la incógnita
+escalar de cierre. `analysis` interpreta el resultado mediante camber, FVIC,
+roll center y track. En particular, el solver de roll no llama a `analysis`.
+
+```text
+AxleGeometry + [zL,zR]
+    -> solveAxleTravel / solveAxleTravelSweep
+    -> AxleTravelResult
+
+AxleGeometry + (phi,h)
+    -> continuation de heave
+    -> continuation de roll + fzero sobre Delta
+    -> AxleRollResult / AxleRollSweepResult
+    -> analyzeAxleRoll / analyzeAxleRollSweep
+    -> camber chassis/road, FVIC, RC y tracks
+    -> plot/report/UI
+```
+
+Las APIs públicas validan una vez y delegan el cálculo repetido a cores
+privados. No se introduce un modelo de vehículo completo. La integración con
+steering reutiliza `[zL,zR]` como input existente, pero no afirma mantener el
+cierre exacto de carretera después de que steering cambie los contactos.
+
+`solveAxleTravel` valida axle, unidades, target y opciones antes de delegar en
+el core privado `solveAxleTravelCore`. El root solve de body roll recibe ya el
+axle y settings validados y llama directamente a ese core. Así cada evaluación
+de `F(Delta)` evita repetir validadores públicos sin exponer una vía pública
+para omitirlos ni duplicar `solveCornerPath`.
 
 ## Referencia de implementación MATLAB
 

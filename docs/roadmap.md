@@ -142,6 +142,37 @@ rules, neumáticos de fuerzas, dinámica, optimización, Adams ni App Designer.
 10. Pasan la suite histórica y nueva, todos los ejemplos, Code Analyzer,
     comprobación de dependencias y `git diff --check`.
 
+## v0.6 — Body Roll & Asymmetric Axle Kinematics
+
+Estado: **implementada**.
+
+Incluye recorrido de eje `[zLeft,zRight]`, compatibilidad de heave, cierre de
+body roll contra contactos geométricos reales, continuation heave-first y
+roll-second, sweep ordenado, carretera normalizada YZ, camber relativo al
+chasis/carretera, FVIC, roll center, altura perpendicular a carretera, dos
+definiciones de track, migración, visualización y ejemplo de integración con
+steering mediante wheel travels reutilizados.
+
+No incluye cierre simultáneo steering+roll, Ackermann road-aligned, modelo de
+vehículo completo, pitch, fuerzas, ARB, muelles, actuation, anti geometry,
+dinámica, neumático de fuerzas, optimización, packaging, rules, Adams o UI.
+
+### Criterios de aceptación v0.6
+
+1. Pares arbitrarios de wheel travel funcionan en ejes FRONT y REAR, y el caso
+   igual reproduce la API histórica de heave.
+2. El roll solve satisface `nRoad dot (CR-CL)=0` con contactos reales y
+   `h=(zLeft+zRight)/2`.
+3. El solver usa una raíz escalar bracketed y continuation sin reordenar sweeps.
+4. Road lines tienen normal unitaria determinista; contactos coincidentes o
+   invertidos y raíces no bracketed conservan status específico.
+5. Camber chassis/road, RC y tracks mantienen signos, unidades e identities.
+6. La altura road-relative es distancia firmada y no sustituye la altura
+   histórica cuando los contactos tienen distinto Z.
+7. Benchmark analítico, residual, signos, round trips, simetría, asimetría,
+   fallos e integración básica con steering quedan probados.
+8. Suite histórica y nueva, ejemplos, Code Analyzer y diff check pasan.
+
 ## Futuro — Longitudinal Anti-Geometry
 
 Milestone no iniciada. Deberá tratar por separado y con terminología aprobada:
@@ -154,8 +185,8 @@ Como mínimo requerirá geometría side-view, wheelbase, posición/altura de CG,
 definición del camino de fuerzas, brake-force distribution cuando corresponda
 y driven axle/drive-force assumptions cuando corresponda. Antes de implementar
 habrá que fijar explícitamente terminología, ecuaciones, signos y definición de
-cualquier porcentaje. v0.5 no calcula ninguna de estas magnitudes.
+cualquier porcentaje. v0.6 no calcula ninguna de estas magnitudes.
 
 ## Milestone siguiente
 
-No se define ni se inicia v0.6 en este cambio.
+No se define ni se inicia v0.7 en este cambio.

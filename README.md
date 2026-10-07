@@ -4,8 +4,8 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
-**v0.5 — Steering Geometry, Rack Kinematics, Scrub, Trail & Ackermann**
-conserva v0.1–v0.4 e implementa además:
+**v0.6 — Body Roll & Asymmetric Axle Kinematics** conserva v0.1–v0.5 e
+implementa además:
 
 - geometría double wishbone de una esquina con diez hardpoints, incluido tie rod/toe link;
 - cierre físico del mecanismo mediante UCA, LCA y tie rod rígidos;
@@ -42,16 +42,31 @@ conserva v0.1–v0.4 e implementa además:
 - invalidez bilateral explícita ante fallo unilateral, conservando los
   diagnósticos de solver de cada esquina;
 - golden regression de rack cero contra resultados independientes de v0.4.0.
+- wheel travel de eje arbitrario `[left,right]`, con `solveAxleHeave` como
+  wrapper compatible;
+- body roll alrededor de `+X`, axle heave medio y cierre escalar contra los
+  contactos geométricos reales de una carretera plana;
+- sweeps de roll ordenados con continuation heave-first/roll-second;
+- bracket local dentro del dominio alcanzable, con exploración bilateral
+  independiente y refinamiento determinista de fronteras inválidas;
+- camber relativo al chasis y relativo a carretera, FVIC y roll center en roll;
+- altura perpendicular firmada del roll center respecto a carretera inclinada;
+- wheel-center track, geometric-contact track y migración desde `h=0, phi=0`;
+- visualización frontal de la carretera inclinada y curvas de roll.
+- statuses cinemáticos y de análisis separados en sweeps con gaps.
 
-No calcula body roll, columna/volante/pinion, fuerzas o compliance de
-dirección, pneumatic trail, anti geometry, actuación, dinámica ni
-optimización.
+No calcula columna/volante/pinion, cierre simultáneo steering+roll, fuerzas o
+compliance de dirección, pneumatic trail, anti geometry, actuación, dinámica
+ni optimización.
 
 ## Convención
 
 - X positivo hacia atrás, Y positivo hacia la derecha, Z positivo hacia arriba.
 - Origen entre los contact patches delanteros sobre el suelo nominal.
 - `wheelTravel = Z_WC,current - Z_WC,static`: positivo en bump y negativo en rebound.
+- `bodyRollAngle > 0`: rotación de mano derecha alrededor de `+X`; la carretera
+  vista en el frame del chasis cae hacia `+Y`.
+- `axleHeave=(zLeft+zRight)/2`; no es todavía heave de vehículo completo.
 - Longitudes internas en metros; entradas públicas de longitud en `"m"` o `"mm"`.
 - Ángulos internos en radianes; las gráficas convierten únicamente para mostrar grados.
 - Camber negativo: parte superior hacia el centro. Toe positivo: toe-in.
@@ -97,6 +112,15 @@ steeringAnalysis = fsd.analysis.analyzeSteering(steering, steeringResult);
 rackSweep = fsd.kinematics.solveRackSweep( ...
     steering, -20:2:20, 0, "mm");
 rackAnalysis = fsd.analysis.analyzeRackSweep(steering, rackSweep);
+
+travelResult = fsd.kinematics.solveAxleTravel( ...
+    axle, [15, -10], "mm");
+rollResult = fsd.kinematics.solveAxleRoll( ...
+    axle, 2, 0, "deg", "mm");
+rollAnalysis = fsd.analysis.analyzeAxleRoll(axle, rollResult);
+rollSweep = fsd.kinematics.solveAxleRollSweep( ...
+    axle, (-3:0.25:3)', 0, "deg", "mm");
+rollCurves = fsd.analysis.analyzeAxleRollSweep(axle, rollSweep);
 ```
 
 Si `result.converged` es falso, sus puntos y camber son `NaN`; la causa y los residuos permanecen en `result.diagnostics` y `result.failureReason`.
@@ -130,6 +154,10 @@ centros de fuerza ni dependen de un plano longitudinal de referencia.
 Los contratos nuevos de steering usan schema `0.5.0`; los schemas de
 v0.1–v0.4 permanecen sin cambios. El análisis de Ackermann no publica un
 porcentaje y el mechanical trail no incluye pneumatic trail.
+
+Los contratos nuevos de recorrido asimétrico, body roll y su análisis usan
+schema `0.6.0`. Los schemas históricos siguen sin cambios. Ackermann continúa
+definido en plan view del chasis y no se presenta como exacto durante roll.
 
 ## Aviso
 

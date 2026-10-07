@@ -115,3 +115,32 @@ R2025b desde el commit v0.4.0
 solver. Cubre FL a 0/+20/-20 mm, FR a +20/-20 mm y una geometría 3D a +12 mm;
 compara UBJ, LBJ, tie-rod outboard, Wheel Center, wheel axis, camber y toe sin
 llamar a `solveBump` actual como expected.
+
+## Cobertura v0.6
+
+- pares asimétricos `[+15,-10]`, `[-12,+8]`, `[+20,+5] mm`, FRONT/REAR,
+  constraints por lado, sweep ordenado e identity;
+- regresión `solveAxleTravel([z,z])` contra `solveAxleHeave`;
+- base ortonormal de carretera, líneas normalizadas, distancia firmada y
+  degeneración/inversión de contactos;
+- benchmark exacto de traslación circular con Delta derivado en
+  `docs/equations.md`, independiente de `fzero`;
+- residual de cierre para roll positivo/negativo, heave cero/no cero,
+  equivalencia deg/rad y signo `phi>0 => zLeft>0,zRight<0` en fixture espejo;
+- round trips pasando por cero con heave cero/no cero y paridades espejo de
+  travel, camber, toe, RC y tracks;
+- camber road-relative manual para FL/FR con wheel axes verticales;
+- altura RC road-relative por evaluación manual de `aY+bZ+c` y conservación
+  explícita del status histórico `CONTACT_LEVEL_MISMATCH`;
+- root no bracketed, heave imposible, payloads NaN, targets/identities
+  manipulados e incompatibilidad entre axles;
+- integración con `solveSteering` usando wheel travels de roll y rack no cero;
+- plots de front view inclinada y curvas de camber, RC y track.
+- regresión near-limit a `h=0.197541687 m`, `phi=0.1 deg` y
+  `Delta≈0.000526305367 m`;
+- bracket normal, endpoint inválido unilateral en cada lado, conservación del
+  último dominio válido, raíz no bracketed, dominio insuficiente y root exacta
+  en el centro sin `fzero`;
+- sweep `[0,4,0] deg` con `CONVERGED/ROOT_NOT_BRACKETED/NOT_ATTEMPTED`, status
+  cinemático preservado, status de análisis separado y todos los agregados
+  fallidos en `NaN`.

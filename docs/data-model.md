@@ -1,4 +1,4 @@
-# Modelo de datos v0.5
+# Modelo de datos v0.6
 
 ## DoubleWishboneGeometry
 
@@ -383,3 +383,42 @@ handles = fsd.analysis.plotSteeringSweep(sweepAnalysis)
 - identidad/modelo: `InvalidGeometryIdentity`;
 - contratos cinemáticos: `InvalidSuspensionState`, `InvalidKinematicResult`, `InvalidBumpSweepResult`;
 - análisis: `InvalidGeometry`, `GeometryMismatch`, `InvalidKinematicResult`, `InvalidBumpSweep`, `InvalidSweepAnalysis`, `InvalidWheelAxis`, `DegenerateWheelAxis`, `NonUnitWheelAxis`, `InvalidWheelAxisOrientation`, `DegenerateToeProjection`, `InvalidPoint`, `InvalidSteeringAxis`, `DegenerateSteeringAxis`, `NonUnitSteeringAxis`, `DegenerateCasterProjection`, `DegenerateKingpinProjection`, `InvalidCorner`, `InvalidFigure`.
+# Contratos v0.6
+
+Los nuevos contratos siguen siendo structs funcionales y serializables; no se
+añaden clases por estado ni una jerarquía full-vehicle.
+
+- `AxleTravelResult` (`0.6.0`): identity de eje, target `[zLeft,zRight]`, dos
+  `KinematicResult`, convergencia bilateral y diagnósticos.
+- `AxleTravelSweepResult` (`0.6.0`): matriz target `N x 2`, sweeps de esquina
+  con continuation y resultados bilaterales ordenados.
+- `AxleRollResult` (`0.6.0`): `(phi,h)`, `[zLeft,zRight]`, resultado de recorrido,
+  contactos, target/solved road lines, residual, error angular y diagnóstico
+  del root solve.
+- `AxleRollSweepResult` (`0.6.0`): vector de ángulos en el orden solicitado,
+  heave escalar constante y estados de roll.
+- `AxleRollAnalysis` (`0.6.0`): camber chassis/road, toe, FVIC/RC heredados,
+  altura histórica y road-relative diferenciadas, tracks y referencia estática.
+- `AxleRollSweepAnalysis` (`0.6.0`): arrays numéricos `N x 1` o `N x 2` y
+  estados completos para trazabilidad.
+
+En un sweep de análisis se separan dos conceptos:
+
+- `kinematicStatus`: status exacto del `AxleRollResult`, incluido el motivo
+  específico del fallo;
+- `analysisStatus`: `CONVERGED` o `KINEMATICS_NOT_CONVERGED`, indicando si
+  existen métricas interpretables.
+
+Los arrays agregados usan `NaN` para targets fallidos o `NOT_ATTEMPTED`,
+incluidos camber, toe, FVIC, RC, tracks y wheel-travel differential. No se
+arrastra ni interpola el estado anterior.
+
+`AxleRollSweepResult.performance` agrega wall time, estados escalares internos,
+evaluaciones únicas de F, corner solves, cache hits, refinamientos de frontera,
+tiempo de bracket y tiempo de `fzero`. Son diagnósticos de software, no métricas
+físicas.
+
+Los resultados fallidos conservan identity, target, status y diagnostics, pero
+no publican estados o métricas aparentemente válidos. Los schemas v0.1–v0.5
+no se modifican; `solveAxleHeave` adapta internamente el resultado general al
+contrato histórico `AxleKinematicResult 0.4.0`.

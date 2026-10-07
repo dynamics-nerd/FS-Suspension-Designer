@@ -35,3 +35,41 @@ neumáticos de fuerzas, dinámica, optimización, Adams y App Designer.
 Los requisitos físicos y fórmulas detalladas se fijan en `conventions.md`,
 `equations.md` y `decisions.md`; este documento solo mantiene trazabilidad de
 alcance.
+
+## v0.6 Body Roll
+
+- **REQ-ROLL-001:** aceptar wheel travel prescrito `[left,right]` en FRONT y
+  REAR, reutilizando el solver de esquina.
+- **REQ-ROLL-002:** conservar `solveAxleHeave` y sus schemas históricos como
+  wrapper del recorrido general.
+- **REQ-ROLL-003:** definir `phi` por mano derecha alrededor de `+X` y exigir
+  `abs(phi)<pi/2` para orientación inequívoca de carretera.
+- **REQ-ROLL-004:** definir `h=(zLeft+zRight)/2` y resolver Delta mediante
+  `nRoad dot (CR-CL)=0` con contactos geométricos actuales.
+- **REQ-ROLL-005:** usar root solve escalar bracketed, diagnostics y
+  continuation heave-first/roll-second.
+- **REQ-ROLL-005A:** construir el bracket con muestras válidas de cada lado de
+  forma independiente, refinar transiciones valid→invalid y priorizar la rama
+  local más próxima al estado anterior.
+- **REQ-ROLL-006:** admitir sweeps ordenados positivos, negativos y cruzando
+  cero sin reordenar inputs.
+- **REQ-ROLL-007:** distinguir target road line y solved contact line, con
+  residual y error angular dentro de tolerancia para convergencia.
+- **REQ-ROLL-008:** detectar contacto coincidente/invertido, root no bracketed
+  y fallo cinemático sin publicar estados válidos.
+- **REQ-ROLL-009:** separar `kinematicStatus` de `analysisStatus` y conservar
+  métricas agregadas `NaN` en failures y targets no intentados.
+- **REQ-ROLL-ANA-001:** publicar camber chassis-relative y road-relative sin
+  cambiar la definición histórica de camber.
+- **REQ-ROLL-ANA-002:** reutilizar FVIC/RC v0.4 y añadir altura perpendicular
+  a road line sin cambiar `rollCenterHeight_m`.
+- **REQ-ROLL-ANA-003:** distinguir wheel-center track, contact track sobre la
+  carretera y cambios respecto a `h=0,phi=0`.
+- **REQ-ROLL-VAL-001:** cubrir benchmark cerrado, residual, round trip,
+  simetría, asimetría, unidades, fallos, identities y steering integration.
+
+## Fuera de alcance v0.6
+
+Cierre simultáneo steering+roll, Ackermann en frame road-aligned, full vehicle,
+pitch, fuerzas, muelles, ARB, actuation, longitudinal anti-geometry, dinámica,
+optimización, packaging, rules, Adams y App Designer.
