@@ -45,7 +45,25 @@ if max(abs(identity.rackAxisDirection - expectedAxis)) > ...
         10 * (tolerances.AbsTol_m + tolerances.RelTol)
     invalid("rackAxisDirection must point from the left endpoint to the right.");
 end
+leftTie_m = identityPoint(identity.frontAxleIdentity.leftGeometryIdentity, ...
+    "FL_TIE_ROD_INBOARD");
+rightTie_m = identityPoint(identity.frontAxleIdentity.rightGeometryIdentity, ...
+    "FR_TIE_ROD_INBOARD");
+pointTolerance_m = 10*(tolerances.AbsTol_m + tolerances.RelTol* ...
+    max([abs(leftTie_m),abs(rightTie_m),1]));
+if max(abs(identity.leftInnerStatic_m-leftTie_m)) > pointTolerance_m || ...
+        max(abs(identity.rightInnerStatic_m-rightTie_m)) > pointTolerance_m
+    invalid("Rack endpoints must match the corner tie-rod inboard points.");
+end
 isValid = true;
+end
+
+function point_m = identityPoint(identity, id)
+row = identity.hardpointIds == id;
+if nnz(row) ~= 1
+    invalid("Steering geometry identity is missing a tie-rod point.");
+end
+point_m = identity.hardpointXyz_m(row,:);
 end
 
 function tf = isFiniteSize(value, expectedSize)

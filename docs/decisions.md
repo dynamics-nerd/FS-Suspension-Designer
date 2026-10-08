@@ -122,7 +122,35 @@
 
 ## Abiertas
 
-- **OPEN DECISION NM-001:** nomenclatura de endpoints de actuación.
-- **OPEN DECISION NM-002:** representación del eje del rocker.
+No hay decisiones abiertas al cerrar v0.7.
 
-No han aparecido decisiones humanas nuevas que bloqueen v0.6.
+## Cerradas en v0.7
+
+- **NM-001 (resuelta 2026-10-07, v0.7):** el elemento genérico es `ACTUATION_ROD`; sus
+  endpoints canónicos son `ACTUATION_ROD_SUSPENSION` y
+  `ACTUATION_ROD_ROCKER`. PUSHROD/PULLROD comparte solver y solo diferencia la
+  arquitectura/identity.
+- **NM-002 (resuelta 2026-10-07, v0.7):** el rocker axis es una línea 3D
+  `P+lambda*u`, con `P` canonicalizado como punto más próximo al origen y `u`
+  unitario/orientado. El signo de `u` define el signo positivo de theta.
+- **ACT-001:** el attachment puede pertenecer a UPRIGHT, UCA o LCA; upright
+  reutiliza su pose exacta y los brazos rotan rígidamente sobre FWD→AFT.
+- **ACT-002:** el closure rod–rocker es analítico círculo–esfera; no usa un
+  solver iterativo ni búsqueda global.
+- **ACT-003:** una llamada aislada elige la raíz equivalente más próxima a
+  theta=0; un sweep elige la más próxima al theta unwrapped anterior.
+- **ACT-004:** tangencia converge con conditioning cero y diagnóstico
+  `TANGENT`; se clasifica con los coeficientes antes de `acos` y publica una
+  sola raíz. No-intersection y underconstrained conservan statuses distintos.
+- **ACT-005:** `orientationMode` es una ayuda de construcción y no forma parte
+  de la identity física; el eje 3D canónico sí forma parte de ella.
+- **ACT-006:** el validador reconstruye la rama cerrada y cada sweep encadena
+  exactamente el ángulo anterior; tras un fallo no se ejecutan estados nuevos.
+- **MR-001:** `damperMotionRatio=dCompression/dWheelTravel`; el installation
+  ratio es su valor absoluto.
+- **MR-002:** derivadas mediante interpolante cuadrático local sobre tres
+  puntos, válido con spacing no uniforme; no se usa una curva `diff` desplazada.
+- **MR-003:** las derivadas requieren recorrido estrictamente monótono y la
+  referencia estática usa el target solicitado exactamente igual a cero.
+- **ARB-001:** la futura estrategia de producto será `INTEGRATED`,
+  `POST_DESIGN` o `DISABLED`. No se implementa ARB en v0.7.

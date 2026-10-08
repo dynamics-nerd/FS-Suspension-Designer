@@ -614,8 +614,75 @@ La regresión numérica 3D estima velocidades de ball joint alrededor de
 elección de verificación del test, no una constante del solver ni una
 tolerancia física.
 
+## Actuation rod y rocker v0.7
+
+Para el eje orientado `(O,u)`, con `||u||=1`, y el rocker rod point estático
+`P0`:
+
+```text
+v = P0-O
+vParallel = u*(u dot v)
+C = O+vParallel
+r = P0-C
+t = u cross r
+P(theta) = C+r*cos(theta)+t*sin(theta)
+```
+
+Se verifican `||r||=||t||` y `r dot t=0`. Con suspension point actual `S`,
+`w=C-S` y longitud rígida `Lrod,0`, el closure es:
+
+```text
+A = 2*(w dot r)
+B = 2*(w dot t)
+D = Lrod,0^2-||w||^2-||r||^2
+A*cos(theta)+B*sin(theta)=D
+R=hypot(A,B)
+alpha=atan2(B,A)
+theta=alpha +/- acos(D/R)
+```
+
+Antes de evaluar `acos`, se clasifica tangencia cuando
+`abs(abs(D)-R)<=toleranceCoefficient`. En ese caso se fuerza el cociente a
+`sign(D)`, se publica una única raíz y conditioning exactamente cero. El
+cociente no se recorta en el caso general. `|D|>R+toleranceCoefficient` es una
+incompatibilidad física. `R≈0,D≈0` es underconstrained; `R≈0,D!=0` no tiene
+solución.
+
+El conditioning publicado es:
+
+```text
+abs(-A*sin(theta)+B*cos(theta))/R
+```
+
+y tiende a cero en tangencia. El umbral `sqrt(eps)` es exclusivamente numérico.
+
+La rotación de UCA/LCA usa el eje interior orientado FWD→AFT. Proyectando el
+ball joint estático/actual perpendicularmente al eje:
+
+```text
+beta=atan2(u dot (r0 cross r1), r0 dot r1)
+```
+
+Todo punto unido al brazo se rota rígidamente beta alrededor de esa línea.
+
+```text
+damperCompression = Ldamper,0-Ldamper
+MR = d(damperCompression)/d(wheelTravel)
+installationRatio = abs(MR)
+Gtheta = d(theta)/d(wheelTravel)
+```
+
+Las derivadas de sweep se obtienen del interpolante cuadrático local de tres
+muestras: central en interiores y unilateral de segundo orden en extremos,
+incluido spacing no uniforme.
+Solo se publican con al menos tres estados válidos y wheel travel estrictamente
+monótono (creciente o decreciente), sin reordenar el sweep. La referencia
+estática se identifica por `requestedWheelTravel_m==0`; el valor logrado puede
+contener el pequeño residuo numérico admitido por el contrato cinemático.
+
 ## Pending mathematical specifications
 
-No están especificados ni implementados body roll, roll axis de vehículo,
-steering wheel/column, pinion ratio, fuerzas o compliance de dirección,
-pneumatic trail, anti geometry, actuation, neumáticos de fuerzas ni dinámica.
+No están especificados ni implementados roll axis de vehículo, steering
+wheel/column, pinion ratio, fuerzas o compliance, pneumatic trail, spring o
+damper forces, wheel rate completo, ARB, anti geometry, neumáticos de fuerzas
+ni dinámica.

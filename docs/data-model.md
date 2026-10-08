@@ -1,4 +1,4 @@
-# Modelo de datos v0.6
+# Modelo de datos v0.7
 
 ## DoubleWishboneGeometry
 
@@ -325,6 +325,9 @@ Cada esquina conserva state, pose, wheel axis, camber y diagnostics del
 solver, y añade rack solicitado/logrado, inboard estático/actual, contacto
 geométrico y un `rackZeroKinematicResult` a igual wheel travel. Esta referencia
 permite separar steering de rack y bump steer sin repetir el solve en analysis.
+Cada `SteeringCornerResult` conserva además `steeringSystemIdentity`; por ello
+puede validarse de forma autónoma, incluida la traslación dirigida del rack,
+sin reconstruir ni reejecutar el solver.
 
 `SteeringAxleResult` compone FL/FR, la identity del sistema, targets de rack y
 wheel travel, flags/status por lado, diagnostics agregados y tiempo. Solo es
@@ -422,3 +425,48 @@ Los resultados fallidos conservan identity, target, status y diagnostics, pero
 no publican estados o métricas aparentemente válidos. Los schemas v0.1–v0.5
 no se modifican; `solveAxleHeave` adapta internamente el resultado general al
 contrato histórico `AxleKinematicResult 0.4.0`.
+
+# Contratos v0.7
+
+Se mantienen structs funcionales para serialización MAT, App Designer futuro y
+evaluación masiva. `ActuationGeometry` es opcional y no añade hardpoints
+obligatorios a `DoubleWishboneGeometry`.
+
+- `ActuationGeometry`: corner identity, tipo PUSHROD/PULLROD, attachment/body,
+  eje de rocker canonicalizado, dos puntos rígidos del rocker, damper chassis,
+  longitudes estáticas y metadata.
+- `ActuationGeometryIdentity`: incluye toda geometría física y la decisión
+  PUSHROD/PULLROD; no es un hash. `rocker.orientationMode` no pertenece a la
+  identity porque es una ayuda de entrada: YZ y CUSTOM con el mismo eje
+  canónico representan la misma física.
+- `ActuationResult`: conserva el source result completo, theta unwrapped,
+  puntos actuales, longitud/compresión, residual, conditioning y diagnostics.
+- `ActuationSweepResult`: orden original, resultados completos, curvas básicas,
+  continuation de rama y conteos de solves/estados omitidos.
+- `ActuationAnalysis`: vista validada de un estado.
+- `ActuationSweepAnalysis`: MR, installation ratio, angular gain, migración,
+  stroke y rocker range.
+
+Un failed result usa `NaN` para todos los puntos y valores derivados. La
+identity no sustituye la validación del payload: se reconstruyen attachment,
+rotación común, coeficientes, clasificación, candidatos, selección de rama,
+damper length y conditioning.
+
+La persistencia general continúa siendo MAT. Un `ActuationGeometry` es un
+struct serializable y puede guardarse con `save`; los helpers históricos
+`saveGeometryMat/loadGeometryMat` siguen deliberadamente limitados a
+`DoubleWishboneGeometry`. No se introduce JSON.
+
+La frontera de construcción es:
+
+```matlab
+actuation = fsd.model.createActuationGeometry( ...
+    cornerGeometry, definition, inputUnit)
+```
+
+`inputUnit` es `"m"` o `"mm"`. `definition` contiene
+`actuationType`, `suspensionAttachment.body/point`,
+`rocker.orientationMode/axis/actuationRodPoint/damperPoint` y
+`damper.chassisPoint`. Para YZ/XZ el axis direction se deriva del preset; CUSTOM
+exige `axis.direction`. El modelo almacenado usa exclusivamente metros y el
+frame `X_REAR_Y_RIGHT_Z_UP`.

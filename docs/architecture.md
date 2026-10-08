@@ -2,7 +2,7 @@
 
 ## Objetivo y límite actual
 
-FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.6** añade recorrido asimétrico de eje, cierre geométrico de body roll y análisis relativo a carretera sobre las capacidades de dirección v0.5. Rules, optimización, dinámica, vehículo completo y UI siguen sin implementación funcional.
+FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.7** añade actuación geométrica opcional sobre las capacidades de suspensión, dirección y body roll v0.1–v0.6. Rules, optimización, dinámica, vehículo completo y UI siguen sin implementación funcional.
 
 ## Capas
 
@@ -21,7 +21,7 @@ Solo el directorio `src` debe añadirse al path. MATLAB resuelve los subpaquetes
 | `geometry` | Primitivas 3D/2D, intersecciones y contacto circular ideal. |
 | `kinematics` | Cierre no lineal de esquina; composición de heave y dirección por rack. |
 | `analysis` | Métricas interpretativas de esquina/eje, roll center y dirección. |
-| `actuation` | Geometría y métricas de accionamiento futuras. |
+| `model/geometry/kinematics/analysis` | Actuación opcional: contrato, primitivas rígidas, cierre y métricas, respectivamente. |
 | `vehicle` | Composición de las cuatro esquinas y parámetros del vehículo. |
 | `tire` | Contrato sustituible para modelos de neumático futuros. |
 | `dynamics` | Dinámica del vehículo futura, consumiendo el contrato de neumático. |
@@ -39,7 +39,6 @@ Dependencias permitidas en la primera evolución:
 - `geometry → model`.
 - `kinematics → geometry, model`.
 - `analysis → model` y contratos públicos producidos por `geometry` o `kinematics`.
-- `actuation → geometry, model`.
 - `vehicle → model` y contratos públicos de los subsistemas que componga.
 - `dynamics → vehicle, model` y la interfaz pública sustituible de `tire`.
 - `packaging`, `rules` y `export` pueden consumir modelos o resultados ya calculados.
@@ -144,6 +143,42 @@ para saltarse integridad.
 ## Integración futura con Adams Car
 
 Adams Car será una herramienta de validación de mayor fidelidad, no la definición interna del modelo. Un adaptador futuro mapeará IDs y unidades canónicos a su formato. El exportador no resolverá cinemática ni modificará la geometría para hacerla aceptable; cualquier transformación necesaria será explícita, probada y trazable. La comparación de resultados pertenecerá a un flujo de validación separado.
+
+## Flujo de actuación v0.7
+
+La jerarquía permanece acíclica:
+
+```text
+model
+geometry -> model
+kinematics -> geometry, model
+analysis -> kinematics, geometry, model
+```
+
+`ActuationGeometry` es un contrato opcional por esquina y no modifica
+`DoubleWishboneGeometry`. Las rotaciones rígidas alrededor de líneas 3D son
+primitivas de `geometry`; `kinematics` transforma el attachment y resuelve el
+cierre rod–rocker; `analysis` calcula derivadas, ranges y migraciones. No se ha
+creado una capa paralela para PUSHROD/PULLROD ni un modelo full-vehicle.
+
+```text
+KinematicResult / SteeringCornerResult
+    + ActuationGeometry
+    -> solveActuation / solveActuationSweep
+    -> ActuationResult / ActuationSweepResult
+    -> analyzeActuationSweep
+    -> MR, stroke, rocker range, plot/report/UI
+```
+
+El resultado fuente viaja íntegro en `ActuationResult`; esto permite validar
+pose, identity y payload sin repetir el solve. Un sweep valida una vez el
+`BumpSweepResult` agregado y llama a un core privado por sample. No existe
+dependencia `kinematics -> analysis`.
+`SteeringCornerResult` lleva la identity del sistema y se valida mediante un
+único contrato público antes de entrar en actuación. El validador de actuación
+reconstruye el cierre desde geometría y source; no confía en candidatos o
+conditioning publicados. Tras el primer fallo de continuation, los estados
+restantes se construyen como `NOT_ATTEMPTED` sin llamar al core geométrico.
 
 ## Flujo de body roll v0.6
 

@@ -73,3 +73,37 @@ alcance.
 Cierre simultáneo steering+roll, Ackermann en frame road-aligned, full vehicle,
 pitch, fuerzas, muelles, ARB, actuation, longitudinal anti-geometry, dinámica,
 optimización, packaging, rules, Adams y App Designer.
+
+## v0.7 Actuation Geometry & Kinematics
+
+- **REQ-ACT-001:** modelo opcional por esquina con PUSHROD/PULLROD y bodies
+  UPRIGHT/UCA/LCA.
+- **REQ-ACT-002:** rocker axis 3D orientado, presets YZ/XZ y CUSTOM.
+- **REQ-ACT-003:** transformar attachments con el rigid body fuente sin
+  re-resolver la suspensión.
+- **REQ-ACT-004:** cierre analítico robusto, roots explícitas y continuation
+  local unwrapped.
+- **REQ-ACT-005:** distinguir no-intersection, underconstrained, degeneraciones,
+  tangencia y fallo cinemático fuente.
+- **REQ-ACT-006:** publicar theta, damper length/compression, residual y
+  conditioning con identities y validadores físicos.
+- **REQ-MR-001:** MR canónico `dCompression/dWheelTravel`, installation ratio
+  absoluto y gain angular separado.
+- **REQ-MR-002:** diferencias finitas de segundo orden no uniformes; derivada
+  no disponible con menos de tres estados o si la coordenada no es estrictamente
+  monótona; el orden de entrada nunca se corrige automáticamente.
+- **REQ-MR-003:** migración referida exclusivamente al target solicitado de
+  wheel travel exactamente cero.
+- **REQ-ACT-007:** validación independiente de coeficientes, tangencia,
+  candidatos, rama continuation, conditioning y payload geométrico.
+- **REQ-ACT-008:** un `NOT_ATTEMPTED` posterior a fallo no invoca el closure ni
+  arrastra diagnósticos del estado anterior.
+- **REQ-ACT-VAL-001:** benchmarks independientes UPRIGHT/UCA/LCA,
+  YZ/XZ/CUSTOM, roots múltiples, tangencia, no-solution, steering, roll y
+  asymmetric travel.
+
+## Fuera de alcance v0.7
+
+Fuerzas de muelle/amortiguador, preload, bump rubber, wheel rate completo,
+ARB, anti-dive/lift/rise/squat, full vehicle, pitch, tire forces, dinámica,
+optimización, packaging, rules, Adams y App Designer.

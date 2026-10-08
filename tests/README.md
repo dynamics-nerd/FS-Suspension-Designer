@@ -144,3 +144,18 @@ llamar a `solveBump` actual como expected.
 - sweep `[0,4,0] deg` con `CONVERGED/ROOT_NOT_BRACKETED/NOT_ATTEMPTED`, status
   cinemático preservado, status de análisis separado y todos los agregados
   fallidos en `NaN`.
+
+## Cobertura v0.7
+
+- modelo, units, identities y canonicalización de axis line;
+- equivalencia cinemática PUSHROD/PULLROD con identities distintas;
+- attachments UPRIGHT/UCA/LCA e invariantes de eje, distancia y round trip;
+- rocker YZ/XZ/CUSTOM, rigidez, closure y signo orientado;
+- roots múltiples, continuation unwrapped, tangencia de ambos signos y por
+  tolerancia, no-intersection y reconstrucción independiente de rama;
+- sweeps bump/rebound, round trips, asymmetric axle, body roll y steering;
+- MR analítico independiente, spacing uniforme/no uniforme estrictamente
+  monótono, referencia estática solicitada, migración, stroke y rocker range;
+- validación autónoma de `SteeringCornerResult` antes de consumirlo;
+- invalid payloads, mezcla de geometrías y propagación NaN;
+- visualización de estado y cuatro curvas de análisis.

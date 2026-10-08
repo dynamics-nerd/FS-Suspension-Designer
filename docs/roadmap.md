@@ -173,6 +173,47 @@ dinámica, neumático de fuerzas, optimización, packaging, rules, Adams o UI.
    fallos e integración básica con steering quedan probados.
 8. Suite histórica y nueva, ejemplos, Code Analyzer y diff check pasan.
 
+## v0.7 — Actuation Geometry & Kinematics
+
+Estado: **implementada**.
+
+Incluye modelo opcional por esquina, PUSHROD/PULLROD, attachments UPRIGHT/UCA/LCA,
+rocker YZ/XZ/CUSTOM, eje 3D canonicalizado, closure analítico, branch continuation,
+damper compression, motion-ratio migration, stroke/range, integración downstream
+con bump, asymmetric axle, body roll y steering, visualización e integridad.
+
+No incluye fuerzas, wheel rate completo, ARB, anti geometry, optimización,
+packaging, full vehicle, Adams ni App Designer.
+
+### Criterios de aceptación v0.7
+
+1. PUSHROD/PULLROD comparte ecuaciones y conserva identity distinta.
+2. UPRIGHT/UCA/LCA preservan todos los invariantes de su rigid body.
+3. YZ/XZ/CUSTOM cierran el rod y conservan rigidez del rocker.
+4. Roots múltiples continúan localmente; tangencia y no-solution se distinguen.
+5. MR usa la definición canónica y diferencias finitas de segundo orden.
+6. Sweeps publican stroke/range y no fabrican derivadas cuando la coordenada es
+   inadecuada.
+7. Steering, asymmetric travel y body roll se consumen sin repetir solves.
+8. Suite histórica/nueva, ejemplos, Code Analyzer y diff check pasan.
+
+## Futuro — Anti-Roll Bar Design
+
+La futura decisión de producto se expresará como
+`antiRollBarStrategy = INTEGRATED | POST_DESIGN | DISABLED`:
+
+- `INTEGRATED`: existencia, geometría, stiffness y contribución front/rear del
+  ARB forman parte de la optimización conjunta desde el principio.
+- `POST_DESIGN`: primero se diseña con ARB desactivada y después se diseña y
+  configura para modificar roll stiffness, distribución front/rear y balance.
+- `DISABLED`: el vehículo se diseña y permanece sin ARB.
+
+La milestone deberá cubrir torsion bar, arms/blades, drop links, ARB wheel
+rate, roll-mode stiffness, distribución front/rear y los tres workflows. No se
+mezcla con el rocker del damper. Una ARB puede modificar load-transfer y roll
+stiffness distribution, pero no se prometerá corregir understeer/oversteer sin
+neumáticos, load sensitivity, fuerzas, aero y modelo de vehículo.
+
 ## Futuro — Longitudinal Anti-Geometry
 
 Milestone no iniciada. Deberá tratar por separado y con terminología aprobada:
@@ -185,8 +226,8 @@ Como mínimo requerirá geometría side-view, wheelbase, posición/altura de CG,
 definición del camino de fuerzas, brake-force distribution cuando corresponda
 y driven axle/drive-force assumptions cuando corresponda. Antes de implementar
 habrá que fijar explícitamente terminología, ecuaciones, signos y definición de
-cualquier porcentaje. v0.6 no calcula ninguna de estas magnitudes.
+cualquier porcentaje. v0.7 no calcula ninguna de estas magnitudes.
 
 ## Milestone siguiente
 
-No se define ni se inicia v0.7 en este cambio.
+No se define ni se inicia v0.8 en este cambio.

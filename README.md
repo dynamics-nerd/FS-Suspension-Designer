@@ -4,7 +4,7 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
-**v0.6 — Body Roll & Asymmetric Axle Kinematics** conserva v0.1–v0.5 e
+**v0.7 — Actuation Geometry & Kinematics** conserva v0.1–v0.6 e
 implementa además:
 
 - geometría double wishbone de una esquina con diez hardpoints, incluido tie rod/toe link;
@@ -54,10 +54,20 @@ implementa además:
 - wheel-center track, geometric-contact track y migración desde `h=0, phi=0`;
 - visualización frontal de la carretera inclinada y curvas de roll.
 - statuses cinemáticos y de análisis separados en sweeps con gaps.
+- `ActuationGeometry` opcional por esquina para PUSHROD/PULLROD con attachment
+  sobre UPRIGHT, UCA o LCA;
+- rocker rígido alrededor de una línea 3D, presets YZ/XZ y eje CUSTOM;
+- cierre analítico del actuation rod, selección de rama continua y diagnóstico
+  de tangencia, falta de intersección y mecanismos underconstrained;
+- rocker angle, longitud/compresión de damper, motion ratio, installation ratio,
+  migración, stroke requerido y excursión angular;
+- consumo directo de estados bump, steering, recorrido asimétrico y body roll,
+  sin volver a resolver la suspensión;
+- visualización 3D de actuación y cuatro curvas de sweep.
 
 No calcula columna/volante/pinion, cierre simultáneo steering+roll, fuerzas o
-compliance de dirección, pneumatic trail, anti geometry, actuación, dinámica
-ni optimización.
+compliance, pneumatic trail, spring/damper forces, wheel rate completo, ARB,
+anti geometry, dinámica ni optimización.
 
 ## Convención
 
@@ -90,6 +100,7 @@ addpath("examples")
 example = bumpKinematicsExample(true);
 analysisExample = singleCornerAnalysisExample(true);
 steeringExample = steeringKinematicsExample(true);
+actuationExample = actuationKinematicsExample(true);
 ```
 
 API principal:
@@ -121,6 +132,12 @@ rollAnalysis = fsd.analysis.analyzeAxleRoll(axle, rollResult);
 rollSweep = fsd.kinematics.solveAxleRollSweep( ...
     axle, (-3:0.25:3)', 0, "deg", "mm");
 rollCurves = fsd.analysis.analyzeAxleRollSweep(axle, rollSweep);
+
+actuation = fsd.model.createActuationGeometry(geometry, definition, "mm");
+actuationResult = fsd.kinematics.solveActuation(actuation, result);
+actuationSweep = fsd.kinematics.solveActuationSweep(actuation, sweep);
+actuationAnalysis = fsd.analysis.analyzeActuationSweep( ...
+    actuation, actuationSweep);
 ```
 
 Si `result.converged` es falso, sus puntos y camber son `NaN`; la causa y los residuos permanecen en `result.diagnostics` y `result.failureReason`.
@@ -158,6 +175,11 @@ porcentaje y el mechanical trail no incluye pneumatic trail.
 Los contratos nuevos de recorrido asimétrico, body roll y su análisis usan
 schema `0.6.0`. Los schemas históricos siguen sin cambios. Ackermann continúa
 definido en plan view del chasis y no se presenta como exacto durante roll.
+
+Los contratos opcionales de actuación usan schema `0.7.0`. PUSHROD/PULLROD es
+una identidad arquitectónica: con las mismas coordenadas produce exactamente
+la misma cinemática. El modelo no calcula fuerzas ni valida tracción/compresión
+estructural del rod.
 
 ## Aviso
 

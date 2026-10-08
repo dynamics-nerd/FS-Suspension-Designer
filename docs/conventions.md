@@ -211,8 +211,45 @@ bracket válido no supera el root solve o su post-check. En análisis de sweep,
 estos statuses se conservan como `kinematicStatus`; el status genérico de que
 no hay métricas se publica separadamente como `analysisStatus`.
 
+## Actuación v0.7
+
+- IDs: `ACTUATION_ROD_SUSPENSION`, `ACTUATION_ROD_ROCKER`, `DAMPER_ROCKER` y
+  `DAMPER_CHASSIS`.
+- `actuationType` es `PUSHROD` o `PULLROD`. Es una elección arquitectónica e
+  identitaria; no cambia el cierre cinemático de un rod rígido.
+- `attachmentBody` es `UPRIGHT`, `UCA` o `LCA`.
+- El rocker axis es la línea orientada `P+lambda*u`. `P` se canonicaliza como
+  el punto de la línea más próximo al origen y `u` es unitario.
+- Ese punto canónico no representa bearings ni brackets. Sus futuras
+  ubicaciones físicas pertenecerán a packaging y no a la identity cinemática
+  de la línea.
+- `u` y `-u` representan la misma línea física pero distintas convenciones de
+  signo. El vector orientado forma parte de la identity y define
+  `rockerAngle>0` por mano derecha.
+- `YZ_PLANE` fija `u=[1,0,0]`; `XZ_PLANE` fija `u=[0,1,0]`; `CUSTOM` conserva
+  un vector 3D arbitrario orientado. Un rocker en XY se expresa como CUSTOM
+  con eje paralelo a Z.
+- `orientationMode` es una ayuda de entrada y permanece en el modelo para
+  trazabilidad, pero no forma parte de la identity física. Dos definiciones
+  con el mismo eje canónico tienen la misma identity aunque usen preset o
+  CUSTOM.
+- La geometría estática introducida es `rockerAngle=0`.
+- `damperCompression=Ldamper,0-Ldamper`: positivo significa que se acorta.
+- En sweeps, `maximumCompression` y `maximumExtension` son magnitudes no
+  negativas respecto al estado estático; valen cero si el path no alcanza el
+  sentido correspondiente. `totalRequiredStroke=max(L)-min(L)`.
+- `damperMotionRatio=d(damperCompression)/d(wheelTravel)`; positivo corresponde
+  normalmente a bump que comprime el damper.
+- `installationRatio=abs(damperMotionRatio)` y nunca significa el cociente
+  inverso.
+- `rockerAngularGain=d(rockerAngle)/d(wheelTravel)` en rad/m.
+- Las curvas derivadas requieren al menos tres muestras y wheel travel
+  estrictamente creciente o decreciente. La referencia estática de migración
+  es el índice cuyo target solicitado vale exactamente cero.
+
+PUSHROD/PULLROD no predice si el miembro trabaja a tracción o compresión. Esa
+validación requiere fuerzas y queda fuera de v0.7.
+
 ## Decisiones aún abiertas
 
-> **OPEN DECISION NM-001 — Actuation IDs:** elegir IDs de actuación al diseñar pushrod/pullrod.
-
-> **OPEN DECISION NM-002 — Rocker representation:** definir el eje del rocker cuando se implemente actuación.
+No hay OPEN DECISIONS activas al cerrar v0.7.

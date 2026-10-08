@@ -14,5 +14,8 @@
   RC y track, vista frontal inclinada e integración básica con steering. El
   estado steered reutiliza wheel travels pero no re-resuelve el cierre de
   carretera después de girar las ruedas.
+- `actuationKinematicsExample`: geometría PUSHROD con rocker YZ, static/bump/
+  rebound, sweep, rocker angle, damper compression, MR migration, stroke,
+  visualización y un segundo caso PULLROD CUSTOM inclinado.
 
 Todos los hardpoints son ficticios y no constituyen targets ni recomendaciones de Formula Student.
