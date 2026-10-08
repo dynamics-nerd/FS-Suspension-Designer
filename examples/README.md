@@ -19,3 +19,11 @@
   visualización y un segundo caso PULLROD CUSTOM inclinado.
 
 Todos los hardpoints son ficticios y no constituyen targets ni recomendaciones de Formula Student.
+
+- `springDamperWheelRateExample`: reutiliza geometría/actuación, añade muelle
+  con preload, damping asimétrico, velocidades prescritas, wheel rate total
+  frente al término elástico, energía, validadores y un segundo modelo con
+  límites estrechos. Dos figuras de nueve vistas, no nueve ventanas.
+  `springDamperWheelRateExample(false)` omite figuras para validación batch.
+
+Example geometry and mechanical parameters only — not a Formula Student setup recommendation.

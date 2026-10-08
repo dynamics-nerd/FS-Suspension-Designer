@@ -680,9 +680,74 @@ monótono (creciente o decreciente), sin reordenar el sweep. La referencia
 estática se identifica por `requestedWheelTravel_m==0`; el valor logrado puede
 contener el pequeño residuo numérico admitido por el contrato cinemático.
 
+## Spring, Damper & Wheel Rate v0.8
+
+Para el coilover ideal, z es achieved wheel travel y c compresión del damper:
+
+```text
+Lseat,0 = Lfree-xPreload
+seatOffset = Lseat,0-Ldamper,0
+Lseat = Ldamper+seatOffset = Lseat,0-c
+xRaw = xPreload+c; x=max(xRaw,0); gap=max(-xRaw,0)
+Lspring=Lfree-x; Fs=k*x; U=0.5*k*x^2
+MR=dc/dz
+springWheelResistance = dU/dz = Fs*MR
+wheelRateElastic = k*MR^2             (engaged branch)
+wheelRateGeometric = Fs*dMR/dz
+wheelRateTotal = wheelRateElastic+wheelRateGeometric
+vd = MR*vWheel
+Fd = cBranch*vd                      (linear asymmetric)
+damperWheelResistance = MR*Fd
+P = Fd*vd = damperWheelResistance*vWheel >= 0
+```
+
+La fuerza aplicada a z es el negativo de la resistencia generalizada. Con
+xRaw<0, Fs=U=Kw=0 lejos de engagement; con xRaw=0 el tangent bilateral no es
+único y se publica NaN. En coil bind no se prolonga la ley beyond solid height.
+No se deduce equilibrio, carga de contacto ni estabilidad global.
+
+La derivada segunda usa c original sobre tres samples vecinos. Con
+`t=(zNeighbor-zCurrent)/h`, `h=max(abs(zNeighbor-zCurrent))`, se resuelve
+`[1,t,t^2]*q=cNeighbor-cCurrent`; `dMR/dz=2*q(3)/h^2`.
+Es exacta para c cuadrática; en malla uniforme interior el error es O(h^2),
+y en extremos/malla arbitraria en general O(h). MR de producción permanece
+el first derivative del análisis v0.7; el camino prescrito usa q(2)/h.
+No se diferencia dos veces una curva MR aproximada. Safeguards, statuses,
+tablas y benchmarks completos en [especificación mecánica](spring-damper-wheel-rate.md).
+
+### F-01: sensibilidad numérica de las derivadas (sin nueva ley física)
+
+En un stencil de tres abscisas x_i, con j,l los otros índices:
+
+```text
+w1_i(z) = (2*z-x_j-x_l)/((x_i-x_j)*(x_i-x_l))
+w2_i = 2/((x_i-x_j)*(x_i-x_l))
+e_i = eC_i+max(abs(MR),abs(diff(c)/diff(z)))*eZ_i
+E_MR = sum(abs(w1_i)*e_i)+16*eps(abs(MR))
+E_c2 = sum(abs(w2_i)*e_i)+16*eps(abs(c2))
+E_F = k*eC_current+16*eps(abs(Fs))
+E_geo = abs(Fs)*E_c2+abs(c2)*E_F+E_F*E_c2+16*eps(abs(Fs*c2))
+E_elastic = k*(2*abs(MR)*E_MR+E_MR^2)     (0 si unseated)
+E_Kw = E_elastic+E_geo+16*eps(abs(Kw_candidate))
+```
+
+Producción suma a E_MR la diferencia entre MR validado v0.7 y MR cuadrático
+centrado; usa el primero para proyección. Pesos calculados en coordenadas
+normalizadas. eC/eZ proceden de representación floating-point y, en producción,
+indicadores dimensionales de residual/conditioning; definición exacta en la
+[política F01-1](spring-damper-wheel-rate.md#f-01-representation-sensitivity-independently-of-matrix-conditioning).
+No son incertidumbres físicas ni cotas rigurosas del error de solver.
+
+Lref=Lfree y kref=k. Presupuestos: T_MR=1e-6+1e-3*abs(MR),
+T_c2=1e-6/Lref+1e-3*abs(c2), T_Kw=1e-6*kref+1e-3*abs(Kw_candidate).
+MR tiene criterio independiente; curvatura exige E_c2<=T_c2 y E_Kw<=T_Kw,
+con valores finitos y safeguards previos. No se acepta curvatura deficiente
+por tener poca fuerza. Se conservan fuerzas/damping con MR fiable, pero no
+se fabrica un Kw total sin término geométrico. Truncación no está incluida en
+estos estimadores; AVAILABLE no garantiza precisión total ni fabricación.
+
 ## Pending mathematical specifications
 
 No están especificados ni implementados roll axis de vehículo, steering
-wheel/column, pinion ratio, fuerzas o compliance, pneumatic trail, spring o
-damper forces, wheel rate completo, ARB, anti geometry, neumáticos de fuerzas
-ni dinámica.
+wheel/column, pinion ratio, fuerzas estructurales o compliance, pneumatic trail,
+equilibrio/cargas de vehículo, ARB, anti geometry, neumáticos de fuerzas ni dinámica.

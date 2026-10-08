@@ -1,5 +1,63 @@
 # Testing strategy
 
+## Corrección F-01 (v0.8 permanece 0.8.0)
+
+`TestCurvatureReliability` añade 16 casos ejecutados (14 métodos, uno con tres
+spacings parametrizados), sobre baseline 311: total 327. No altera pruebas
+históricas. Comprueba sensibilidad de muestras, MR separado de curvatura,
+cuadrática a 1e-13 m, rocker a 1e-4/1e-8/1e-9 m, cero bien resuelto, no uniforme,
+descendente, preload/rate, cancelación, unseated/engagement, m/mm, nominal
+irresoluble, cobertura parcial/plot NaN, gaps reales y ocho manipulaciones
+adversariales de valores, status, weights, error, migración y agregados.
+
+`tests/private/rockerWheelRateReference.m` calcula un círculo de suspensión y
+cierre círculo/esfera del rocker independientes; deriva implícitamente theta
+y la longitud del damper dos veces. No llama al solver ni al helper probado.
+Referencia central z=0.01 m: Kw=433.730954102 N/m. Spacing 1e-4 m se compara
+con AbsTol=0.03 N/m, por truncación del stencil; los spacings finos deben ser
+indisponibles. Cuadrática exacta: Kw=13962 N/m, pero el input redondeado a
+1e-13 m no puede recuperar fiablemente esa curvatura. El MR central se
+compara con 0.56 (AbsTol=1e-5), no exige exactitud inexistente en esas muestras.
+La equivalencia m/mm del estimador usa RelTol=0.01, por redondeo en conversiones.
+
+```matlab
+setupProject
+results = runProjectTests;
+addpath("tests")
+reportV08 = verifyV08; % ocho ejemplos, Analyzer, dependencias y timings
+reportF01 = verifyF01; % reproducciones, warm-up, mediana y perfil sin solves
+```
+
+Los budgets F01-1 son política numérica, no tolerancias físicas ni intervalos
+estadísticos. No incluyen truncación; consultar la especificación mecánica.
+
+## Cobertura v0.8
+
+`TestSpringDamperModel`, `TestSpringDamperPhysics` y
+`TestSpringDamperIntegration` añaden 39 tests significativos. Se conservan los
+272 históricos; sólo cambia el expected version del test foundation a 0.8.0.
+Cubren parámetros/identity/MAT, SI y unidades de frontera, muelle/preload/
+asientos/unseating, transición, energía independiente, wheel rate completo,
+MR constante/variable/negativo/cero, quadratic benchmark con malla uniforme,
+no uniforme y decreciente, damping lineal/tabulado y potencias, límites,
+derivadas indisponibles, gap real y tangencia real, manipulación de familias de
+campos, fuentes de otro sweep/model, FL/FR/RL/RR, asymmetric travel, roll±,
+steering+bump y nueve paneles gráficos ocultos.
+
+Expected del benchmark: `c=a*z+b*z^2`, `MR=a+2*b*z`, `dMR/dz=2*b`,
+`Fs=k*max(preload+c,0)`, `Fw=Fs*MR`, `Kw=k*MR^2+2*b*Fs` en engaged branch.
+No se fabrica un ActuationResult: se usa la API de camino prescrito ideal.
+Expected energéticos independientes usan diferencias centrales con h=1e-6 m,
+errores admitidos 2e-6 N y 2e-5 N/m por truncación/roundoff. Benchmarks
+cuadráticos usan 2e-13 para MR, 3e-10 1/m para dMR, 2e-7 N/m para Kw.
+Son tolerancias de verificación numérica, nunca de fabricación.
+
+Después de `setupProject; runProjectTests`, ejecutar `addpath("tests");
+report=verifyV08` para ocho ejemplos, Code Analyzer sobre todos los .m,
+timing de cuatro etapas (un warm-up + mediana de tres runs, 21 samples) y
+perfil que comprueba cero llamadas a nonlinear/kinematic solvers durante
+análisis mecánico. El perfil se separa de las mediciones de tiempo.
+
 > Engineering change → Unit test → Known case → Validation → Merge
 
 ```matlab

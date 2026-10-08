@@ -1,5 +1,54 @@
 # Requisitos
 
+## v0.8 Spring, Damper & Wheel-Rate Modelling
+
+- **REQ-SD-001:** modelo COILOVER opcional por esquina, SI y MAT, independiente
+  de UI y de contratos geométricos, con identidad física completa.
+- **REQ-SD-002:** muelle compresión-only, precarga no negativa, asientos con
+  offset firmado, gap y energía; no convertir preload en corner load/sag.
+- **REQ-SD-003:** `Fw=Fs*MR`, `Kw=k*MR^2+Fs*dMR/dz`; conservar ambos términos
+  y rigidez negativa con diagnóstico, no una afirmación de estabilidad global.
+- **REQ-SD-004:** derivada segunda directamente desde c(z), achieved travel,
+  mallas no uniformes/invertidas, extremos y estados no disponibles explícitos.
+- **REQ-SD-005:** damping por velocidad axial firmada, branches independientes,
+  pasividad/potencia; sin mezclar damping con wheel rate.
+- **REQ-SD-006:** tablas piecewise linear pasivas con origen (0,0), sin
+  extrapolación ni requisito artificial de monotonicidad de fuerza.
+- **REQ-SD-007:** límites opcionales, UNKNOWN si ausentes; coil bind y damper
+  exceeded no extrapolan end-stop laws ni publican fuerzas factibles ficticias.
+- **REQ-SD-008:** single-state axial-only; sweeps validan fuentes completas,
+  velocidades y asociación sin re-resolver suspensión/rocker.
+- **REQ-SD-009:** gaps/ill-conditioning/transiciones conservan NaN; referencia
+  nominal sólo con target cero único y wheel rate válido.
+- **REQ-SD-VAL-001:** tests independientes cuadrático/MR constante, preload,
+  energía/derivadas, damping con MR negativo, límites, unidades, tablas,
+  integridad, cuatro corners, asymmetric travel, roll y steering.
+- **REQ-SD-VAL-002:** 272 tests históricos, ocho ejemplos, Code Analyzer,
+  dependency audit, diff check y benchmark warm-up de 21 samples.
+
+El [contrato detallado](spring-damper-wheel-rate.md) fija los statuses y APIs.
+F-01 añade requisitos de fiabilidad numérica, sin cambiar las leyes físicas:
+
+- **REQ-SD-F01-001:** estimar sensibilidad desde pesos del stencil y resolución
+  de las muestras originales c/z, no sólo rcond o eps de la derivada final.
+- **REQ-SD-F01-002:** criterios separados para MR, curvatura intrínseca e impacto
+  en Kw; presupuestos mixtos absolutos/relativos documentados, sin ocultar
+  cancelación ni curvatura irresoluble detrás de fuerza/preload pequeños.
+- **REQ-SD-F01-003:** suprimir c2, término geométrico y total no fiables con NaN
+  y status explícito; preservar respuesta axial, fuerzas/damping de rueda y
+  componente elástico si MR y sus leyes/límites son válidos.
+- **REQ-SD-F01-004:** nominal/migración/extrema/plots no reciclan valores
+  invalidados; cobertura parcial explícita, sin interpolación de gaps.
+- **REQ-SD-F01-005:** validadores reconstruyen también sensibilidad/statuses,
+  weights, cobertura y agregados; rechazan payloads adversariales.
+- **REQ-SD-F01-VAL:** reproducir cuadrática a 1e-13 m y rocker a 1e-4/1e-8/1e-9 m
+  con referencia analítica independiente; casos cero, mallas irregulares y
+  descendentes, unidades, preload, gaps reales y regresión histórica completa.
+
+No incluye ARB, anti geometry, equilibrio, dinámica, optimización, reglas,
+packaging, Adams ni App Designer. Las exclusiones siguientes son históricas
+por milestone, no exclusiones de las capacidades mecánicas actuales.
+
 ## v0.5 Steering
 
 - **REQ-STR-001:** aceptar únicamente un `AxleGeometry` FRONT con FL/FR.

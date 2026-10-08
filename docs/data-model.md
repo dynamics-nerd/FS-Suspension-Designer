@@ -1,4 +1,40 @@
-# Modelo de datos v0.7
+# Modelo de datos v0.8
+
+## Contratos mecánicos opcionales v0.8
+
+`SpringDamperModel` es un struct, no una nueva jerarquía de clases. Contiene
+`cornerId`, la `actuationIdentity` existente, `configuration="COILOVER"`,
+`spring`, `damper`, `derivedStaticGeometry`, metadata e identity. No duplica
+la geometría completa de actuación. Parámetros se almacenan en SI con
+sufijos de unidad; límites opcionales ausentes se normalizan a `[]`.
+La identity canónica 1.0.0 incluye todos los parámetros físicos, tablas,
+límites y asociación; excluye metadata. Cambios de rate, preload o damping
+cambian identity. Los contratos antiguos no cambian de schema.
+
+`SpringDamperStateAnalysis` conserva source íntegro, modelIdentity y velocidad
+axial prescrita, más `state` axial-only. Las métricas en rueda son NaN.
+`SpringDamperSweepAnalysis` conserva source (sweep y análisis de actuación
+íntegros, o camino prescrito explícito), path, velocidad en rueda N×1,
+states N×1, curvas redundantes N×1, referencia nominal, métricas y timing.
+No mezcla fuentes por dimensiones: compara identidad y payload upstream.
+Los validadores reconstruyen leyes, geometría de asientos, statuses y
+agregados. NaN significa no disponible; no se sustituye por cero.
+
+F-01 mantiene schema/version 0.8.0 y SpringDamperModel sin cambios. Añade a
+los sweeps `derivativeDiagnostics` (política F01-1, muestras, stencil/pesos,
+candidatos, estimaciones/límites y flags), `motionRatioStatus` por estado/curva,
+`validWheelRateSampleCount` y `wheelRateCoverageComplete`. Curvatura y MR
+tienen disponibilidad independiente; los candidatos diagnósticos no sustituyen
+curvas publicadas. El single-state axial-only no necesita estos diagnostics.
+La reconstrucción completa verifica los campos nuevos. Un análisis mecánico
+MAT previo a F-01 debe recalcularse desde source; no se añade migrador ni se
+acepta un payload antiguo como si hubiera superado el nuevo criterio.
+
+Persistencia: `save/load` MAT de structs, conservando identity/model/source
+juntos; validar tras load. No se redefine el loader histórico de geometría
+como un loader genérico ni se introduce otro formato. La metadata puede
+registrar KNOWN/ASSUMED/sourceNote por parámetro; si falta, su procedencia no
+se presume conocida. Véase [campos y APIs](spring-damper-wheel-rate.md).
 
 ## DoubleWishboneGeometry
 

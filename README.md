@@ -4,7 +4,7 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
-**v0.7 — Actuation Geometry & Kinematics** conserva v0.1–v0.6 e
+**v0.8 — Spring, Damper & Wheel-Rate Modelling** conserva v0.1–v0.7 e
 implementa además:
 
 - geometría double wishbone de una esquina con diez hardpoints, incluido tie rod/toe link;
@@ -64,10 +64,18 @@ implementa además:
 - consumo directo de estados bump, steering, recorrido asimétrico y body roll,
   sin volver a resolver la suspensión;
 - visualización 3D de actuación y cuatro curvas de sweep.
+- coilover ideal opcional por esquina, muelle lineal de compresión, precarga,
+  geometría de asientos, descarga y energía almacenada;
+- damper pasivo lineal asimétrico o tabulado, con branches por velocidad axial;
+- resistencia generalizada firmada en rueda y wheel rate tangente completo
+  `k*MR^2 + Fs*dMR/dz`, incluidos diagnósticos de rigidez tangente negativa;
+- límites explícitos de longitud/solid height, derivadas condicionadas,
+  validación de fuentes y nueve vistas mecánicas agrupadas.
 
-No calcula columna/volante/pinion, cierre simultáneo steering+roll, fuerzas o
-compliance, pneumatic trail, spring/damper forces, wheel rate completo, ARB,
-anti geometry, dinámica ni optimización.
+No calcula columna/volante/pinion, cierre simultáneo steering+roll, fuerzas
+estructurales o compliance, pneumatic trail, cargas de contacto/equilibrio,
+ARB, anti geometry, dinámica ni optimización. La respuesta mecánica consume
+estados prescritos; no calcula sag, corner load, ride frequency ni damping ratio.
 
 ## Convención
 
@@ -180,6 +188,42 @@ Los contratos opcionales de actuación usan schema `0.7.0`. PUSHROD/PULLROD es
 una identidad arquitectónica: con las mismas coordenadas produce exactamente
 la misma cinemática. El modelo no calcula fuerzas ni valida tracción/compresión
 estructural del rod.
+
+Los contratos de muelle/amortiguador usan schema `0.8.0`; no se modifican
+los schemas históricos ni los solvers. Su identity incluye la asociación
+con actuación y todos los parámetros físicos, pero no metadata.
+
+## Uso mecánico v0.8
+
+```matlab
+setupProject
+results = runProjectTests;
+addpath("examples")
+e = springDamperWheelRateExample(true);
+
+% El ejemplo devuelve modelos y fuentes válidos, no un setup recomendado.
+response = fsd.analysis.analyzeSpringDamperSweep( ...
+    e.model, e.actuation, e.actuationSweep, e.actuationAnalysis, 100, "mm/s");
+% Un estado individual sólo proporciona métricas axiales; no inventa MR.
+nominal = e.nominal;
+```
+
+Inputs del modelo: `configuration="COILOVER"`, `spring.modelType`, `rate`,
+`freeLength`, `preloadCompression`, solid height opcional; damper lineal con
+`compressionCoefficient/reboundCoefficient` o tablas `[speed,force_N]`.
+Los nombres, unidades, firmas completas y statuses están en
+[especificación v0.8](docs/spring-damper-wheel-rate.md).
+
+Roadmap: v0.1–v0.7 conservadas; v0.8 añade respuesta mecánica cuasiestática.
+ARB y longitudinal anti-geometry siguen siendo milestones futuras.
+No se inicia v0.9, optimización, Adams ni App Designer.
+
+Para verificar los ocho ejemplos, Code Analyzer y rendimiento:
+
+```matlab
+addpath("tests")
+report = verifyV08;
+```
 
 ## Aviso
 

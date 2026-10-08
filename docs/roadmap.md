@@ -228,6 +228,35 @@ y driven axle/drive-force assumptions cuando corresponda. Antes de implementar
 habrá que fijar explícitamente terminología, ecuaciones, signos y definición de
 cualquier porcentaje. v0.7 no calcula ninguna de estas magnitudes.
 
-## Milestone siguiente
+## v0.8 — Spring, Damper & Wheel-Rate Modelling
 
-No se define ni se inicia v0.8 en este cambio.
+Estado: **implementada**, pendiente de revisión humana y merge autorizado.
+
+Incluye coilover ideal opcional, muelle lineal de compresión y preload,
+separación de asientos, descarga, energía, damping lineal asimétrico y tabulado,
+proyección firmada, wheel rate elástico/geometrico/total, límites proporcionados,
+derivada directa de MR, integridad, plots, ejemplo y pruebas independientes.
+
+Criterios de aceptación:
+
+1. Benchmarks `c=a*z+b*z^2` y MR constante reproducen fuerza, energía y
+   rigidez, con precarga cero/no cero y mallas crecientes/decrecientes.
+2. `Fw=dU/dz`; `Kw=dFw/dz`; preload modifica el término geométrico.
+3. MR negativo selecciona correctamente la branch axial; ambas potencias
+   disipadas coinciden y son no negativas.
+4. Unseating, transición, solid height, límites de damper y fuera de tablas
+   mantienen statuses explícitos y no inventan leyes de end stops.
+5. Gaps, fuentes incorrectas y derivadas no válidas no generan métricas en rueda.
+6. Los cuatro corners, asymmetric travel, roll y steering consumen sus
+   fuentes sin nuevos solves dentro del análisis mecánico.
+7. Suite histórica y nueva, ocho ejemplos, Code Analyzer sin incidencias,
+   dependencias acíclicas, perfil de cero solves y diff check pasan.
+
+Fuera de alcance: equilibrio global, cargas neumático/aero, ride frequency,
+damping ratio, ARB, resortes no lineales, bump stops, heave/third springs,
+torsion springs, hysteresis/thermal, rod forces/fatigue, anti geometry,
+optimización, normativa, packaging collisions, Adams y App Designer.
+
+La estrategia ARB `INTEGRATED | POST_DESIGN | DISABLED` y la milestone
+longitudinal anti-dive, anti-lift/anti-rise y anti-squat anteriores se conservan.
+NM-001 y NM-002 permanecen resueltas. No se inicia ni define v0.9.

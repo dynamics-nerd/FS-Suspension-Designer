@@ -2,9 +2,24 @@
 
 ## Objetivo y límite actual
 
-FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.7** añade actuación geométrica opcional sobre las capacidades de suspensión, dirección y body roll v0.1–v0.6. Rules, optimización, dinámica, vehículo completo y UI siguen sin implementación funcional.
+FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.8** añade respuesta mecánica cuasiestática opcional de coilover sobre las capacidades v0.1–v0.7. Rules, optimización, dinámica, vehículo completo y UI siguen sin implementación funcional.
 
 ## Capas
+
+v0.8 mantiene esa separación. `model` contiene `SpringDamperModel`, identidad
+y conversiones mecánicas; `analysis` contiene leyes, límites y proyección.
+No se añade lógica mecánica a `kinematics`, `ActuationGeometry` o la UI.
+El nuevo flujo es `ActuationSweepResult + ActuationSweepAnalysis + modelo
+-> analyzeSpringDamperSweep -> respuesta/plots`. La geometría explícita en
+la firma permite reutilizar el validador upstream existente, sin duplicarla
+en el modelo. Se valida el agregado una vez en la frontera; el loop privado
+no revalida fuentes por sample ni llama a ningún solver.
+
+Un `ActuationResult` de roll, steering o recorrido asimétrico se consume con
+`analyzeSpringDamperState`: axial-only, sin derivadas en rueda inventadas.
+La API de camino prescrito distingue explícitamente una ley ideal de una
+solución de rocker; no crea un contrato cinemático falso. Véase
+[especificación mecánica](spring-damper-wheel-rate.md).
 
 1. **Presentación (`app`)**: futura interfaz App Designer. Traduce interacción humana a llamadas del núcleo y presenta resultados.
 2. **Núcleo de ingeniería (`src/+fsd`)**: modelos, validación y algoritmos independientes de la UI.

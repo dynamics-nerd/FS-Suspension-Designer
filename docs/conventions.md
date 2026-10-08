@@ -1,5 +1,24 @@
 # Convenciones
 
+## Mecánica v0.8
+
+Se conservan X atrás / Y derecha / Z arriba y `wheelTravel>0` en bump.
+`c=Ldamper,0-Ldamper` y `MR=dc/dz` son firmados; nunca sustituir MR por
+installation ratio en fuerzas o velocidades. `Fs>=0` es magnitud axial de
+compresión; `Fs*MR=dU/dz` es resistencia generalizada. La fuerza del muelle
+que actúa sobre la coordenada z es su opuesta, no una carga de contacto.
+`vd=MR*vWheel>0` selecciona damper COMPRESSION; `vd<0` REBOUND.
+`Fd` tiene el signo de vd; la fuerza aplicada es `-Fd`, y `Fd*vd>=0`.
+
+SI interno: m, m/s, N, N/m, N*s/m, J, W. `convertMechanicalUnits` convierte
+longitud m/mm, velocidad m/s o mm/s, stiffness N/m o N/mm, damping N*s/m
+o N/(mm/s), exclusivamente en fronteras. Tablas usan fuerzas en N.
+El instante nominal z=0 no es equilibrio ni define sag/corner load.
+Precarga conocida o asumida debe indicarse en metadata, no inferirse de masa.
+Bounds ausentes son UNKNOWN, no una certificación de seguridad.
+Detalles de discontinuidades y tolerancias numéricas en
+[especificación v0.8](spring-damper-wheel-rate.md).
+
 ## Unidades
 
 El núcleo utiliza SI: m, rad, N, kg y s. Las APIs de geometría y wheel travel aceptan `"m"` o `"mm"`; convierten en la frontera mediante `fsd.model.convertLengthToMetres`.

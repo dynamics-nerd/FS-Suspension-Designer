@@ -120,7 +120,32 @@
 - **PERF-003:** `solveAxleTravelCore` es privado y asume axle, target SI y
   settings ya validados; las APIs públicas conservan validación completa.
 
-## Abiertas
+## Cerradas en v0.8
+
+- **SD-001:** COILOVER ideal, muelle lineal compresión-only y geometría de
+  asientos derivada de longitud libre/preload; no se añade fuerza a actuación.
+- **SD-002:** resistencia generalizada firmada como gradiente de energía;
+  wheel rate total incluye `Fs*dMR/dz`. Negativo se conserva como diagnóstico.
+- **SD-003:** estado individual axial-only; sweep usa MR de v0.7 validado.
+  Geometría explícita adicional en la firma permite reutilizar su validador.
+- **SD-004:** dMR/dz desde interpolante cuadrático de c(z), no de MR aproximado;
+  stencil centrado/escalado y safeguards numéricos documentados. Gaps no se
+  cruzan y datos no se reordenan. No se afirma orden dos en todo caso no uniforme.
+- **SD-005:** damping lineal asimétrico y tabulado sin extrapolar; force
+  magnitude no tiene que ser monótona, pero la disipación es no negativa.
+- **SD-006:** UNKNOWN sin bounds; exceeded invalida respuesta constitutiva;
+  transición de engagement y coil-bind boundary no tienen tangent bilateral.
+- **SD-007:** benchmarks con camino prescrito explícito, nunca ActuationResult
+  falsificado. Es una hipótesis ideal de test, no validación de rocker físico.
+- **SD-008:** extrema completos o NaN ante samples no disponibles, sin esconder
+  estados faltantes. Result validators reconstruyen payload, no sólo shape.
+
+No se requiere nueva decisión física humana para este modelo ideal solicitado.
+OPEN DECISION para una milestone futura: cualquier ley de bump stop/post-bind,
+spring no lineal o damper con gas/hysteresis requiere especificación y aprobación;
+no se elige ni implementa aquí. NM-001/NM-002 siguen resueltas y ARB-001 intacta.
+
+## Abiertas al cerrar v0.7
 
 No hay decisiones abiertas al cerrar v0.7.
 
