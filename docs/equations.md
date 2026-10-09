@@ -746,8 +746,39 @@ por tener poca fuerza. Se conservan fuerzas/damping con MR fiable, pero no
 se fabrica un Kw total sin término geométrico. Truncación no está incluida en
 estos estimadores; AVAILABLE no garantiza precisión total ni fabricación.
 
-## Pending mathematical specifications
+## Vehicle Parameters & Static Load Equilibrium v0.9
+
+M=sum(m_i), rCG=sum(m_i*r_i)/M; coordenada desconocida no se inventa.
+Suelo horizontal sin otras cargas: W=M*g, suma N=W,
+suma x_i*N_i=W*xCG, suma y_i*N_i=W*yCG. Altura CG no aparece.
+Para ejes X=0/L: NF=W*(L-xCG)/L; NR=W*xCG/L.
+A=[1,1,1,1; xContacts'; yContacts'], b=W*[1;xCG;yCG].
+Rango tres deja un grado: N=N0+lambda*n, A*n=0. Intersectar N_i>=0
+da intervalo admisible; N0 nunca se publica como distribución única.
+CW=(FR+RL)/W añade fila [0,1,1,0]. Simetría es hipótesis explícita,
+medidas conservan su residual, y falta de cuarta condición queda indeterminada.
+M_sprung=M-totalUnsprung sólo con datos completos; soporte local=N_i-m_ui*g
+bajo hipótesis concentrada/vertical ideal, no fuerzas de todos los links 3D.
+
+Equilibrio local: Fs(z)*MR(z)=support_target, con MR firmado y damping=0.
+Interpolación lineal de fuerza validada: a=(target-Fi)/(Fj-Fi),
+z_eq=zi+a*(zj-zi). Root exacta DEL interpolante, no del mecanismo continuo.
+Kw completo validado v0.8 clasifica pendiente local, no estabilidad global;
+con F-01 no fiable no se sustituye Kw por término elástico ni secante.
+Método, error proxies, tolerancias numéricas y limits de completitud en
+[contrato v0.9](vehicle-static-equilibrium.md).
+
+Correcciones de auditoría v0.9: SL-32 separa residual de equilibrio, error de
+roundoff y N_i>=0. La sensibilidad por sigmaMin del sistema escalado produce
+presupuestos en N y se propaga a los cocientes -N0_i/n_i (lambda también en N).
+Un intervalo puntual numérico conserva nullspace de dimensión 1. Candidatos
+de frontera se verifican contra las filas originales, incluida CW, antes y
+después de cualquier corrección estrictamente negativa de roundoff. Medidas
+no se corrigen. Soporte negativo no se recorta. Fórmulas, origen y limitaciones
+del presupuesto en la sección SL-32 del contrato; no cambia ninguna ley v0.8.
+
+## Pending mathematical specifications (después de v0.9)
 
 No están especificados ni implementados roll axis de vehículo, steering
 wheel/column, pinion ratio, fuerzas estructurales o compliance, pneumatic trail,
-equilibrio/cargas de vehículo, ARB, anti geometry, neumáticos de fuerzas ni dinámica.
+equilibrio global acoplado de chasis, ARB, anti geometry, neumáticos de fuerzas ni dinámica.

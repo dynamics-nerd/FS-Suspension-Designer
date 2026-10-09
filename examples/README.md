@@ -1,5 +1,13 @@
 # Examples
 
+## v0.9
+
+vehicleStaticEquilibriumExample(showPlots) enseña masas base/piloto/fuel con
+provenance ASSUMED, CG, indeterminación diagonal, closure CW, soporte reducido,
+equilibrio local y comparación con vehículo sin piloto. Tres figuras muestran
+planta/cargas indeterminadas, distribución cerrada y roots sobre fuerza-travel.
+Valores ilustrativos, no recomendaciones de setup. No afirma equilibrio global.
+
 - `staticDoubleWishboneExample`: construcción, consulta, reflexión y plot estático con diez hardpoints.
 - `bumpKinematicsExample`: estado cero, bump, rebound, sweep, Camber(WheelTravel) y comparación 3D.
 - `singleCornerAnalysisExample`: geometría, sweep, camber, toe, bump steer, caster, kingpin inclination y tiempos separados de solver/análisis.

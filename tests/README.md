@@ -1,5 +1,63 @@
 # Testing strategy
 
+## Regresiones de auditoría v0.9
+
+TestStaticLoadAudit (16 métodos) cubre los tres reproductores, todos los
+vértices/aristas, interior/exterior y roundoff, tracks diferentes, contactos
+no rectangulares, gravity=5/10, conditioning, ambos límites CW, negativa
+-5e-8 N, preservación exacta de 1e-12/1e-9/cero, discrepancias de medidas,
+soporte negativo/irresoluble y ataques a los diagnósticos/familia/identity.
+TestFlatIntervalAudit (9 métodos) comprueba N=21/101/501/2001, extremos
+inclusivos, flats separados, roots aisladas a ambos lados, gaps por límites,
+orden creciente/decreciente, dominio puntual y payloads manipulados.
+Incluye un prefijo axial unseated seguido de fallo cinemático/NOT_ATTEMPTED:
+el contrato histórico invalida MR del sweep y NO permite fabricar un flat.
+Los 368 tests previos se conservan sin modificaciones.
+Validación final real en R2025b: **393/393 PASS**, nueve ejemplos y Code Analyzer
+**0 incidencias / 238 archivos**. No hay tests requeridos pendientes.
+
+Expected de vértices: 1000 N sobre el contacto correspondiente; aristas:
+500 N por contacto extremo. Expected fuera: no existe conjunto de normales
+no negativas. Residuales se reconstruyen independientemente con coordenadas
+y peso originales, tolerancia software 1e-9 N/Nm para los fixtures de escala
+2 m/1000 N (NO define aceptación de viabilidad en producción).
+La complejidad estructural verifica R comparaciones + como máximo F avances;
+no exige ratios de tiempo exactos. verifyV09Audit mide API/core y el filtro
+específico mediante profiler separado, con fuentes creadas antes del cronómetro.
+
+```matlab
+setupProject;
+runProjectTests;
+addpath("tests");
+verifyV09;       % nueve ejemplos, Analyzer y DAG
+verifyV09Audit;  % reproductores + mediana de 3 mediciones después de warm-up
+verifyF01;       % curvatura irresoluble v0.8, no se modifica
+```
+
+## Cobertura v0.9
+
+41 tests nuevos: VehicleParameters (12), StaticVehicleLoads (13),
+CornerStaticEquilibrium (16). Baseline histórica 327; entrega inicial **368/368 PASS**
+en MATLAB R2025b, antes de las 25 regresiones de auditoría. Resultados y mediciones en
+[informe v0.9](../docs/v0.9-validation.md).
+Sólo el expected version de foundation cambia a 0.9.0; ningún cálculo o
+tolerancia histórica se modifica. Incluyen masas/CG/inventarios, falta de
+datos, unidades/gravity, familia [250+d,250-d,250-d,250+d], CW y tracks distintos,
+CG fuera de soporte, medidas/residual, sprung/unsprung, roots lineales y
+cuadrática de compresión con múltiples roots/tangencia, preload, F-01,
+límites/gaps/NOT_ATTEMPTED, mutaciones de payload e integración/figuras ocultas.
+Referencias de cargas: 1000 N, L=2 m y tracks 1 m; roots lineales
+F=300+7500*z N con z_eq=(330-300)/7500 m. Tolerancias 1e-10 N en álgebra,
+1e-12 a 1e-14 m en roots de paths ideales; software, no tolerancias físicas.
+Cuadrática c=.5*z-10*z² da F/k=.01-.15*z-15*z²+200*z³ y demanda 300 N:
+roots z=0 y (15-sqrt(345))/400 m en el dominio usado, con slopes opuestos.
+Tangencia exacta muestreada z=(30-sqrt(1260))/1200; no se promete detectar
+una tangencia continua que la malla no resuelve.
+
+Ejecutar setupProject; runProjectTests; addpath("tests"); verifyV09.
+El verifier ejecuta los ocho ejemplos previos, el nuevo, Analyzer/DAG y
+benchmarks con warm-up, fuentes resueltas fuera del equilibrio local.
+
 ## Corrección F-01 (v0.8 permanece 0.8.0)
 
 `TestCurvatureReliability` añade 16 casos ejecutados (14 métodos, uno con tres

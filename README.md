@@ -4,7 +4,7 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
-**v0.8 — Spring, Damper & Wheel-Rate Modelling** conserva v0.1–v0.7 e
+**v0.9 — Vehicle Parameters, Static Loads & Corner Equilibrium** conserva v0.1–v0.8 e
 implementa además:
 
 - geometría double wishbone de una esquina con diez hardpoints, incluido tie rod/toe link;
@@ -72,10 +72,13 @@ implementa además:
 - límites explícitos de longitud/solid height, derivadas condicionadas,
   validación de fuentes y nueve vistas mecánicas agrupadas.
 
-No calcula columna/volante/pinion, cierre simultáneo steering+roll, fuerzas
-estructurales o compliance, pneumatic trail, cargas de contacto/equilibrio,
-ARB, anti geometry, dinámica ni optimización. La respuesta mecánica consume
-estados prescritos; no calcula sag, corner load, ride frequency ni damping ratio.
+v0.9 añade masas operativas y composición de CG, carga de ejes, familia
+indeterminada de cuatro normales, cierre explícito por medidas/crossweight/
+simetría asumida, bookkeeping sprung/unsprung y equilibrio LOCAL sobre un
+path validado. No publica cuatro corner weights únicos sin cuarta condición.
+No calcula equilibrio global de chasis, heave/pitch/roll acoplados, dinámica,
+ARB, anti geometry, neumáticos de fuerzas, optimización, ride frequency ni
+damping ratio. Recorrido local de equilibrio no equivale a ride height real.
 
 ## Convención
 
@@ -214,9 +217,27 @@ Inputs del modelo: `configuration="COILOVER"`, `spring.modelType`, `rate`,
 Los nombres, unidades, firmas completas y statuses están en
 [especificación v0.8](docs/spring-damper-wheel-rate.md).
 
-Roadmap: v0.1–v0.7 conservadas; v0.8 añade respuesta mecánica cuasiestática.
+Roadmap: v0.1–v0.8 conservadas; v0.9 añade vehículo, cargas estáticas y equilibrio local.
 ARB y longitudinal anti-geometry siguen siendo milestones futuras.
-No se inicia v0.9, optimización, Adams ni App Designer.
+Equilibrio acoplado de chasis sigue futuro. No se inicia v0.10, Adams ni App Designer.
+
+## Uso estático de vehículo v0.9
+
+```matlab
+addpath("examples")
+e = vehicleStaticEquilibriumExample(true);
+% M/CG por componentes, familia de cargas, CW explícito y root local estimada.
+addpath("tests")
+report = verifyV09;
+```
+
+Gravity es entrada obligatoria. Cargas en N; kg_equivalent usa esa gravedad.
+Datos desconocidos permanecen NaN. Contratos, APIs, modos y limitaciones en
+[Vehicle Parameters & Static Load Equilibrium](docs/vehicle-static-equilibrium.md).
+Validación tras correcciones de auditoría: **393/393 tests** (368 anteriores +
+25 nuevos), **9/9 ejemplos**, **0 incidencias de Code Analyzer / 238 archivos
+MATLAB**. Archivos, benchmarks, rendimiento y
+limitaciones en el [informe de entrega v0.9](docs/v0.9-validation.md).
 
 Para verificar los ocho ejemplos, Code Analyzer y rendimiento:
 

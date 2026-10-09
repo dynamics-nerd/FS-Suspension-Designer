@@ -259,4 +259,24 @@ optimización, normativa, packaging collisions, Adams y App Designer.
 
 La estrategia ARB `INTEGRATED | POST_DESIGN | DISABLED` y la milestone
 longitudinal anti-dive, anti-lift/anti-rise y anti-squat anteriores se conservan.
-NM-001 y NM-002 permanecen resueltas. No se inicia ni define v0.9.
+NM-001 y NM-002 permanecen resueltas. v0.9 se describe a continuación.
+
+## v0.9 — Vehicle Parameters, Static Loads & Corner Equilibrium
+
+Implementada: masas operativas, CG compuesto, dimensiones/gravedad/contactos,
+cargas de eje y familia de cuatro contactos, closure measured/CW/ASSUMED,
+bookkeeping sprung/unsprung, comparaciones y equilibrio local sobre path v0.8.
+Criterios: indeterminación sin cuarta condición explícita, desconocidos NaN,
+balances/momento/no negatividad, roots y selección no arbitrarias, F-01 intacto,
+327 históricos + tests nuevos, nueve ejemplos, Analyzer cero y DAG conservado.
+No incluye equilibrio simultáneo de chasis, dinámica, ARB, anti, aero, tires,
+optimización, Adams ni UI. Root interpolada no es ride height ni pose resuelta.
+
+## Futuro — Coupled Chassis Pose & Global Static Equilibrium
+
+No implementado. Requerirá full-vehicle heave/pitch/roll, geometría cinemática
+3D coherente de cuatro esquinas, carretera/contact constraints, tire vertical
+compliance cuando corresponda, balances sprung/unsprung y acoplamiento de
+fuerzas/momentos. Cuatro roots locales no sustituyen esa especificación.
+ARB INTEGRATED/POST_DESIGN/DISABLED y longitudinal anti geometry se conservan.
+No se inicia v0.10.

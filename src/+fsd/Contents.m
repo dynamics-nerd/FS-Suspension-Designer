@@ -1,5 +1,14 @@
 % FS Suspension Designer engineering core.
 %
+% v0.9 Vehicle Parameters, Static Loads & Corner Equilibrium
+%   fsd.model.createVehicleParameters          - Standalone SI mass/CG contract.
+%   fsd.model.createVehicleLoadCase            - Explicit load distribution mode.
+%   fsd.analysis.analyzeStaticVehicleLoads     - Reactions/family and local support.
+%   fsd.analysis.solveCornerStaticEquilibrium  - Validated sampled-path roots.
+%   fsd.analysis.compareStaticVehicleCases     - Explicit scenario differences.
+%   fsd.analysis.plotStaticVehicleLoads        - Contacts and known reactions.
+%   fsd.analysis.plotCornerStaticEquilibrium   - Force path and local roots.
+%
 % Namespaces
 %   fsd.model        - Canonical data contracts and validation.
 %   fsd.geometry     - Geometry primitives and static geometry operations.

@@ -1,0 +1,9 @@
+function [vehicle, definition, units] = vehicleFixture()
+%VEHICLEFIXTURE Independent 1000 N rectangular support benchmark, not setup data.
+definition = struct("wheelbase",2,"frontTrack",1,"rearTrack",1,"gravity_mps2",10, ...
+    "operatingConfiguration","TEST","massMode","TOTAL_MASS","sourceKind","KNOWN", ...
+    "totalMass",100,"cg",[1,0,0.3],"includes","COMPLETE_OPERATING_VEHICLE", ...
+    "unsprungMass",[2,3,4,5]);
+units = struct("length","m","mass","kg","gravity","m/s^2");
+vehicle = fsd.model.createVehicleParameters(definition,units);
+end

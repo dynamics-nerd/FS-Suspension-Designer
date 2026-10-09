@@ -1,4 +1,30 @@
-# Modelo de datos v0.8
+# Modelo de datos v0.9
+
+## Contratos v0.9
+
+VehicleParameters y VehicleLoadCase son structs 0.9.0, independientes de las
+cuatro geometrías. definitionSI preserva inputs, modo/inventarios/provenance;
+modelo deriva M/CG coordenada a coordenada, sprungMass sólo con desglose completo.
+Identities 1.0.0 incluyen inputs físicos/configuración/supuestos; metadata de
+presentación queda fuera. No hashes, clases nuevas ni persistencia ajena a MAT.
+StaticVehicleLoads conserva identidad, case, matriz y familia/bounds del
+nullspace, closure explícito, medidas originales, residual, soporte y statuses.
+CornerStaticEquilibrium preserva modelo/actuation/path completos, demanda,
+opciones, todos los brackets/roots/flats, selección y reporting de precisión.
+Validador reconstruye el payload, no sólo identities/flags. Sin root seleccionada
+los campos numéricos del resumen son NaN; roots alternativas permanecen visibles.
+Los contratos históricos no cambian. [Campos y APIs v0.9](vehicle-static-equilibrium.md).
+
+Auditoría v0.9 (schema/versión siguen 0.9.0): family añade rawLambdaInterval_N,
+lambdaBoundaryBudget_N, loadRoundoff_N, nullDirectionRoundoff, endpointLoads_N,
+intervalClassification y admissibleDimension. Un punto numérico no modifica
+degreeOfFreedom algebraico ni suministra cierre implícito. Resultado de cargas
+añade normalRoundoffBudget_N, numericalClassification y supportRoundoffBudget_N.
+Mediciones canónicas y candidatos se conservan; soporte negativo/irresoluble no
+se publica como demanda aceptada. CornerStaticEquilibrium añade
+flatIntervalFilterDiagnostics (algoritmo y contadores deterministas, no tiempos).
+Los validadores reconstruyen también estos campos; payloads anteriores a esta
+corrección deben regenerarse desde fuentes, no recibir flags inventados.
 
 ## Contratos mecánicos opcionales v0.8
 

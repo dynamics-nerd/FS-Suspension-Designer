@@ -2,9 +2,22 @@
 
 ## Objetivo y límite actual
 
-FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.8** añade respuesta mecánica cuasiestática opcional de coilover sobre las capacidades v0.1–v0.7. Rules, optimización, dinámica, vehículo completo y UI siguen sin implementación funcional.
+FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.9** añade parámetros de vehículo, distribución estática de cargas y equilibrio local de esquina. Rules, optimización, dinámica, equilibrio global acoplado y UI siguen sin implementación funcional.
 
 ## Capas
+
+v0.9 añade structs VehicleParameters/VehicleLoadCase en model, independientes
+de hardpoints. analysis resuelve algebraicamente cargas y consume respuesta
+v0.8 validada para búsqueda local sobre path. No añade otro paquete vehículo
+duplicado, nuevas tecnologías ni dependencia kinematics→analysis.
+Distribución de cargas nunca llama solvers; roots locales son interpolación
+explícita, no nuevos cierres de suspensión/rocker.
+
+Flujos: masa/dimensiones/CG → VehicleParameters → VehicleLoadCase →
+StaticVehicleLoads (familia o distribución cerrada) → demanda reducida por
+esquina, cuando hay información → CornerStaticEquilibrium sobre path v0.8.
+UI/plots sólo consumen resultados. Cuatro roots no son pose de chasis.
+Véase [contrato v0.9](vehicle-static-equilibrium.md).
 
 v0.8 mantiene esa separación. `model` contiene `SpringDamperModel`, identidad
 y conversiones mecánicas; `analysis` contiene leyes, límites y proyección.

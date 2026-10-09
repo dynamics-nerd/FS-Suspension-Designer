@@ -1,5 +1,20 @@
 # Convenciones
 
+## Vehículo y cargas estáticas v0.9
+
+Se conserva X atrás/Y derecha/Z arriba y origen de contactos delanteros.
+Ejes nominales X=0/L, FL/RL a Y negativo. Contactos reales explícitos no son
+Wheel Centers ni se sustituyen por tracks nominales. M en kg, normales en N,
+CG/dimensiones en m, gravedad m/s² explícita. kg_equivalent=N/gravity.
+CW canónico=(FR+RL)/(M*g); diagonal complementaria=(FL+RR)/(M*g).
+No es reparto delantero. Altura CG no altera reparto nivelado por sí sola.
+Masa base excluye items añadidos; inventarios disjuntos evitan doble conteo.
+Unsprung es parte del total, no masa adicional. NaN nunca implica cero.
+Support=N-m_unsprung*g pertenece a un modelo vertical local ideal declarado.
+EquilibriumWheelTravel conserva bump positivo; no se denomina rideHeight.
+Estabilidad por Kw completo sólo es local y estimada si la root es interpolada.
+Las nuevas políticas numéricas y statuses están en [especificación](vehicle-static-equilibrium.md).
+
 ## Mecánica v0.8
 
 Se conservan X atrás / Y derecha / Z arriba y `wheelTravel>0` en bump.

@@ -1,5 +1,38 @@
 # Requisitos
 
+## v0.9 Vehicle Parameters, Static Loads & Corner Equilibrium
+
+- REQ-V09-MASS: TOTAL_MASS/COMPONENT_MASSES excluyentes, inventarios disjuntos,
+  gravity explícita, composición CG XYZ y unknown preservados; SI/MAT/provenance.
+- REQ-V09-LOAD: balances vertical/longitudinal/lateral con contactos reales;
+  rango/nullspace, no negatividad, familia y límites sin cargas únicas inventadas.
+- REQ-V09-CLOSE: measured/CW/ASSUMED symmetry explícitos, sin clipping físico;
+  CW=(FR+RL)/(M*g), residual de medidas conservado y viabilidad/uniqueness.
+- REQ-V09-SUPPORT: sprung/unsprung no duplicados; demanda local sólo con datos,
+  sin aero/anti ni equivalencia a fuerzas exactas en links.
+- REQ-V09-EQ: path v0.8 validado en reposo, todos los cruces resolubles,
+  roots/flats/ausencia explícitos, sin extrapolar/gaps ni elección estable implícita.
+- REQ-V09-QUALITY: fuerza con MR válido puede producir root con Kw desconocido;
+  conservar F-01 y estabilidad local no evaluable, sin afirmar pose global.
+- REQ-V09-VAL: referencias independientes, payload adversarial, 327 históricos,
+  nueve ejemplos, Analyzer cero, DAG, perfil sin nuevos solves y timings.
+
+Especificación: [Vehicle Parameters & Static Load Equilibrium](vehicle-static-equilibrium.md).
+
+### Correcciones de auditoría v0.9
+
+- REQ-V09-F01: reconocer vértices/aristas factibles con intervalos puntuales a
+  resolución de roundoff; verificar candidatos y separar dimensión admisible
+  del grado de libertad algebraico. CG exterior más allá del presupuesto se rechaza.
+- REQ-V09-F02: no negatividad separada del residual de balance; conservar CW
+  original, candidato diagnóstico y soporte NaN cuando inviable. Soporte negativo
+  nunca se recorta; signo irresoluble tiene diagnóstico explícito y demanda NaN.
+- REQ-V09-F03: mediciones SI idénticas al input canónico, sin snapping ni ajuste.
+- REQ-V09-F04: filtrado de roots/flats O(N log N) como máximo, sin alterar gaps,
+  extremos, orden, roots aisladas ni estabilidad. Medir filtro aparte de fuentes.
+- REQ-V09-AUDIT-VAL: conservar los 368 tests anteriores y nueve ejemplos;
+  añadir regresiones independientes y adversariales para los cuatro hallazgos.
+
 ## v0.8 Spring, Damper & Wheel-Rate Modelling
 
 - **REQ-SD-001:** modelo COILOVER opcional por esquina, SI y MAT, independiente

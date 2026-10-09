@@ -1,5 +1,21 @@
 # Registro de decisiones
 
+## Cerradas para v0.9
+
+- VEH-001: modelos standalone en model y análisis en analysis; sin paquete
+  duplicado ni dependencia de cuatro geometrías para masas/cargas.
+- VEH-002: gravity obligatoria, inventarios explícitos, unknown por coordenada,
+  sin convertir una masa base sin piloto en masa suspendida.
+- LOAD-001: familia SVD escalada; representante algebraico no es solución única.
+  Medidas/CW/simetría explícita cierran el cuarto dato, con residual/no negatividad.
+- LOAD-002: CW=(FR+RL)/(M*g); medidas inconsistentes no fuerzan complement=1-CW.
+- EQ-001: interpolación declarada del path validado, sin solves ocultos;
+  default UNIQUE_ONLY, selección por referencia sólo si solicitada explícitamente.
+- EQ-002: Kw completo F-01, clasificación local/no global; igualdad de fuerzas
+  en extremos no prueba plateau sin tangentes marginales o branch unseated.
+- OPEN DECISION futura: error experimental, roots continuas con refinamiento
+  explícito y Coupled Chassis Pose & Global Static Equilibrium. No implementados.
+
 ## Cerradas en v0.1
 
 - **CS-001:** origen entre contact patches delanteros sobre el suelo nominal.
