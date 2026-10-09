@@ -1,5 +1,20 @@
 # Convenciones y formulación matemática
 
+## Equilibrio global v0.10
+
+R=Rx(phi)*Ry(theta), WCworld=R*WCbody(z)+[0,0,h].
+Ms=M-sum(mu); CGsBody=(M*CGnominal-sum(mu*WCnominal))/Ms.
+Ug=Ms*g*ZCGsWorld+sum(mu*g*ZWCworld), Us=.5*k*max(preload+c(z),0)^2.
+d=roadZ-WCworld.Z+R0; delta=max(0,d); N=kt*delta; Ut=.5*kt*delta².
+U=Ug+sum(Us)+sum(Ut); residual=gradient_q(U).
+Rh=M*g-sum(N); Rzi=Fs*dc/dzi+(mu*g-N)*eZ'*R*dWCbody/dzi.
+Mx=sum(YWC*(N-mu*g))-Ms*g*YCGs;
+My=-sum(XWC*(N-mu*g))+Ms*g*XCGs; Rphi=-Mx; Rtheta=-cos(phi)*My.
+Derivadas y energía provienen del mismo pp, no de fuerza/MR independientes.
+Hessiano global escalado y gates F-01/contact/knots, unidades, signos,
+tolerancias y derivación finita en [especificación v0.10](global-static-equilibrium.md).
+No se añade física a las fórmulas históricas siguientes.
+
 ## Body-roll closure v0.6
 
 Para `phi` finito con `abs(phi)<pi/2`, la carretera horizontal del mundo se
@@ -777,8 +792,8 @@ después de cualquier corrección estrictamente negativa de roundoff. Medidas
 no se corrigen. Soporte negativo no se recorta. Fórmulas, origen y limitaciones
 del presupuesto en la sección SL-32 del contrato; no cambia ninguna ley v0.8.
 
-## Pending mathematical specifications (después de v0.9)
+## Pending mathematical specifications (después de v0.10)
 
 No están especificados ni implementados roll axis de vehículo, steering
 wheel/column, pinion ratio, fuerzas estructurales o compliance, pneumatic trail,
-equilibrio global acoplado de chasis, ARB, anti geometry, neumáticos de fuerzas ni dinámica.
+ARB, anti geometry, neumáticos laterales/longitudinales, contacto dependiente de camber ni dinámica.

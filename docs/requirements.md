@@ -1,5 +1,25 @@
 # Requisitos
 
+## v0.10 Coupled Chassis Pose & Global Static Equilibrium
+
+- REQ-V10-POSE: siete DOF, R finita Rx*Ry coherente, sin yaw/translation XY.
+- REQ-V10-TIRE: ley opcional vertical unilateral explícita, sin N negativa.
+- REQ-V10-MASS: cuatro mu conocidas o cero autorizado; CG suspendido derivado
+  y mu en WC móviles, sin doble gravedad ni NaN→0.
+- REQ-V10-ENERGY: única U, gradient coherente con pp, springLaw v0.8 reutilizada,
+  balances world actuales y CW emergente, no un cierre impuesto de v0.9.
+- REQ-V10-PATH: producción 3D real, fixed-inboard; segmentar gaps/ramas/límites,
+  no extrapolación/re-solves; MR vs fuente y c2 F-01 independiente.
+- REQ-V10-SOLVE: scaled Newton limitado, tolerancias dimensionales explícitas,
+  multistart/alternativas/deduplicación, conditioning, límites artificiales.
+- REQ-V10-STABILITY: Hessiano global fiable o NOT_EVALUABLE, transiciones sin
+  bilateral ficticio, mínimos/marginales/no restauradoras diferenciadas.
+- REQ-V10-VAL: 393 históricos intactos (excepto expected version), benchmarks
+  independientes/payload adversarial, diez ejemplos, Analyzer0, DAG/perfil/timings.
+
+Alcance y límites efectivos en [contrato](global-static-equilibrium.md),
+evidencia real en [informe](v0.10-validation.md). No v0.11.
+
 ## v0.9 Vehicle Parameters, Static Loads & Corner Equilibrium
 
 - REQ-V09-MASS: TOTAL_MASS/COMPONENT_MASSES excluyentes, inventarios disjuntos,

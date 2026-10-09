@@ -272,11 +272,21 @@ balances/momento/no negatividad, roots y selección no arbitrarias, F-01 intacto
 No incluye equilibrio simultáneo de chasis, dinámica, ARB, anti, aero, tires,
 optimización, Adams ni UI. Root interpolada no es ride height ni pose resuelta.
 
-## Futuro — Coupled Chassis Pose & Global Static Equilibrium
+## v0.10 — Coupled Chassis Pose & Global Static Equilibrium
 
-No implementado. Requerirá full-vehicle heave/pitch/roll, geometría cinemática
-3D coherente de cuatro esquinas, carretera/contact constraints, tire vertical
-compliance cuando corresponda, balances sprung/unsprung y acoplamiento de
-fuerzas/momentos. Cuatro roots locales no sustituyen esa especificación.
+Implementada como modelo reducido SAMPLED_PATH_APPROXIMATION: siete DOF,
+pose rígida, cuatro paths 3D de bump fixed-inboard, springs v0.8, vertical tire
+unilateral con inputs explícitos, CG sprung/unsprung móviles, U canónica y
+solve global escalado/multistart. Eval/solve separados, contacto/wheel lift,
+balances world, CW emergente, estabilidad condicionada por calidad, identidades,
+validadores, referencias de altura definidas, plots/ejemplo/benchmarks.
+
+Criterios: benchmark200kg/g10 reproduce h=-5mm, N500/corner; gradient de U
+independiente; momentos actuales; tres contactos sin tensión; múltiples roots
+y estabilidad diferenciadas; gaps/MR/c2/límites indisponibles sin falsos outputs;
+393 históricos + tests nuevos, diez ejemplos, Analyzer0/DAG/perfil/diff check.
+Evidencia en [informe v0.10](v0.10-validation.md). Pendiente revisión humana.
+Limitación de integración: el contrato de sweep existente sólo fija inboard/rack0;
+no se afirma fixed-rack no nulo ni multibody continuo exacto.
 ARB INTEGRATED/POST_DESIGN/DISABLED y longitudinal anti geometry se conservan.
-No se inicia v0.10.
+Sin dinámica/aero/ARB/rules/Tilt/UI/Adams; no se inicia v0.11.

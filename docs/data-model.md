@@ -1,4 +1,20 @@
-# Modelo de datos v0.9
+# Modelo de datos v0.10
+
+## Contratos v0.10
+
+Structs serializables schema0.10.0: VerticalTireModel, GlobalStaticSystem,
+PreparedGlobalStaticSystem, GlobalStaticState, GlobalStaticEquilibriumResult.
+System compone vehículo/case y cuatro cells de fuentes/tire FL/FR/RL/RR;
+geometry/actuation/springDamper/mechanical permanecen contratos originales.
+Identity1.0.0 sin hash incluye parámetros físicos/paths/calidad/road/hipótesis;
+metadata/display names excluidos. Prepared contiene pp, derivatives, segmentos,
+nominal WC y sprung CG derivado; no es un cache confiado sin validación.
+State conserva evaluación prescrita, U/gradient/H candidato/quality, corner
+outputs, contactos, CG móvil, CW, balances world, alturas y referencia v0.9.
+Result separa attempts de alternativas válidas y selectedIndex (NaN sin selección).
+Campos numéricos indisponibles NaN; no se inventan roots o alturas nominales.
+Validadores reconstruyen física/aceptación/estabilidad/selección, no sólo IDs.
+[Campos y APIs](global-static-equilibrium.md). Se conservan schemas anteriores.
 
 ## Contratos v0.9
 

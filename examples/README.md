@@ -1,5 +1,17 @@
 # Examples
 
+## v0.10
+
+`globalStaticEquilibriumExample(showPlots)` construye cuatro geometrías y
+rockers independientes, paths bump 3D resueltos, springs/dampers v0.8, neumáticos
+verticales ASSUMED, vehículo/case y referencias físicas de altura.
+Publica h/pitch/roll, travels, normales/CW/contactos/Fs y momentos world.
+Tres figuras: pose/road/tire surrogate, cargas/compresiones/residual, energy
+slices prescritas (NO re-equilibradas). Sin datos recomendados de Formula Student.
+Kt/R0, mu/CG, preload y g son hipótesis ilustrativas, no medidas reales.
+Paths se crean antes de solve; no re-solves dentro del análisis energético.
+Los nueve ejemplos anteriores permanecen disponibles; verifyV10 ejecuta diez.
+
 ## v0.9
 
 vehicleStaticEquilibriumExample(showPlots) enseña masas base/piloto/fuel con

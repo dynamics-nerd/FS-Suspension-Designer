@@ -1,5 +1,16 @@
 % FS Suspension Designer engineering core.
 %
+% v0.10 Coupled Chassis Pose & Global Static Equilibrium
+%   fsd.model.createVerticalTireModel               - Explicit vertical-only tire.
+%   fsd.model.createGlobalStaticSystem              - Four-corner source aggregate.
+%   fsd.analysis.prepareGlobalStaticSystem          - Validate and segment sampled paths.
+%   fsd.analysis.evaluateGlobalStaticState          - Prescribed seven-coordinate energy.
+%   fsd.analysis.solveGlobalStaticEquilibrium       - Scaled bounded Newton/multistart.
+%   fsd.analysis.validateGlobalStaticState          - Reconstruct evaluated physics.
+%   fsd.analysis.validateGlobalStaticEquilibrium    - Reconstruct roots/stability/selection.
+%   fsd.analysis.plotGlobalStaticEquilibrium        - Pose, loads, energy slices.
+%   fsd.analysis.benchmarkGlobalStaticEquilibrium   - Separate preparation/core timings.
+%
 % v0.9 Vehicle Parameters, Static Loads & Corner Equilibrium
 %   fsd.model.createVehicleParameters          - Standalone SI mass/CG contract.
 %   fsd.model.createVehicleLoadCase            - Explicit load distribution mode.

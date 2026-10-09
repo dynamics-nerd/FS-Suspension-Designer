@@ -1,5 +1,48 @@
 # Testing strategy
 
+## v0.10 global static equilibrium
+
+F-01 de selección: TestGlobalStaticSelection añade 27 regresiones: políticas
+de singleton, COIL_BIND_LIMIT, cardinalidades, energías válidas/inválidas,
+empate exacto frente a un ulp distinto, deduplicación/orden, roots físicas
+marginales y dos mínimos locales de distinta energía, ataques al validator,
+MAT, plot sin selección y cuatro mecanismos reales bajo la política estable.
+Los expected derivan del contrato, no del selector.
+globalSelectionTestCall invoca el archivo privado de producción desde su
+carpeta actual, restaurada con onCleanup: no copia lógica, no añade carpetas
+private al path ni expone APIs de test en producción. Payloads mínimos son
+tests aislados del selector, nunca resultados físicos válidos fabricados.
+Los reproductores de integración usan factories/solve/validator públicos y
+fuentes ASSUMED; verifyF01V10 informa las cuatro categorías únicas.
+
+```matlab
+setupProject; addpath("tests");
+verifyF01V10;
+runtests("tests/TestGlobalStaticSelection.m");
+```
+
+Engineering change → Unit test → Known case → Validation → Merge autorizado.
+TestGlobalStaticEquilibrium: energía/gradient independientes, rotaciones/momentos
+finitos, simétrico/pitch/roll/CW/compliance/mu, contactos y solve/failure.
+TestGlobalStaticIntegrity: 17 payload attacks, unidades/IDs/datos no finitos,
+masa desconocida/zero explícito, identidad física/metadata/MAT y fuentes.
+TestGlobalStaticPathQuality: múltiples roots estable/no restauradora, tres
+contactos marginales, F-01 con fuerzas disponibles/c2 no fiable, descending,
+duplicados, límites/coil bind, fallo/NOT_ATTEMPTED/rama y mecanismos 3D reales.
+Expected críticos analíticos, no obtenidos del solver bajo prueba.
+
+```matlab
+setupProject; results = runProjectTests;
+addpath("tests"); report = verifyV10;
+```
+
+verifyV10 ejecuta los diez ejemplos, plots ocultos, Code Analyzer sobre todos
+los .m, DAG y profiler sin solves/validaciones/modelos dentro del core energético;
+timings de preparación/pp/U/gradient+H/solve/validation separados.
+Los verifiers antiguos conservan checks de su versión; no se modifican para
+fingir regresión de otra release. El expected version de foundation sí cambia
+a0.10.0, única edición de tests históricos. [Informe](../docs/v0.10-validation.md).
+
 ## Regresiones de auditoría v0.9
 
 TestStaticLoadAudit (16 métodos) cubre los tres reproductores, todos los

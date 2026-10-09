@@ -1,5 +1,23 @@
 # Registro de decisiones
 
+## Cerradas para v0.10
+
+- GST-001: siete coordenadas y orden Rx(phi)*Ry(theta), conforme al prompt;
+  se conservan marcos/signos/unidades históricos.
+- GST-002: vertical tire unilateral opcional con kt/R0/provenance explícitos;
+  único plano road, no círculo camber-dependent ni damping.
+- GST-003: CG suspendido derivado; mu móviles en WC; cero sólo aproximación explícita.
+- GST-004: U canónica, pp C1 por segmentos y derivatives del mismo pp;
+  fuentes reales vs ideales declaradas, cero re-solves en evaluación.
+- GST-005: Newton amortiguado base MATLAB, bounds/scales/tolerancias explícitas;
+  multistart con UNIQUE_ONLY o LOWEST_ENERGY_STABLE, sin unicidad global prometida.
+- GST-006: estabilidad desde H global escalado, gates c2 F-01/knots/contactos;
+  curvatura no fiable no inventa rigidez ni invalida fuerza por sí sola.
+- GST-007: factory en model y validación/pp downstream en analysis, sin ciclos.
+- OPEN DECISION real: datos kt/R0/CG de mu, convergencia de path/mediciones,
+  selección física entre ramas y extensión fixed-rack no nulo.
+  Ninguna se completa con datos FS típicos inventados.
+
 ## Cerradas para v0.9
 
 - VEH-001: modelos standalone en model y análisis en analysis; sin paquete

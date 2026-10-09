@@ -1,5 +1,17 @@
 # Convenciones
 
+## Pose global estática v0.10
+
+q=[h,theta,phi,zFL,zFR,zRL,zRR]' en m/rad/rad/m/m/m/m.
+X atrás/Y derecha/Z arriba intactos. R=Rx(phi)*Ry(theta), translation [0,0,h].
+Pitch mano derecha +Y, roll mano derecha +X; yaw y XY fijos.
+Wheel travel sigue body-relative; no equivale a heave ni ride height.
+Road horizontal rígido global Z=roadHeight_m (default 0). Alturas sólo de puntos
+físicos definidos por usuario. kt/R0 obligatorios, nunca inventados.
+UNSPRUNG_MASS_AT_WHEEL_CENTER explícito; unknown no es cero salvo selección
+ZERO_UNSPRUNG_APPROXIMATION registrada. CW global=(FR+RL)/sum(N), salida;
+no modifica la semántica CW de referencia v0.9. [Detalles](global-static-equilibrium.md).
+
 ## Vehículo y cargas estáticas v0.9
 
 Se conserva X atrás/Y derecha/Z arriba y origen de contactos delanteros.

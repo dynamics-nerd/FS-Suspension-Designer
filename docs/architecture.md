@@ -1,5 +1,19 @@
 # Arquitectura
 
+## Extensión v0.10
+
+GlobalStaticSystem/VerticalTireModel en model; preparación, energía, solve,
+validadores y plots en analysis. Structs MATLAB/MAT, sin clases/servicios nuevos.
+Model sólo valida contratos de modelos; la validación upstream cinemática y
+construcción de pp ocurre downstream en prepareGlobalStaticSystem.
+Loop privado recibe inputs prevalidos, sin resolver geometría/rocker/steering.
+Se reutilizan springLaw/mechanicalBounds v0.8, no otra ley de muelle.
+DAG preservado: geometry→model; kinematics→geometry/model;
+analysis→geometry/kinematics/model. Sin model→analysis ni kinematics→analysis.
+UI/rules/export no participan; el neumático vertical tiene frontera de ley
+sustituible sin cambiar gravedad/muelles. [Contrato](global-static-equilibrium.md).
+Los límites de las secciones históricas siguientes corresponden a su milestone.
+
 ## Objetivo y límite actual
 
 FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.9** añade parámetros de vehículo, distribución estática de cargas y equilibrio local de esquina. Rules, optimización, dinámica, equilibrio global acoplado y UI siguen sin implementación funcional.

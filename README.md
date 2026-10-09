@@ -4,6 +4,28 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+**v0.10 — Coupled Chassis Pose & Global Static Equilibrium** añade pose rígida
+heave/pitch/roll y cuatro wheel travels acoplados por una única energía,
+muelles v0.8 y neumáticos verticales unilaterales opcionales con datos explícitos.
+Incluye paths 3D validados, solve escalado/multistart, wheel lift, balances world,
+estabilidad local condicionada por fiabilidad y validadores por reconstrucción.
+No es dinámica ni un sustituto de Adams. [Contrato v0.10](docs/global-static-equilibrium.md).
+
+```matlab
+setupProject
+results = runProjectTests;
+addpath("examples", "tests")
+example = globalStaticEquilibriumExample(true);
+report = verifyV10;
+```
+
+La descripción siguiente conserva las capacidades históricas v0.1–v0.9.
+
+Validación v0.10 en MATLAB R2025b: **444/444 tests** (393 históricos + 51 nuevos),
+**10/10 ejemplos**, **0 incidencias de Code Analyzer en 269 archivos**.
+Archivos, benchmarks, rendimiento y limitaciones en el
+[informe de entrega v0.10](docs/v0.10-validation.md).
+
 **v0.9 — Vehicle Parameters, Static Loads & Corner Equilibrium** conserva v0.1–v0.8 e
 implementa además:
 
@@ -76,7 +98,7 @@ v0.9 añade masas operativas y composición de CG, carga de ejes, familia
 indeterminada de cuatro normales, cierre explícito por medidas/crossweight/
 simetría asumida, bookkeeping sprung/unsprung y equilibrio LOCAL sobre un
 path validado. No publica cuatro corner weights únicos sin cuarta condición.
-No calcula equilibrio global de chasis, heave/pitch/roll acoplados, dinámica,
+v0.9 por sí sola no calcula equilibrio global de chasis, heave/pitch/roll acoplados, dinámica,
 ARB, anti geometry, neumáticos de fuerzas, optimización, ride frequency ni
 damping ratio. Recorrido local de equilibrio no equivale a ride height real.
 
@@ -219,7 +241,7 @@ Los nombres, unidades, firmas completas y statuses están en
 
 Roadmap: v0.1–v0.8 conservadas; v0.9 añade vehículo, cargas estáticas y equilibrio local.
 ARB y longitudinal anti-geometry siguen siendo milestones futuras.
-Equilibrio acoplado de chasis sigue futuro. No se inicia v0.10, Adams ni App Designer.
+v0.10 añade equilibrio acoplado de chasis; Adams y App Designer siguen futuros.
 
 ## Uso estático de vehículo v0.9
 
@@ -228,7 +250,8 @@ addpath("examples")
 e = vehicleStaticEquilibriumExample(true);
 % M/CG por componentes, familia de cargas, CW explícito y root local estimada.
 addpath("tests")
-report = verifyV09;
+% verifyV09 conserva la comprobación histórica de versión 0.9.0.
+report = verifyV10; % verificación actual, incluye los ejemplos históricos
 ```
 
 Gravity es entrada obligatoria. Cargas en N; kg_equivalent usa esa gravedad.
