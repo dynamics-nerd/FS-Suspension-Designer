@@ -1,5 +1,19 @@
 # Convenciones
 
+## Definición y evaluación v0.11
+
+Mismos X atrás/Y derecha/Z arriba, m/rad/N/kg/s y signs históricos. IDs de
+requisitos mayúsculos estables y scopes tipados; display names/prioridades en
+metadata. KNOWN no implica FIXED; rol, provenance y disponibilidad separados.
+Unknown `[]`, nunca cero. SI en definitionSI; conversiones de nominal/bounds/
+tolerancias/escalas sólo en fábricas. Las condiciones *_m ya son SI.
+Tolerancia target no sustituye calidad upstream; escala y peso no son implícitos.
+ABS debe solicitarse, MR sigue firmado e installation ratio=abs(MR).
+Targets BUMP reflejados sólo mediante operación explícita limitada; no copiar
+heading firmado RACK bajo esa regla. Gaps preservados, PASS exclusivamente
+muestreado; box/fixed se refieren al modelo nominal, no a todo su movimiento.
+[Contrato completo](design-requirements-target-evaluation.md).
+
 ## Pose global estática v0.10
 
 q=[h,theta,phi,zFL,zFR,zRL,zRR]' en m/rad/rad/m/m/m/m.

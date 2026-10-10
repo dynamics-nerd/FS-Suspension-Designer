@@ -4,6 +4,31 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+**v0.11 — Design Requirements, Targets & Evaluation** añade especificaciones
+progresivas sin geometría, parámetros con conocimiento/provenance, variables
+con bounds pendientes, targets escalares/curvas, restricciones nominales de
+hardpoints y evaluación de 23 métricas existentes. Conserva errores, cobertura,
+gaps y HARD/SOFT; compara candidatos sin ganador automático ni optimizador.
+[Contrato y APIs](docs/design-requirements-target-evaluation.md) ·
+[Informe de validación e inventario](docs/v0.11-validation.md).
+
+Validación real MATLAB R2025b: **605/605 tests** (471 históricos + 134 nuevos),
+**11/11 ejemplos**, **0 incidencias de Code Analyzer / 326 archivos MATLAB**.
+Perfil del evaluador sin nuevos solves; solvers históricos intactos.
+
+```matlab
+setupProject
+results = runProjectTests;
+addpath("examples", "tests")
+example = designTargetEvaluationExample(true);
+report = verifyV11;
+```
+
+Los valores del ejemplo son hipótesis ilustrativas, no targets recomendados.
+Las comparaciones son muestreadas: no certifican recorrido continuo, seguridad,
+normativa, packaging ni rendimiento. UI, optimización y Adams siguen futuros.
+Las secciones siguientes conservan la historia de milestones anteriores.
+
 **v0.10 — Coupled Chassis Pose & Global Static Equilibrium** añade pose rígida
 heave/pitch/roll y cuatro wheel travels acoplados por una única energía,
 muelles v0.8 y neumáticos verticales unilaterales opcionales con datos explícitos.
@@ -16,10 +41,12 @@ setupProject
 results = runProjectTests;
 addpath("examples", "tests")
 example = globalStaticEquilibriumExample(true);
-report = verifyV10;
+% verifyV10 es un verificador histórico ligado a la versión 0.10.0.
+% Para el checkout actual, ejecutar verifyV11 (arriba).
 ```
 
 La descripción siguiente conserva las capacidades históricas v0.1–v0.9.
+Tras F-01 de selección global, la baseline real al iniciar v0.11 fue **471/471**.
 
 Validación v0.10 en MATLAB R2025b: **444/444 tests** (393 históricos + 51 nuevos),
 **10/10 ejemplos**, **0 incidencias de Code Analyzer en 269 archivos**.

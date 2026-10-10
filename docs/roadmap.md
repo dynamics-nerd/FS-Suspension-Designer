@@ -289,4 +289,25 @@ Evidencia en [informe v0.10](v0.10-validation.md). Pendiente revisión humana.
 Limitación de integración: el contrato de sweep existente sólo fija inboard/rack0;
 no se afirma fixed-rack no nulo ni multibody continuo exacto.
 ARB INTEGRATED/POST_DESIGN/DISABLED y longitudinal anti geometry se conservan.
-Sin dinámica/aero/ARB/rules/Tilt/UI/Adams; no se inicia v0.11.
+Sin dinámica/aero/ARB/rules/Tilt/UI/Adams en v0.10.
+
+## v0.11 — Design Requirements, Targets & Evaluation
+
+Implementa especificaciones progresivas, ocho roles/separación de knowledge,
+variables y restricciones nominales de hardpoints, targets escalares/curvas,
+catálogo de métricas existentes y evaluación validada reproducible. No optimizer.
+Criterios: benchmarks analíticos, unidades/scopes/identidades correctas,
+cobertura/gaps/RMS ponderado, ningún PASS incompleto, HARD separado de SOFT,
+ningún solve oculto, dos geometrías con tradeoffs, native/mechanical/global
+integration F-01 conservada, MAT/ataques, 471 históricos y nuevos tests,
+11 ejemplos, Analyzer0/DAG/performance/diff check. Revisión humana pendiente.
+[Contrato](design-requirements-target-evaluation.md) · [Evidencia](v0.11-validation.md).
+
+## Futuro conservado (no iniciado en esta tarea)
+
+Generación razonada de targets desde vehículo; Performance Solver reducido;
+síntesis inversa; optimización de hardpoints/multiobjetivo/Pareto; packaging 3D;
+Formula Student Rules Engine; anti-dive, anti-lift/anti-rise, anti-squat; ARB
+`antiRollBarStrategy = INTEGRATED | POST_DESIGN | DISABLED`; Tilt Test;
+comparación robusta bajo incertidumbre; Adams export y validation plan.
+Cada capacidad requiere contratos físicos y validación propios. No v0.12.

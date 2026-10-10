@@ -1,5 +1,61 @@
 # Testing strategy
 
+## v0.11 requirements/targets/evaluation
+
+`setupProject; results=runProjectTests` ejecuta toda la suite. `addpath("tests");
+report=verifyV11` ejecuta 11 ejemplos, Analyzer en todos los .m, DAG, plots,
+perfil y mediana de costes (warm-up y tres mediciones). No escribe resultados
+ni hace commits. Verificadores v0.9/v0.10 con assert de versión se conservan
+históricos; verifyV11 usa verifyV08 y los ejemplos más recientes sin falsearlos.
+
+TestDesignDefinitions: roles/availability/scopes/SI, preliminary sin geometría,
+FREE cerrado/incompleto, inválidos, provenance/RULE, identities/presentación,
+MAT. TestDesignEvaluation: escalares/bandas/límites, linear/quadratic/
+no uniforme/descending, RMS independiente, gaps/coverage, calidad c2 F-01,
+MR firmado/installation abs/Fs/Fw/Kw, fuentes y ataques al assessment/target.
+TestDesignIntegration: cinco métricas BUMP con traslación rígida conocida,
+RACK/ROLL/ACTUATION nativos, STATIC_LOADS con/sin closure, global N500/CW.5/
+referencia .095, tres categorías sin selección LOWEST_ENERGY_STABLE,
+geometrías A/B con tradeoffs y restricciones distintas, dashboard y gráficos.
+
+Fixtures prescritas 1-D son benchmarks matemáticos explícitos, no resultados
+kinemáticos fabricados. designComparisonTestCall prueba sólo comparación
+matemática con gaps internos/branch, no el validator de una fuente ficticia.
+designCoreBenchmark mide el core privado con inputs prevalidos, no ofrece
+una API pública que pueda omitir integridad. Ambos restauran pwd/path.
+Tolerancias de expected están justificadas por roundoff o solver histórico,
+no son recomendaciones de tolerancias de diseño de Formula Student.
+La única edición de tests históricos v0.11 es expected version 0.11.0.
+Resultados e inventario en [informe](../docs/v0.11-validation.md).
+
+### Regresiones de auditoría F-01/F-02/F-03
+
+Se preservan los 605 tests de la baseline v0.11; ninguna edición a sus expected.
+`TestDesignCandidateAudit` cubre siete familias, ambas órdenes, registros
+opcionales, corners/ejes independientes, vehicle/case, provenance ausente,
+payloads coordinados, replay de assessment legacy y todas las APIs completas.
+`TestDesignTargetPlotAudit` inspecciona XData/YData de objetos gráficos nativos:
+pico de 5 mm, valle, descending, tolerancia por nudo, bandas/límites, cambios
+de pendiente, mallas diferentes y orden, cobertura parcial y gap mecánico real.
+`TestDesignMechanicalDiagnostics` comprueba coil exceso/frontera, travel,
+unseating, MR/Kw/calidad, conditioning, fallo upstream y estados válidos.
+
+`designAuditFixture` usa fuentes calculadas con APIs físicas reales y benchmarks
+ASSUMED identificados. `designAuditTestCall("LEGACY_ASSESSMENT",...)` emula
+deliberadamente el constructor antiguo sin asociación cruzada: sólo para probar
+rechazo en el validator público, no es API de validación. Su modo de benchmark
+aisla el coste del mapa usando inputs ya verificados, fuera de loops de muestras.
+Las tolerancias de targets en tests son especificaciones adversariales explícitas,
+no criterios de diseño de un FS. En grids minúsculos MR puede ser AVAILABLE y
+fallar un target de 1e-9: nunca se relaja para esconder roundoff.
+
+Ejecutar `setupProject; runProjectTests` y después `addpath("tests");
+report=verifyV11Audit`. Este último conserva `verifyV11` histórico, ejecuta once
+ejemplos, Analyzer/DAG/perfiles, mide warm-up + medianas y crecimiento 1–16
+fuentes, y genera PNGs de QA en `output/v0.11-audit-qa` (ignorado por Git).
+Los PNGs requieren además inspección visual; no sustituyen los tests gráficos.
+Resultados e inventario: [correcciones](../docs/v0.11-audit-corrections.md).
+
 ## v0.10 global static equilibrium
 
 F-01 de selección: TestGlobalStaticSelection añade 27 regresiones: políticas
@@ -303,6 +359,94 @@ llamar a `solveBump` actual como expected.
 - sweep `[0,4,0] deg` con `CONVERGED/ROOT_NOT_BRACKETED/NOT_ATTEMPTED`, status
   cinemático preservado, status de análisis separado y todos los agregados
   fallidos en `NaN`.
+
+## Renderizado v0.11 F-04
+
+`TestDesignTargetRender` añade 16 casos: ambos temas, visible/oculta, pico,
+valle, candidatos con mallas distintas en ambos órdenes, cobertura parcial y
+gaps internos. Exporta PNG reales, verifica contraste final, presencia de
+píxeles de target/bandas/candidatos, leyenda/etiquetas y datos sin cambios.
+Los PNG de unit tests usan tempname y se eliminan mediante teardown.
+Se oculta el toolbar **sólo en figuras de QA** para que el hover del ratón no
+contamine la captura o introduzca un warning. No se cambian preferencias.
+
+La suite normal **no prueba por sí sola la primera figura de una sesión nueva**.
+Ejecutar estos comandos separadamente desde la raíz, cada uno en un proceso
+MATLAB nuevo (PowerShell/terminal; no dentro de una sesión gráfica previa):
+
+```text
+matlab -batch "setupProject; addpath('tests'); verifyV11FirstTargetExport('auto');"
+matlab -batch "setupProject; addpath('tests'); verifyV11FirstTargetExport('dark');"
+matlab -batch "setupProject; addpath('tests'); verifyV11FirstTargetExport('light');"
+```
+
+`auto` exige un entorno cuyo tema automático efectivo sea oscuro; lo verifica
+después de exportar, sin editar preferencias permanentes. Los otros dos usan
+`theme(fig,...)`, disponible y verificado en R2025b, únicamente sobre la primera
+figura creada por el plot. Cada proceso comprueba primera y segunda exportación,
+ausencia de warnings, pico/bandas originales y evaluación inalterada; perfila
+el plot para detectar solves ocultos. Evidencias deliberadamente conservadas en
+`output/v0.11-f04-qa` (ignorado por Git), no scripts temporales incorporados.
+El helper mide luminancia sRGB: nominal >=3.5:1, bandas >=3:1, y confirma en
+el PNG RGB los colores efectivos del fondo y trazos con margen de cuantización
+de 2/255. Inspección visual complementaria, no certificación de accesibilidad.
+
+La anomalía del lienzo exterior/etiquetas observada en F-04 se corrige en F-05
+con la política local documentada abajo, separada del contraste del target.
+La evidencia F-04 precedente se conserva como histórica.
+Validación final 10 octubre 2026: 716/716 PASS (700 anteriores + 16 nuevos),
+Failed=0, Incomplete=0; tres procesos nuevos de primeras/segundas exportaciones
+completados, sin warnings de exportación en esas pruebas.
+
+## Fondos exteriores y texto v0.11 F-05
+
+Se conservan los 16 casos F-04 y se amplían con `designExteriorTextCheck`:
+PNG real leído con imread, fondo dominante por región exterior y mediana de
+píxeles de texto efectivos (margen RGB 2/255), contraste sRGB >=4.5:1 y al menos
+20 píxeles de texto en cada región. Regiones normalizadas `[xmin xmax ymin ymax]`
+del PNG de dos paneles: título/exponente `[0 1 0 .035]`, margen Y `[0 .07 0 1]`,
+etiqueta/ticks X `[0 1 .94 1]`, gap/ticks `[0 1 .40 .55]`. Son ventanas de QA
+de un caso conocido, no reglas de ingeniería ni detector universal de texto.
+También se verifican XColor/YColor/ZColor sobre el fondo efectivo de cada eje.
+Se complementa con inspección visual: no OCR, no garantía semántica pixel a pixel.
+
+Tres nuevos tests: API sin cambio manual de tema visible/oculta con dos
+candidatos y resize real; control negativo que conserva los glifos grises y
+blanquea el lienzo PNG, exigiendo `fsd:tests:ExteriorTextContrast`. No se duplica
+el conjunto de tests de datos F-02. Contraste target/bandas sigue verificándose
+con el helper F-04 sin modificarlo. Todos los PNG temporales usan teardown.
+
+Ejecutar cada comando en un proceso **nuevo**, antes de cualquier figura:
+
+```text
+matlab -batch "setupProject; addpath('tests'); verifyV11FirstFigureText('auto','off');"
+matlab -batch "setupProject; addpath('tests'); verifyV11FirstFigureText('auto','on');"
+matlab -batch "setupProject; addpath('tests'); verifyV11FirstFigureText('light','off');"
+matlab -batch "setupProject; addpath('tests'); verifyV11FirstFigureText('dark','off');"
+matlab -batch "setupProject; addpath('tests'); verifyV11FirstFigureText('auto','off','MULTI');"
+matlab -batch "setupProject; addpath('tests'); verifyV11FirstFigureText('auto','off','PARTIAL');"
+matlab -batch "setupProject; addpath('tests'); verifyV11FirstFigureText('auto','off','GAP');"
+```
+
+`auto` significa que el test **no** llama a theme: usa directamente la API en
+el entorno automático oscuro original, sin cambiar preferencias. La API aplica
+su propio fallback oscuro local; el resultado final ya no usa ThemeMode auto.
+Light/dark explícitos se configuran sólo para esos escenarios. Cada proceso
+comprueba primera exportación inmediata, resize 1100×700→900×600, PNG realmente
+de dimensiones distintas y segunda figura tras exportación previa. Para resize
+visible, se deja montar la ventana **después** de la primera exportación y se
+sincroniza el frontend con drawnow/pause(1), sólo en QA; no es una solución de
+tema ni se espera antes del primer PNG, lo que podría ocultar el defecto.
+WindowState/WindowStyle normal se aplican sólo a esa ventana de QA.
+
+Evidencias deliberadamente conservadas en output/v0.11-f05-qa, ignorado por Git.
+El verificador falla en rojo con producción anterior por contraste 1.411534:1,
+sin ayuda de theme desde el test. F-01/F-02/F-03 se ejercitan separadamente en
+114 tests focalizados (62+18+15+19), además de la suite completa.
+Validación final: **719/719 PASS**, Failed=0, Incomplete=0 (716 históricos
+conservados + 3 nuevos), **114/114 focalizados** y siete procesos nuevos de QA.
+La primera exportación visible se verifica sin espera previa; sólo se espera
+después para resize. Sus PNG finales cambian realmente de 1154×787 a 949×685.
 
 ## Cobertura v0.7
 

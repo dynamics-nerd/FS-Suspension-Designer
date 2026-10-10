@@ -1,5 +1,17 @@
 # Arquitectura
 
+## Extensión v0.11
+
+DesignParameter/Target/Constraint/Specification/Candidate y catálogo en model;
+adaptadores tipados/evaluador/validators/reporting en analysis. Definición sin
+geometría ni solves. Cada fuente nativa se verifica upstream una vez por llamada;
+el core privado compara datos prevalidos sin validators ni solvers en loops.
+Model.validateDesignCandidate es estructural; analysis.validateDesignCandidate
+reconstruye integridad nativa. Las identidades del assessment enlazan spec y
+candidato, sin copiar análisis completos. No modifica geometrías ni leyes.
+DAG existente intacto; ningún solver depende de la capa de diseño. No UI,
+optimización, nuevos servicios ni dependencias. [Contrato](design-requirements-target-evaluation.md).
+
 ## Extensión v0.10
 
 GlobalStaticSystem/VerticalTireModel en model; preparación, energía, solve,
@@ -16,7 +28,7 @@ Los límites de las secciones históricas siguientes corresponden a su milestone
 
 ## Objetivo y límite actual
 
-FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.9** añade parámetros de vehículo, distribución estática de cargas y equilibrio local de esquina. Rules, optimización, dinámica, equilibrio global acoplado y UI siguen sin implementación funcional.
+FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.11** incorpora definición y evaluación asistida sobre modelos v0.1–v0.10, incluido equilibrio global reducido. Rules, optimización, dinámica y UI siguen sin implementación funcional. Los límites de las secciones históricas se refieren a su versión.
 
 ## Capas
 

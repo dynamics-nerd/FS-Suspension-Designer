@@ -1,5 +1,35 @@
 # Requisitos
 
+## v0.11 Design Requirements, Targets & Evaluation
+
+- REQ-V11-PARAM: ocho roles compatibles, siete disponibilidades, unknown vacío,
+  provenance explícita y RULE estructurada sin normativa incorporada.
+- REQ-V11-SPACE: FREE/RANGE sin defaults; cierre exige bounds/binding; fixed
+  con tolerancia explícita y box nominal XYZ cerrado, sin colisiones CAD.
+- REQ-V11-TARGET: seis tipos completos, catálogo real, scopes/units/coordenadas
+  y condiciones estáticas tipadas; simetría explícita limitada.
+- REQ-V11-EVAL: consume resultados originales verificados una vez por fuente,
+  sin solves ni mutaciones; errores/normalización/score explícitos.
+- REQ-V11-COVERAGE: NaN/statuses/gaps, no extrapolación, RMS domain-weighted,
+  sampled distinto de continuous; HARD demostrado invalida incluso parcial.
+- REQ-V11-CANDIDATE: identidades y asociaciones, comparación sin ganador,
+  readiness/prerrequisitos; event priorities sólo metadata.
+- REQ-V11-CANDIDATE-F01: fuentes canónicas coherentes entre sí por corner,
+  vehículo y load case, aun sin registros nominales; rechazo previo a cualquier
+  assessment, independiente del orden, sin rutas públicas completas alternativas.
+- REQ-V11-PLOT-F02: target/bandas desde todos los nudos originales; muestras,
+  gaps y cobertura independientes por candidato; sin cambiar semántica sampled.
+- REQ-V11-DIAGNOSTIC-F03: causas mecánicas específicas con prioridad documentada,
+  sin promover disponibilidad ni modificar límites o física v0.8.
+- REQ-V11-INTEGRITY: reconstruct validators, MAT, ataques, benchmarks analíticos,
+  fuentes reales y selección global F-01 sin alternatives{1} implícita.
+- REQ-V11-VALIDATION: 471 históricos + suite nueva, 11 ejemplos, Analyzer0,
+  DAG/perfil/costes/diff check; no commits/tags/merge/v0.12.
+
+Contrato e implementación en [especificación](design-requirements-target-evaluation.md),
+evidencia de ejecución en [informe](v0.11-validation.md).
+Correcciones de auditoría: [informe específico](v0.11-audit-corrections.md).
+
 ## v0.10 Coupled Chassis Pose & Global Static Equilibrium
 
 - REQ-V10-POSE: siete DOF, R finita Rx*Ry coherente, sin yaw/translation XY.

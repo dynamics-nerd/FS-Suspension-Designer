@@ -1,5 +1,25 @@
 % FS Suspension Designer engineering core.
 %
+% v0.11 Design Requirements, Targets & Evaluation
+%   fsd.model.createDesignParameter             - Role, availability, provenance.
+%   fsd.model.createDesignTarget                - Explicit scalar/band/curve target.
+%   fsd.model.createSuspensionDesignTargets     - Standalone target collection.
+%   fsd.model.createDesignConstraint            - Fixed hardpoint or XYZ box.
+%   fsd.model.createDesignSpecification         - Progressive specification.
+%   fsd.model.createDesignCandidate             - Native model/result sources.
+%   fsd.model.designMetricCatalog               - Typed supported result metrics.
+%   fsd.model.designScope                       - Vehicle/axle/corner/component/point.
+%   fsd.model.convertDesignUnits                - Explicit SI boundary conversion.
+%   fsd.model.designVariableSpace               - Bounds/bindings, no optimizer.
+%   fsd.model.mirrorBumpDesignTarget            - Explicit limited symmetry rule.
+%   fsd.analysis.evaluateDesignCandidate        - Validated sampled comparisons.
+%   fsd.analysis.validateDesignCandidate        - Reconstruct native source integrity.
+%   fsd.analysis.validateDesignAssessment       - Reconstruct errors/status/coverage.
+%   fsd.analysis.designReadiness                - Missing input/result diagnostics.
+%   fsd.analysis.compareDesignCandidates        - Same specification, no winner.
+%   fsd.analysis.designAssessmentTable          - Requirement dashboard with units.
+%   fsd.analysis.plotDesignTargetEvaluation     - Targets/results/errors/gaps.
+%
 % v0.10 Coupled Chassis Pose & Global Static Equilibrium
 %   fsd.model.createVerticalTireModel               - Explicit vertical-only tire.
 %   fsd.model.createGlobalStaticSystem              - Four-corner source aggregate.

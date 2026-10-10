@@ -1,4 +1,29 @@
-# Modelo de datos v0.10
+# Modelo de datos v0.11
+
+## Contratos v0.11
+
+Structs schema0.11.0 con kind/definitionSI/identity/metadata: DesignParameter,
+DesignTarget, SuspensionDesignTargets, DesignConstraint, DesignSpecification y
+DesignCandidate. Specification no exige geometrías: parámetros/targets/limits
+pueden registrarse antes. Tipos/provenance compatibles con vocabulario v0.9.
+Candidate agrega fuentes nativas tipadas y sus modelos; su identidad reemplaza
+payloads pesados por IDs y controles. DesignAssessment contiene comparación y
+readiness ligada a ambas identidades, nunca resultados inventados ni nuevos
+solves. DesignComparison conserva evaluaciones bajo una única especificación.
+Validadores reconstruyen registros y evaluación desde fuentes originales;
+MAT round-trip probado. Sin jerarquía OO ni DB. Contrato, campos, catálogo,
+scopes, unidades, bindings y APIs en
+[design-requirements-target-evaluation.md](design-requirements-target-evaluation.md).
+
+Tras auditoría F-01, la validación estructural de `model`/fábrica no equivale
+a validez física conjunta. `analysis` reconstruye todas las fuentes y une sus
+identidades físicas en un mapa privado por dominio/corner; registros nominales
+siguen opcionales. Un candidato permite un vehículo/load case/configuración,
+sin escenarios múltiples implícitos. Referencias y fuentes participan en la
+misma invariante. Un assessment previo incoherente falla al validarse otra vez.
+No se añaden campos públicos ni nuevos schemas: diagnósticos F-03 reutilizan
+`reasons`, con prioridad explícita; fuentes nativas retienen causas secundarias.
+Plot F-02 lee nudos originales de la especificación sin modificar assessments.
 
 ## Contratos v0.10
 

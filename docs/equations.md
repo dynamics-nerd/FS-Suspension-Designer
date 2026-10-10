@@ -1,5 +1,19 @@
 # Convenciones y formulación matemática
 
+## Comparación de requisitos v0.11 (sin nuevas ecuaciones de suspensión)
+
+Nominal: d=y−t, v=max(abs(d)−tau,0). Banda: d=y−clamp(y,l,u),
+v=max(l−y,y−u,0). Upper: d=y−u,v=max(d,0); lower: d=y−l,v=max(−d,0).
+Aceptación inclusiva; residual d/s, violation v/s sólo con s>0 y justificación
+explícita. Target cero no es denominador. Tau no modifica calidad upstream.
+Target piecewise linear en sus knots; actual sólo samples nativos, sin
+extrapolación ni interpolación de resultados. RMS de r sobre edges válidos:
+sqrt(sum(dx*(r_i²+r_(i+1)²)/2)/sum(dx)), cuadratura muestreada ponderada por
+dominio, sin gaps. Score opcional sqrt(sum(w*RMS(v/s)²)/sum(w)) sólo SOFT
+completos con todos los pesos/escalas explícitos; HARD permanece separado.
+Box lXYZ<=pXYZ<=uXYZ; fixed abs(p−p0)<=tolerance por coordenada, nominal.
+[Dominio, métricas y limitaciones](design-requirements-target-evaluation.md).
+
 ## Equilibrio global v0.10
 
 R=Rx(phi)*Ry(theta), WCworld=R*WCbody(z)+[0,0,h].
@@ -792,7 +806,7 @@ después de cualquier corrección estrictamente negativa de roundoff. Medidas
 no se corrigen. Soporte negativo no se recorta. Fórmulas, origen y limitaciones
 del presupuesto en la sección SL-32 del contrato; no cambia ninguna ley v0.8.
 
-## Pending mathematical specifications (después de v0.10)
+## Pending mathematical specifications (después de v0.11)
 
 No están especificados ni implementados roll axis de vehículo, steering
 wheel/column, pinion ratio, fuerzas estructurales o compliance, pneumatic trail,

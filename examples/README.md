@@ -1,5 +1,17 @@
 # Examples
 
+## v0.11
+
+`designTargetEvaluationExample(showPlots)` registra KNOWN/RANGE/FIXED/ASSUMED/
+FREE y CG desconocido sin rellenar cero, camber curve, toe band, signed MR,
+box del UBJ y Ackermann HARD con fuente ausente. Genera explícitamente bump/
+actuation/mechanical antes de evaluar, compara dos geometrías, imprime tablas
+con errores/unidades/cobertura/missing y dibuja cuatro figuras target/actual/
+aceptación/error/violaciones/gaps con ambos IDs. A mejora toe, B mejora camber
+pero viola UBJ; no hay ganador. Todos los valores son ilustrativos, no targets
+recomendados, ni certificación continua/normativa/packaging/rendimiento.
+verifyV11 ejecuta éste y los diez ejemplos históricos. No nuevo módulo/UI.
+
 ## v0.10
 
 `globalStaticEquilibriumExample(showPlots)` construye cuatro geometrías y

@@ -1,5 +1,29 @@
 # Registro de decisiones
 
+## Cerradas para v0.11
+
+- DTE-001: separar parámetros, targets/constraints y assessment; structs/MAT,
+  model/analysis existentes, sin otra capa OO/paquete ni tecnología nueva.
+- DTE-002: rol compatible con v0.9 separado de provenance/availability;
+  unknown vacío; límites/bindings no inferidos ni recomendaciones FS.
+- DTE-003: catálogo/adaptadores cerrados de 23 métricas ya disponibles;
+  sourceId/tipo/scope/coordenada/referencia explícitos, condiciones rack/roll SI.
+- DTE-004: interpolar target lineal, jamás actual; igualdad de coordenada
+  scalar; RMS trapezoidal sólo edges válidos, PASS exclusivamente muestreado.
+- DTE-005: HARD violado incluso parcial invalida respecto al spec; missing no
+  PASS; SOFT conserva residuales sin invalidación automática. Score opt-in.
+- DTE-006: validar fuente nativa una vez por llamada pública; core seguro sin
+  validators/solvers en loops; validator del assessment reconstruye resultados.
+- DTE-007: HP fixed/box nominales con tol explícita; sin packaging cert.
+- DTE-008: regla explícita de espejo sólo BUMP side-independent, no steering.
+- Base Git confirmada en comprobación final: v0.10.0, main y HEAD apuntan a
+  18ff78e7b4f1d64bb2ff75375cac28c89fa64ce5 (baseline real 471).
+  Se rectifica la observación inicial sobre ausencia del tag. No se crea ni
+  modifica ningún tag, rama, commit o main.
+- OPEN DECISION: targets/escalas/tolerancias reales, normativa verificada,
+  simetría steering/roll, conectividad más fina, continuous verification y
+  propagación de incertidumbre. No se completan con valores típicos inventados.
+
 ## Cerradas para v0.10
 
 - GST-001: siete coordenadas y orden Rx(phi)*Ry(theta), conforme al prompt;
