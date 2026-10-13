@@ -1,5 +1,17 @@
 # Convenciones
 
+## Síntesis de eje v0.13
+
+FRONT=FL/FR, REAR=RL/RR, dos seeds explícitos en frame común. Convenciones
+X_REAR_Y_RIGHT_Z_UP/SI intactas. Links por IDs de parámetros correspondientes:
+X/Z idénticas, Y reflejada sobre Y=0, bounds intersectados, FIXED nunca movido.
+Se vinculan coordenadas, no curvas firmadas ni necesariamente toda geometría.
+u independiente sigue [0,1]/frozen0 y round-trip v0.12. Cada lado conserva
+fuentes/cobertura/gaps propios. Roll heave es promedio de wheel travel, no pose
+global. Ejes/corners/identidades físicas no se intercambian por source IDs.
+Selected requiere score conjunto explícito y elegibilidad bilateral; cero no
+certifica continuidad. [Contrato](axle-level-synthesis.md).
+
 ## Síntesis v0.12
 
 Física/signos/SI históricos intactos. Parámetros FREE/RANGE HP_X/Y/Z con

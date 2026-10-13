@@ -1,5 +1,18 @@
 # Examples
 
+## v0.13
+
+`axleSuspensionSynthesisExample(showPlots,useSymmetry)` suministra ambos seeds
+FL/FR, cuatro upper inboard Z con +/-10mm, links opcionales, dos UBJ HARD FIXED,
+camber/toe BUMP por lado y road camber ROLL a h=0. Targets proceden de una
+referencia alcanzable modificada5mm, resuelta aparte con APIs nativas.
+Un controller/assessment conjunto busca, retiene candidatos y compara ambos
+modelos/curvas; repite físicamente el seleccionado y guarda/revalida MAT.
+Default simétrico: E7, BUMP7+7, ROLL7, mejora0.086073119596→0. Datos ASSUMED de
+verificación, no setup FS ni óptimo global/certificación continua/fabricación.
+`verifyV13` ejecuta los doce ejemplos anteriores y éste (showPlots=false),
+después verifica reporting, perfiles, Analyzer/DAG y costes. [Contrato](../docs/axle-level-synthesis.md).
+
 ## v0.12
 
 `inverseSuspensionSynthesisExample(showPlots)` define un seed 3D ASSUMED,

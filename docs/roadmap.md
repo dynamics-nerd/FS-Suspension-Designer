@@ -1,5 +1,18 @@
 # Roadmap
 
+## v0.13 — Axle-Level Suspension Synthesis
+
+Síntesis coordinada FRONT FL/FR o REAR RL/RR con dos seeds explícitos,
+hardpoints inboard de ambas, vínculos de simetría seleccionados, BUMP bilateral
+y ROLL nativo opcional con plan explícito, spec/assessment conjunta v0.11 y
+controller v0.12 único. Records, failures, snapshots, cache, counters, MAT y
+reporting sin solves. Aceptación: modificar físicamente ambos lados, reconstruir
+fuentes nuevas, mejorar objetivo conjunto y conservar candidatos; comparación
+nativa y benchmark analítico, regresiones/13 ejemplos/Analyzer/DAG completos.
+[Contrato](axle-level-synthesis.md) · [Evidencia](v0.13-validation.md).
+No inverse rack/actuation/global static, generador desde concepto, optimizador
+global/Pareto, CAD/rules/UI/Adams ni v0.14. Las exclusiones inferiores son históricas.
+
 ## v0.12 — Inverse Suspension Synthesis
 
 Implementada como capa local de una esquina: seed DW, XYZ de cuatro pivotes

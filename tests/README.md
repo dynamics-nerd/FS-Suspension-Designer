@@ -1,5 +1,19 @@
 # Testing strategy
 
+## v0.13 axle synthesis
+
+`setupProject; results=runProjectTests; addpath("tests"); report=verifyV13`.
+Baseline904/904 PASS. Historical expected físicos intactos; Foundation sólo
+actualiza versión. Nuevos TestAxleSynthesisSpace/Physics/Integration/Reporting:
+pares FRONT/REAR/24 coordenadas, simetría/bounds/FIXED, builders/F04/rethrow,
+APIs físicas independientes y fórmula analítica ROLL, benchmark bilateral,
+snapshots/fuentes/score/history/cache/selección/MAT, PNGs single/no-eligible/gaps.
+Los tests usan datos ASSUMED, tolerancias de verificación, no targets FS.
+verifyV13 mide pipelines físicos/costes/perfiles sin solves en validators/eval/
+reporting y ejecuta13 ejemplos/Analyzer/DAG. Verificadores de versión fija previos
+siguen disponibles en sus tags, no se alteran para aparentar compatibilidad.
+[Contrato](../docs/axle-level-synthesis.md) · [Validación](../docs/v0.13-validation.md).
+
 ## v0.12 synthesis
 
 `setupProject; results=runProjectTests; addpath("tests"); report=verifyV12`.

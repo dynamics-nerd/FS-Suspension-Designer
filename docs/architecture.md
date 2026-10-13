@@ -1,5 +1,18 @@
 # Arquitectura
 
+## Extensión v0.13
+
+Síntesis de eje en `fsd.synthesis`: dos seeds → bindings/mapa de simetría →
+builders v0.12 → BUMP por corner y ROLL nativo opcional → candidato/assessment
+conjunto v0.11 → único boundedDirectSearch → records/reporting/MAT.
+No se almacenan dos búsquedas independientes como si fueran una síntesis de eje.
+Nuevos structs consumidores; model/geometry/kinematics/analysis históricos no
+dependen de synthesis ni cambian. Plots llaman a geometry para dibujar ambos
+modelos; dependencias synthesis→model/kinematics/analysis/geometry, acíclicas.
+Builders, evaluación de targets, replay/validators y UI siguen separados.
+ROLL recibe ángulos/heave/opciones explícitos, no otro modelo de vehículo.
+[Contrato de eje](axle-level-synthesis.md). Las exclusiones de abajo son históricas.
+
 ## Extensión v0.12
 
 `fsd.synthesis` orquesta espacio → builder → BUMP/analysis nuevos → evaluación

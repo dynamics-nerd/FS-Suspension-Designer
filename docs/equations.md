@@ -1,5 +1,17 @@
 # Convenciones y formulación matemática
 
+## Síntesis de eje v0.13 (sin nuevas ecuaciones de suspensión)
+
+Para un link correspondiente: xR=xL, zR=zL, yR=-yL. Sea s=+1 (X/Z) o -1 (Y);
+el intervalo independiente es [lL,hL] ∩ sort(s*[lR,hR]). El seed debe estar en
+la intersección y satisfacer exactamente xR=s*xL. Se usa el affine map v0.12
+una sola vez por DOF; después se reconstruyen ambas coordenadas físicas.
+El score es el único RMS ponderado v0.11 sobre SOFT conjuntos, sin pesos nuevos
+por lado ni penalización HARD. ROLL reutiliza exactamente el cierre v0.6 de
+abajo y su contacto/RC nativos; no se aproxima con dos BUMP. Guards locales
+del Jacobiano v0.12 se aplican también a las poses de esquina ROLL publicadas.
+No se demuestra unicidad/continuidad global. [Contrato](axle-level-synthesis.md).
+
 ## Síntesis v0.12 (sin cambiar física histórica)
 
 Span>0: u_i=(x_i-l_i)/(h_i-l_i), x_i=l_i+u_i*(h_i-l_i), 0<=u_i<=1.

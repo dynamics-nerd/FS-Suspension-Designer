@@ -1,5 +1,18 @@
 % FS Suspension Designer engineering core.
 %
+% v0.13 Axle-Level Suspension Synthesis
+%   fsd.synthesis.createAxleDesignSpace          - Explicit FL/FR or RL/RR seeds and plans.
+%   fsd.synthesis.validateAxleDesignSpace        - Bounds, FIXED and selected symmetry links.
+%   fsd.synthesis.normalizeAxleVariables         - Independent SI coordinates to unit box.
+%   fsd.synthesis.denormalizeAxleVariables       - Shared v0.12 coordinate contract.
+%   fsd.synthesis.buildAxleCandidate             - Rebuild both corners deterministically.
+%   fsd.synthesis.evaluateAxleCandidate          - Fresh bilateral BUMP and optional ROLL.
+%   fsd.synthesis.runAxleInverseSearch           - One joint objective and shared controller.
+%   fsd.synthesis.validateAxleSynthesisEvaluation - Native evidence reconstruction, no solves.
+%   fsd.synthesis.validateAxleSynthesisResult     - Joint provenance and deterministic replay.
+%   fsd.synthesis.compareAxleSynthesisCandidates  - Joint targets and changes/tradeoffs.
+%   fsd.synthesis.plotAxleSynthesisResult         - Both geometries, targets, trace and failures.
+%
 % v0.12 Inverse Suspension Synthesis
 %   fsd.synthesis.createDesignSpace             - Immutable seed/v0.11 bounded bindings.
 %   fsd.synthesis.validateDesignSpace           - Reconstruct supported definition.

@@ -1,5 +1,18 @@
 # Modelo de datos
 
+## Contratos v0.13
+
+AxleSynthesisDesignSpace, AxleSynthesisEvaluation, AxleSynthesisResult y snapshot
+son structs schema0.13.0. SeedAxle/AxleGeometry y sus dos identidades mantienen
+schemas históricos. Space conserva spec/planes canónicos/cornerSpaces v0.12,
+physicalVariables con ambas declaraciones, variables independientes,
+independentIndex/multiplier y symmetryLinks. No clases/DB/handles persistidos.
+Evaluation conserva axle/identity/changes, tres wrappers físicos independientes,
+candidate/assessment conjuntos, disponibilidad/calidad/HARD/SOFT/score/tiempos.
+Fallos de builder no publican eje ficticio; fallos de análisis conservan el sweep.
+Result reutiliza search v0.12 íntegro y agrega snapshots/statistics/diagnostics.
+MAT completo se valida tras load sin solves. [Campos y APIs](axle-level-synthesis.md).
+
 ## Contratos v0.12
 
 SynthesisDesignSpace, SynthesisEvaluation y SynthesisResult son structs

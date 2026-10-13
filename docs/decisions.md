@@ -1,5 +1,26 @@
 # Registro de decisiones
 
+## Cerradas para v0.13
+
+- AXS-001: dos seeds explícitos con referencia completa común; FRONT/REAR
+  históricos, sin generar la esquina ausente ni masas/CG ficticios.
+- AXS-002: reutilizar cornerSpace/buildCore/coordinateCore/bumpQuality y el
+  boundedDirectSearch original; no refactor ni otro optimizador.
+- AXS-003: vínculos sólo entre mismos roles/componentes declarados FREE/RANGE,
+  Y=0, exactos en seeds; intersectar bounds y eliminar DOF dependiente.
+  Simetría seleccionada no implica simetría completa ni de curvas.
+- AXS-004: dos BUMP nuevos por eje válido y ROLL opcional nativo con ángulos,
+  heave y opciones explícitos; source aliases ligados al mismo wrapper físico.
+- AXS-005: un candidato/assessment v0.11 para todo el eje, calidad bilateral y
+  de planes solicitados; clasificación primaria sin perder diagnósticos por lado.
+- AXS-006: allowlist física v0.12 intacta; conservar fuentes independientes
+  disponibles ante fallo de otro análisis, sin score/estado ficticio ni catch universal.
+- AXS-007: snapshots completos y replay sin solves; sweeps e internal corner
+  solves separados del presupuesto E. Reporting/MAT consumen datos, no cálculos físicos.
+- OPEN DECISION: datos/targets/pesos/tolerancias reales, validación experimental,
+  ramas/continuidad global, simetría completa/planos desplazados, nuevos adapters
+  inversos y robustez. [Alcance y límites](axle-level-synthesis.md).
+
 ## Cerradas para v0.12
 
 - SYN-001: capa consumidora synthesis, structs/MAT y APIs pequeñas, sin refactor

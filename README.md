@@ -4,6 +4,37 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+**v0.13 — Axle-Level Suspension Synthesis** amplía la búsqueda a FRONT FL/FR
+o REAR RL/RR con dos seeds explícitos, coordenadas inboard de ambos lados y
+vínculos de simetría opcionales. Reconstruye ambos modelos, ejecuta BUMP por
+corner y ROLL nativo opcional, y usa un único assessment v0.11/controlador v0.12.
+Fuentes, HARD/SOFT/calidad, snapshots, fallos, caché, historial, MAT y gráficos
+bilaterales permanecen trazables; no se altera ningún solver histórico.
+[Contrato y APIs](docs/axle-level-synthesis.md) · [Validación](docs/v0.13-validation.md).
+
+```matlab
+setupProject
+results = runProjectTests;
+addpath("examples", "tests")
+example = axleSuspensionSynthesisExample(true);
+report = verifyV13;
+```
+
+Baseline v0.12:904/904 PASS,12 ejemplos,Analyzer0/378,DAG acíclico. El benchmark
+v0.13 alcanzable modifica ambas esquinas: E7, BUMP7+7, ROLL7, score conjunto
+0.086073119596→0. Son datos ASSUMED de software, **no targets ni un setup Formula
+Student recomendado**. BUMP/ROLL mantienen Optimization Toolbox/fsolve;
+controller base MATLAB. Validación final y límites en el informe enlazado.
+Validación final R2025b: **1064/1064 tests PASS** (904 históricos+160 nuevos),
+Failed=0, Incomplete=0; **13/13 ejemplos**, **Analyzer0/408 .m**, DAG10 acíclico.
+Perfiles del evaluador/validators/reporting sin nuevos solves físicos.
+Desarrollo experimental: **no utilizar resultados para fabricar una suspensión
+real**. Sin UI, CAD, certificación normativa, Adams ni optimización global.
+Los verificadores de versión fija anteriores son históricos; usar verifyV13
+en este checkout. Las secciones siguientes conservan entregas anteriores.
+
+## Historia v0.12
+
 **v0.12 — Inverse Suspension Synthesis** incorpora búsqueda local acotada y
 determinista sobre coordenadas XYZ de cuatro anclajes UCA/LCA inboard de una
 esquina. Reconstruye geometrías, ejecuta BUMP real y evalúa camber, toe,

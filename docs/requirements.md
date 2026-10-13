@@ -1,5 +1,23 @@
 # Requisitos
 
+## v0.13 Axle-Level Suspension Synthesis
+
+- REQ-V13-SPACE: dos seeds FRONT/REAR, frame común, 24 coordenadas posibles,
+  FREE/RANGE/FIXED/boxes/SI/provenance, simetría seleccionada sin DOFs duplicados.
+- REQ-V13-BUILD: reconstrucción bilateral atómica, hardpoints autorizados,
+  identities individuales/conjunta, fallos F04 sin solves y seeds inmutables.
+- REQ-V13-PHYSICS: BUMP real por lado; ROLL nativo con plan/heave explícitos;
+  targets sólo de adaptadores reales, gaps/calidad preservados y unsupported explícito.
+- REQ-V13-JOINT: un assessment, HARD/availability/quality separados, pesos sólo
+  explícitos, ningún ganador con score o HARD incompleto.
+- REQ-V13-SEARCH: controller v0.12 único, deterministic budgets/cache/history;
+  contadores de candidatos distintos de sweeps/cierres físicos internos.
+- REQ-V13-EVIDENCE: snapshots ligados a ambos modelos/planes/spec, validators y
+  replay sin solves, ataques/MAT/reporting single/no-eligible/PNG verificables.
+- REQ-V13-VALIDATION: baseline904, nuevos tests, mejora bilateral real, benchmark
+  analítico de roll, trece ejemplos, Analyzer0/DAG, solvers/APIs históricos intactos.
+  Sin commit/merge/tag/release/main/v0.14. [Contrato](axle-level-synthesis.md).
+
 ## v0.12 Inverse Suspension Synthesis
 
 - REQ-V12-SPACE: seed inmutable, FREE/RANGE/FIXED v0.11, XYZ inboard/SI,
