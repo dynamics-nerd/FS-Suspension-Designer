@@ -1,5 +1,55 @@
 # Testing strategy
 
+## Auditoría v0.14 V14-F-01: SOFT exclusivamente RACK
+
+`TestSteeringRackOnlyAudit` es una suite nueva independiente; no edita los
+1195 tests anteriores. Usa el mecanismo ASSUMED de steeringSynthesisFixture,
+rear reference 1.6 m y los cuatro targets RACK reales (headings FL/FR y
+Ackermann a ambos signos de rack), o sólo los dos Ackermann. Tolerancia cero
+en los SOFT es un control explícito de score no nulo, no un requisito FS.
+El oracle escalar calcula el RMS ponderado de violaciones desde los ángulos
+nativos, pesos y escalas originales, sin usar la proyección ni el RMS agregado
+del assessment. AbsTol 1e-12 es verificación aritmética de la misma evidencia.
+
+Incluye BUMP HARD satisfecho/fallido/indeterminado, SOFT excelente que no
+rescata HARD FAIL, parcial/straight unavailable, controles mixtos/ROLL/HARD-only/
+score desactivado, rechazo público sin SOFT, fuentes no soportadas, errores
+recuperables/desconocidos, búsquedas deterministas, MAT y ataques de spec,
+assessment, grids y opciones. Profile verifica cero solves durante validators,
+assessment y comparación. Los tests gráficos históricos conservan la cobertura
+de reporting sin solves; F-01 no modifica el sistema gráfico.
+
+```matlab
+setupProject;
+newResults = runtests("tests/TestSteeringRackOnlyAudit.m");
+results = runProjectTests;
+addpath("tests"); report = verifyV14F01;
+```
+
+Evidencia RED y resultados finales en
+[registro V14-F-01](../docs/v0.14-validation.md#corrección-de-auditoría-v14-f-01).
+Resultados reales: baseline1195/1195, nueva suite29/29 y suite final1224/1224
+PASS, Failed0,Incomplete0. verifyV14F01:14 ejemplos,Analyzer0/435,DAG10 y
+hiddenSolves0. RACK-only E3/BUMP6/RACK3,score .0265716889609→.0238159165073;
+benchmarks mixto v0.14 y v0.12/v0.13 intactos. MAT bajo output/v014-f01-*.mat.
+
+## v0.14 steering synthesis
+
+`setupProject; results=runProjectTests; addpath("tests"); report=verifyV14`.
+Baseline real1064/1064 PASS,Failed0/Incomplete0,13 ejemplos,Analyzer0/408,DAG10.
+TestSteeringSynthesisSpace/Physics/Integration/Reporting cubren endpoints XYZ,
+montaje/fixed/bounds/simetría, mecanismos degenerados, nuevas fuentes BUMP/RACK/
+ROLL, rack rígido/longitudes/signs/Ackermann, calidad con inner trasladado,
+HARD/missing/gaps/score, cache/budgets, snapshots/attacks/MAT y PNG de ambos temas.
+Expected físicos proceden de APIs nativas independientes; tolerancias1e-10rad,
+2e-9m y rcond1e-12 son controles de verificación, no límites FS/fabricación.
+Benchmark separado demuestra mejora alcanzable y tradeoff contra ideales cero.
+Resultado final real:1195/1195 PASS,Failed0/Incomplete0,131 nuevos (45/36/41/9);
+9 gráficos repetidos tras ajuste de constructor,14 ejemplos,Analyzer0/433,
+DAG10 y perfiles sin solves ocultos. Evidencia MAT/PNG en el informe enlazado.
+Los1064 históricos se mantienen; Foundation cambia sólo versión. Verificadores
+de versión fija previos corresponden a sus tags. [Evidencia](../docs/v0.14-validation.md).
+
 ## v0.13 axle synthesis
 
 `setupProject; results=runProjectTests; addpath("tests"); report=verifyV13`.

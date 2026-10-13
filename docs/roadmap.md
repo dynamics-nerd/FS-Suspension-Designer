@@ -1,5 +1,18 @@
 # Roadmap
 
+## v0.14 — Steering Geometry & Ackermann Synthesis
+
+Extensión FRONT del diseño de eje: XYZ autorizadas de ambos endpoints tie rod,
+rack/longitudes nativos reconstruidos, dos BUMP y RACK bilateral nuevos, ROLL
+centrado opcional, un assessment v0.11 y boundedDirectSearch v0.12 único.
+Aceptación: cambio físico steering → nuevos cierres BUMP/RACK → bump steer y
+Ackermann evaluados → mejora alcanzable → candidato íntegro conservado/MAT;
+tradeoffs, adversariales,1064 históricos+nuevos,14 ejemplos,Analyzer/DAG/PNG.
+[Contrato](steering-geometry-synthesis.md) · [Evidencia](v0.14-validation.md).
+No columna/pinion/compliance, grid simultáneo, nuevos adapters inversos,
+CAD/rules/UI/Adams, certificación continua/global ni v0.15.
+Exclusiones inferiores describen sus milestones históricos.
+
 ## v0.13 — Axle-Level Suspension Synthesis
 
 Síntesis coordinada FRONT FL/FR o REAR RL/RR con dos seeds explícitos,

@@ -1,5 +1,20 @@
 # Examples
 
+## v0.14
+
+`steeringSynthesisExample(showPlots)` define dos corners/steering FRONT ASSUMED,
+rear line1.6m, dos TRout X [.04,.06]m vinculados, UBJ/inners FIXED/boxes nominales.
+Referencia nativa .055m: BUMP steer/toe por lado, toe/headings RACK y Ackermann
+en ambos rangos de rack (giro deducido del mecanismo). Pesos diferentes3/1/.5/2,
+escalas .01rad y .001rad, tolerancia1e-7rad sólo de verificación. Search E3,
+BUMP3+3/RACK3, mejora0.441327900783→0, repetición física independiente y MAT.
+Hay seis sweeps externos explícitos (referencia3/repetición3); search cuenta9.
+Comparación secundaria ZERO_STEER_TRADEOFF reutiliza evidencia fresca bajo
+otra spec explícita; aumentar pickup X mejora bump steer pero empeora Ackermann
+ideal. No se sustituye el objetivo de búsqueda ni se proclama ganador Pareto.
+`verifyV14` ejecuta los trece ejemplos históricos+éste, PNGs/perfiles/costes y
+Analyzer/DAG. No datos/setup FS recomendados ni certificación de fabricación.
+
 ## v0.13
 
 `axleSuspensionSynthesisExample(showPlots,useSymmetry)` suministra ambos seeds

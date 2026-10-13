@@ -1,5 +1,22 @@
 # Requisitos
 
+## v0.14 Steering Geometry & Ackermann Synthesis
+
+- REQ-V14-MECHANISM: FRONT FL/FR/steering seeds explícitos coherentes, pickups y
+  joints tie rod XYZ autorizados, FIXED/RANGE/boxes/simetría, reconstrucción atómica.
+- REQ-V14-PHYSICS: BUMP L/R y RACK nuevos sobre el mismo mecanismo; ROLL centrado
+  opcional; longitudes/rack rígidos, rear reference explícita, sólo adapters nativos.
+- REQ-V14-EVALUATION: un assessment, HARD prioritario, cobertura/calidad separadas,
+  SOFT normalizado con pesos explícitos y tradeoffs físicos sin ganador inventado.
+- REQ-V14-PROVENANCE: snapshots/model identities/planes/options/grids/reference/
+  límites/spec y cache ligados; validators/MAT/reporting sin solves; unknown rethrow.
+- REQ-V14-CONTROLLER: boundedDirectSearch único, budgets/history/cache intactos,
+  contadores BUMP L/R/RACK/ROLL distintos de evaluaciones y closures internos.
+- REQ-V14-QA: baseline1064 conservada+nuevas regresiones, benchmark modifique
+  realmente steering,14 ejemplos,Analyzer0,DAG,PNG claro/oscuro sin leyendas sobre datos.
+  No commit/merge/tag/release/main/v0.15 ni certificación CAD/normativa/fabricación.
+  [Contrato](steering-geometry-synthesis.md) · [Evidencia](v0.14-validation.md).
+
 ## v0.13 Axle-Level Suspension Synthesis
 
 - REQ-V13-SPACE: dos seeds FRONT/REAR, frame común, 24 coordenadas posibles,

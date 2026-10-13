@@ -1,5 +1,25 @@
 # Registro de decisiones
 
+## Cerradas para v0.14
+
+- STS-001: extender privadamente bindings y pipeline de eje; schemas públicos
+  nuevos0.14, sin ampliar silenciosamente APIs v0.12/v0.13 ni duplicar optimizador.
+- STS-002: endpoints de diseño libres si autorizados; rack nativo rígido con
+  traslación compartida, longitudes derivadas y cambios registrados por candidato.
+- STS-003: referencia BUMP/ROLL rack cero exclusivamente; rearAxleX y límites
+  de rack explícitos. Grids independientes no son cierre simultáneo roll–steering.
+- STS-004: adaptadores existentes RACK/BUMP/ROLL, guard local con inner actual,
+  Ackermann gaps/giros nativos; score/pesos/escalas v0.11, HARD antes de disponibilidad.
+- STS-005: contexto/identidad física separados, evidencia por invocación y replay
+  sin solves; allowlist de degeneraciones nuevas cerrada, errores desconocidos rethrow.
+- STS-006: benchmark alcanzable y comparación separada contra métricas cero para
+  hacer visible el compromiso físico; no confundir objetivos o declarar otro ganador.
+- STS-007: leyendas externas y lienzo amplio en wrappers, core gráfico compartido,
+  sin rediseñar el plot/evaluator v0.11 ni cambiar unidades/curvas.
+- OPEN DECISION: mounting/travel/targets/pesos/escalas/tolerancias reales,
+  continuidad y ramas globales, validación experimental, compliance/pinion,
+  packaging de movimiento y grid simultáneo. [Contrato](steering-geometry-synthesis.md).
+
 ## Cerradas para v0.13
 
 - AXS-001: dos seeds explícitos con referencia completa común; FRONT/REAR

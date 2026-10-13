@@ -1,4 +1,4 @@
-function space = spaceCore(seed,specification,plan)
+function space = spaceCore(seed,specification,plan,extraRoles)
 %SPACECORE Canonical definition; no solves, inferred bounds or physical presets.
 fsd.model.validateDoubleWishboneGeometry(seed);
 fsd.model.validateDesignSpecification(specification);
@@ -14,6 +14,11 @@ declared = fsd.model.designVariableSpace(specification,true);
 variables = cell(size(declared.variables)); lower = zeros(numel(variables),1); upper = lower; initial = lower;
 keys = strings(numel(variables),1);
 supported = seed.cornerId + "_" + ["UCA_FWD_CHASSIS","UCA_AFT_CHASSIS","LCA_FWD_CHASSIS","LCA_AFT_CHASSIS"];
+% Private opt-in only; historical public corner/axle APIs never supply it.
+if nargin==4
+    requireSynthesis(isequal(extraRoles,["TIE_ROD_INBOARD","TIE_ROD_OUTBOARD"]),'Unsupported private binding extension.');
+    supported=[supported,seed.cornerId+"_"+extraRoles];
+end
 parameters = specification.definitionSI.parameters;
 for i = 1:numel(parameters)
     p = parameters{i}.definitionSI;
@@ -29,7 +34,7 @@ for i = 1:numel(parameters)
 end
 for i = 1:numel(variables)
     p = declared.variables{i}; axis = find(["HARDPOINT_X","HARDPOINT_Y","HARDPOINT_Z"] == p.binding);
-    requireSynthesis(isscalar(axis) && p.unit == "m" && ismember(p.scope.id,supported), 'Only XYZ of UCA/LCA chassis pivots supported.');
+    requireSynthesis(isscalar(axis) && p.unit == "m" && ismember(p.scope.id,supported), 'Coordinate role is not authorized by this synthesis API.');
     row = find(seed.hardpoints.ids == p.scope.id); initial(i) = seed.hardpoints.xyz_m(row,axis);
     lower(i) = p.bounds(1); upper(i) = p.bounds(2);
     requireSynthesis(initial(i)>=lower(i) && initial(i)<=upper(i),'Seed coordinate outside bounds.');

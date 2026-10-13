@@ -1,5 +1,19 @@
 # Modelo de datos
 
+## Contratos v0.14
+
+SteeringSynthesisDesignSpace/Evaluation/Result y snapshot: structs0.14.0/MAT.
+Reutilizan campos del eje: seedAxle/cornerSpaces/physicalVariables/variables,
+independentIndex/multiplier/symmetryLinks/specification/sourceIds. Añaden
+seedSteering nativo; plan.rack y referenceRackTravel_m=0. Evaluation añade
+steering/steeringIdentity/mechanismDiagnostics y cuarto wrapper físico RACK,
+después de BUMP L/R y ROLL opcional. Diagnósticos contienen longitudes tie rod
+y rack seed/candidato, sin inputs de length redundantes. Snapshot separa seed
+physical identity y contexto entero de planes/options/spec/links. Result retiene
+search original; statistics.rackSweeps separa RACK de BUMP/ROLL/candidatos.
+Un fallo atómico no publica modelo/identity parcial. MAT se revalida sin solves.
+No clases/handles persistentes ni schemas físicos nuevos. [Contrato](steering-geometry-synthesis.md).
+
 ## Contratos v0.13
 
 AxleSynthesisDesignSpace, AxleSynthesisEvaluation, AxleSynthesisResult y snapshot

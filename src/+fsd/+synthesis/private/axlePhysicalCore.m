@@ -1,8 +1,11 @@
 function evidence = axlePhysicalCore(model,family,plan,execution,id,stored)
 %AXLEPHYSICALCORE Native invocation or algebraic evidence reconstruction (no solve).
 replay=nargin==6;
+requireSynthesis(ismember(family,["BUMP","ROLL","RACK"]),'Unknown native physical family.');
 if family=="BUMP"
     identity=fsd.model.geometryIdentity(model); scope=model.cornerId;
+elseif family=="RACK"
+    identity=model.identity; scope="FRONT";
 else
     identity=fsd.model.axleIdentity(model); scope=model.axleId;
 end
@@ -22,6 +25,8 @@ else
     try
         if family=="BUMP"
             sweep=fsd.kinematics.solveBumpSweep(model,plan.travel_m,'m',plan.solverOptions);
+        elseif family=="RACK"
+            sweep=fsd.kinematics.solveRackSweep(model,plan.travel_m,plan.wheelTravel_m,'m',plan.solverOptions);
         else
             sweep=fsd.kinematics.solveAxleRollSweep(model,plan.angles_rad,plan.axleHeave_m,'rad','m',plan.solverOptions);
         end
@@ -39,6 +44,14 @@ if family=="BUMP"
     requireSynthesis(isequaln(sweep.geometryIdentity,identity) && isequaln(sweep.requestedWheelTravel_m,plan.travel_m), ...
         'BUMP model/grid mismatch.');
     evidence.quality=bumpQuality(model,sweep);
+elseif family=="RACK"
+    fsd.kinematics.validateRackSweepResult(sweep,model);
+    requireSynthesis(isequaln(sweep.steeringSystemIdentity,identity) && isequaln(sweep.requestedRackTravel_m,plan.travel_m) && ...
+        isequaln(sweep.requestedWheelTravel_m,plan.wheelTravel_m),'RACK model/grid/wheel travel mismatch.');
+    for k=1:numel(sweep.results)
+        requireSynthesis(isequaln(sweep.results(k).requestedWheelTravel_m,plan.wheelTravel_m),'RACK contained wheel travel mismatch.');
+    end
+    evidence.quality=rackQuality(model,sweep);
 else
     fsd.kinematics.validateAxleRollSweepResult(sweep);
     requireSynthesis(isequaln(sweep.axleIdentity,identity) && isequaln(sweep.requestedBodyRollAngle_rad,plan.angles_rad) && ...
@@ -47,10 +60,17 @@ else
 end
 timer=tic;
 try
-    if family=="BUMP", evidence.analysis=fsd.analysis.analyzeBumpSweep(model,sweep);
-    else, evidence.analysis=fsd.analysis.analyzeAxleRollSweep(model,sweep); end
+    if family=="BUMP"
+        evidence.analysis=fsd.analysis.analyzeBumpSweep(model,sweep);
+    elseif family=="RACK"
+        evidence.analysis=fsd.analysis.analyzeRackSweep(model,sweep);
+    else
+        evidence.analysis=fsd.analysis.analyzeAxleRollSweep(model,sweep);
+    end
 catch cause
-    if ~recoverableFailure("ANALYSIS",cause.identifier), rethrow(cause); end
+    expected=recoverableFailure("ANALYSIS",cause.identifier);
+    if family=="RACK", expected=steeringRecoverableFailure("ANALYSIS",cause.identifier); end
+    if ~expected, rethrow(cause); end
     evidence.failureStage="ANALYSIS"; evidence.exceptionId=string(cause.identifier); evidence.exceptionMessage=string(cause.message);
 end
 evidence.analysisTime_s=toc(timer);

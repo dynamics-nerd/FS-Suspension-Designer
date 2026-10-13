@@ -1,4 +1,4 @@
-function quality = bumpQuality(geometry,sweep)
+function quality = bumpQuality(geometry,sweep,currentInner_m)
 %BUMPQUALITY Local closure orientation and reciprocal conditioning, not proof of branch uniqueness.
 % Infinitesimal world-axis rotations about WC; translations scaled by Lref.
 c = geometry.cornerId;
@@ -14,7 +14,9 @@ for k=1:count
     r = sweep.results(k); if ~r.converged, continue; end
     current = r.state.xyz_m; index = zeros(5,1);
     for i=1:5, index(i)=find(r.state.pointIds==out(i)); end
-    [conditioning(k),orientation(k)] = closure(current(index,:),r.state.wheelCenter_m,p,lengths,scale);
+    prescribed=p;
+    if nargin==3, prescribed(5,:)=currentInner_m(k,:); end
+    [conditioning(k),orientation(k)] = closure(current(index,:),r.state.wheelCenter_m,prescribed,lengths,scale);
 end
 threshold = sqrt(eps('double')); % numerical near-singularity gate, no manufacturing meaning
 reliable = sweep.converged & conditioning>threshold & referenceRcond>threshold & ...

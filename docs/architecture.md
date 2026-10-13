@@ -1,5 +1,17 @@
 # Arquitectura
 
+## Extensión v0.14
+
+Un FRONT steering seed y dos corners → mapa de eje con bindings tie rod
+privados opt-in → builders canónicos → BUMP por lado/RACK bilateral/ROLL
+centrado opcional → un candidato/assessment v0.11 → boundedDirectSearch v0.12.
+No solvers/modelos históricos dependen de synthesis. Nuevo schema consumidor,
+sin nueva clase/servicio/módulo físico. Normalización/FIXED/simetría/builders y
+evidencia/assessment/replay de eje se comparten; defaults/APIs v0.12/v0.13
+mantienen sus schemas y alcance. Un pequeño core gráfico compartido extrae el
+plot de eje y sitúa sus leyendas fuera de datos; evaluator/validators/reporting
+no resuelven mecanismos. [Contrato](steering-geometry-synthesis.md).
+
 ## Extensión v0.13
 
 Síntesis de eje en `fsd.synthesis`: dos seeds → bindings/mapa de simetría →

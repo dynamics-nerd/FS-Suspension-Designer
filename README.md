@@ -4,6 +4,37 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+**v0.14 — Steering Geometry & Ackermann Synthesis** coordina suspensión y
+dirección FRONT FL/FR en un único espacio/assessment. Añade XYZ autorizadas de
+TIE_ROD_INBOARD/OUTBOARD a los pivotes de trapecios, rack rígido reconstruido,
+BUMP bilateral y RACK nativos nuevos, ROLL centrado opcional, fuentes y snapshots
+verificables. Reutiliza boundedDirectSearch y el catálogo v0.11, sin otra física.
+[Contrato y APIs](docs/steering-geometry-synthesis.md) · [Validación](docs/v0.14-validation.md).
+
+```matlab
+setupProject
+results = runProjectTests;
+addpath("examples", "tests")
+example = steeringSynthesisExample(true);
+report = verifyV14;
+```
+
+Baseline real:1064/1064 PASS,13 ejemplos,Analyzer0/408,DAG acíclico. Benchmark
+alcanzable: E3, BUMP3+3, RACK3, score0.441327900783→0. Se presenta además una
+comparación separada frente a cero bump steer/Ackermann ideal: mejorar uno
+puede empeorar el otro. Pesos/escalas explícitos; datos ASSUMED de verificación,
+**no setup FS recomendado**. Rack cero para BUMP/ROLL; rearAxleX y travel limits
+obligatorios; no grid simultáneo roll–steering ni collision checking.
+Validación final: **1195/1195 tests PASS**,Failed0/Incomplete0 (1064+131),
+**14/14 ejemplos**,**Analyzer0/433 .m**,DAG10 acíclico,consumers sin solves
+ocultos y46 PNGs dark/light. Inventario, costes y límites en el informe enlazado.
+MATLAB R2025b y Optimization Toolbox/fsolve para física; controlador base MATLAB.
+**No utilizar resultados para fabricar una suspensión real**. Sin App Designer,
+CAD, certificación normativa, Adams, optimización global, commit/merge/tag/release
+ni v0.15. Verificadores de versión fija anteriores son históricos; usar verifyV14.
+
+## Historia v0.13
+
 **v0.13 — Axle-Level Suspension Synthesis** amplía la búsqueda a FRONT FL/FR
 o REAR RL/RR con dos seeds explícitos, coordenadas inboard de ambos lados y
 vínculos de simetría opcionales. Reconstruye ambos modelos, ejecuta BUMP por
@@ -30,8 +61,8 @@ Failed=0, Incomplete=0; **13/13 ejemplos**, **Analyzer0/408 .m**, DAG10 acíclic
 Perfiles del evaluador/validators/reporting sin nuevos solves físicos.
 Desarrollo experimental: **no utilizar resultados para fabricar una suspensión
 real**. Sin UI, CAD, certificación normativa, Adams ni optimización global.
-Los verificadores de versión fija anteriores son históricos; usar verifyV13
-en este checkout. Las secciones siguientes conservan entregas anteriores.
+El verificador verifyV13 corresponde al tag v0.13.0; las secciones siguientes
+conservan entregas anteriores.
 
 ## Historia v0.12
 

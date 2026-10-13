@@ -5,4 +5,8 @@ snapshot=struct('schemaVersion',"0.13.0",'kind',"AxleSynthesisExecutionSnapshot"
     'specificationIdentity',space.specification.identity,'plan',space.plan,'sourceIds',{space.sourceIds}, ...
     'physicalVariables',{space.physicalVariables},'variables',{space.variables}, ...
     'symmetryLinks',space.symmetryLinks,'independentIndex',space.independentIndex,'multiplier',space.multiplier);
+if isfield(space,'seedSteering')
+    snapshot.schemaVersion="0.14.0"; snapshot.kind="SteeringSynthesisExecutionSnapshot";
+    snapshot.seedSteeringIdentity=space.seedSteering.identity;
+end
 end

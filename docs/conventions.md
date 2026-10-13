@@ -1,5 +1,19 @@
 # Convenciones
 
+## Síntesis de steering v0.14
+
+SI/+X atrás/+Y derecha/+Z arriba y todos los signs históricos intactos.
+Bindings TIE_ROD_INBOARD/OUTBOARD cambian diseño entre candidatos, nunca
+posición individual por sample. Rack izquierda→derecha definido por endpoints;
+q no determina por sí solo giro. BUMP/ROLL referenceRackTravel_m=0 explícito;
+RACK wheelTravel_m=[FL,FR] fijo y límites explícitos que incluyen cero.
+Rear axle X del seed es referencia geométrica, no wheelbase inferido. Ackermann
+straight es unavailable, no error cero. Objetivos de giros separados no rellenan
+ese gap. Simetría de coordenadas, no de ángulos firmados; asimetría permitida.
+Un solo assessment/score opt-in, ningún ganador artificial de SOFT incompleto.
+Boxes/FIXED se refieren a nominal, no collision-free ni recorrido continuo.
+[Contrato](steering-geometry-synthesis.md).
+
 ## Síntesis de eje v0.13
 
 FRONT=FL/FR, REAR=RL/RR, dos seeds explícitos en frame común. Convenciones

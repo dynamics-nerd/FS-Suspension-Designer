@@ -1,5 +1,18 @@
 # Convenciones y formulación matemática
 
+## Síntesis de steering v0.14 (sin nuevas ecuaciones físicas)
+
+Reutiliza rack/cierre/headings/Ackermann v0.5 y score v0.11 descritos abajo.
+Ltie,0=norm(TRout,0−TRin,0) procede de cada geometría reconstruida; no es otro
+DOF. En el Jacobiano local v0.12, la quinta fila usa TRin,current prescrito
+por el rack, manteniendo L_i0 y Lref del modelo nuevo. También se comprueba
+la pose rackZero a wheel travel fijo. Mismo sqrt(eps) y orientación local,
+sin cambiar acceptance nativa ni garantizar rama/continuidad global.
+Mapa de simetría/normalización v0.13 íntegro, no réplica de ángulos firmados.
+El solver BUMP no acepta rack no cero; este contexto lo rechaza explícitamente.
+No se aproxima roll+steering simultáneo con sweeps separados ni se define
+Ackermann%/ratio de rueda nuevo. [Contrato](steering-geometry-synthesis.md).
+
 ## Síntesis de eje v0.13 (sin nuevas ecuaciones de suspensión)
 
 Para un link correspondiente: xR=xL, zR=zL, yR=-yL. Sea s=+1 (X/Z) o -1 (Y);

@@ -1,5 +1,18 @@
 % FS Suspension Designer engineering core.
 %
+% v0.14 Steering Geometry & Ackermann Synthesis
+%   fsd.synthesis.createSteeringDesignSpace           - Coherent FRONT corners and native rack seed.
+%   fsd.synthesis.validateSteeringDesignSpace         - Reconstruct authorized joint definition.
+%   fsd.synthesis.normalizeSteeringVariables         - Independent SI coordinates to unit box.
+%   fsd.synthesis.denormalizeSteeringVariables       - Shared coordinate/frozen contract.
+%   fsd.synthesis.buildSteeringCandidate             - Both corners, rack and derived tie lengths.
+%   fsd.synthesis.evaluateSteeringCandidate          - Fresh bilateral BUMP/RACK and optional ROLL.
+%   fsd.synthesis.runSteeringInverseSearch           - Shared boundedDirectSearch controller.
+%   fsd.synthesis.validateSteeringSynthesisEvaluation - Native evidence/assessment, no solves.
+%   fsd.synthesis.validateSteeringSynthesisResult     - Joint snapshots/cache/controller replay.
+%   fsd.synthesis.compareSteeringSynthesisCandidates  - Native joint comparisons and physical changes.
+%   fsd.synthesis.plotSteeringSynthesisResult         - Curves/gaps, trace, geometry and changed coordinates.
+%
 % v0.13 Axle-Level Suspension Synthesis
 %   fsd.synthesis.createAxleDesignSpace          - Explicit FL/FR or RL/RR seeds and plans.
 %   fsd.synthesis.validateAxleDesignSpace        - Bounds, FIXED and selected symmetry links.

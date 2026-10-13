@@ -1,4 +1,4 @@
-function space = axleSpaceCore(left,right,spec,plan,links)
+function space = axleSpaceCore(left,right,spec,plan,links,extraRoles)
 %AXLESPACECORE Compose existing corner bindings, not two independent searches.
 axle=fsd.model.createAxleGeometry(left,right);
 requireSynthesis(isequaln(left.referenceFrame,right.referenceFrame),'Seeds must share the complete vehicle reference frame.');
@@ -62,7 +62,11 @@ for j=1:2
     selected=targets(cellfun(@(t) t.definitionSI.sourceType=="BUMP" && t.definitionSI.scope.id==corners(j),targets));
     sub.targets=fsd.model.createSuspensionDesignTargets(selected);
     name="leftBump"; if j==2, name="rightBump"; end
-    spaces{j}=spaceCore(seeds{j},fsd.model.createDesignSpecification(sub),plan.(name));
+    if nargin==6
+        spaces{j}=spaceCore(seeds{j},fsd.model.createDesignSpecification(sub),plan.(name),extraRoles);
+    else
+        spaces{j}=spaceCore(seeds{j},fsd.model.createDesignSpecification(sub),plan.(name));
+    end
     sourceIds{j}=unique(sourceIds{j},'stable');
     if isempty(sourceIds{j}), sourceIds{j}="SYNTH_BUMP_"+corners(j); end
 end

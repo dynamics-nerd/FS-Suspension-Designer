@@ -11,10 +11,23 @@ e=struct('schemaVersion',"0.13.0",'kind',"AxleSynthesisEvaluation",'execution',a
     'classification',"INVALID_GEOMETRY",'reason',"INVALID_GEOMETRY",'eligible',false,'score',NaN, ...
     'timing_s',struct('builder',0,'evaluator',0,'total',0));
 total=tic; timer=tic;
+steeringMode=isfield(space,'seedSteering');
+if steeringMode
+    e.schemaVersion="0.14.0"; e.kind="SteeringSynthesisEvaluation";
+    e.steering=[]; e.steeringIdentity=[]; e.mechanismDiagnostics=[];
+    e.physical{4}=[]; e.analysisStatus(4,1)="NOT_ATTEMPTED";
+end
 try
-    [axle,changes]=axleBuildCore(space,x);
+    if steeringMode
+        [steering,changes,mechanismDiagnostics]=steeringBuildCore(space,x);
+        axle=steering.frontAxleGeometry;
+    else
+        [axle,changes]=axleBuildCore(space,x);
+    end
 catch cause
-    if ~recoverableFailure("BUILDER",cause.identifier), rethrow(cause); end
+    expected=recoverableFailure("BUILDER",cause.identifier);
+    if steeringMode, expected=steeringRecoverableFailure("BUILDER",cause.identifier); end
+    if ~expected, rethrow(cause); end
     e.failureStage="BUILDER"; e.exceptionId=string(cause.identifier); e.exceptionMessage=string(cause.message);
     e.timing_s.builder=toc(timer); e.timing_s.total=toc(total);
     if replay, finishReplay(); end
@@ -23,9 +36,14 @@ end
 e.timing_s.builder=toc(timer); e.axle=axle; e.changes=changes; e.geometryValid=true;
 e.axleIdentity=fsd.model.axleIdentity(axle);
 models={axle.leftGeometry;axle.rightGeometry;axle}; plans={space.plan.leftBump;space.plan.rightBump;space.plan.roll};
-for j=1:3
+families=["BUMP";"BUMP";"ROLL"];
+if steeringMode
+    e.steering=steering; e.steeringIdentity=steering.identity; e.mechanismDiagnostics=mechanismDiagnostics;
+    models{4}=steering; plans{4}=space.plan.rack; families(4)="RACK";
+end
+for j=1:numel(plans)
     if isempty(plans{j}), continue; end
-    family="BUMP"; if j==3, family="ROLL"; end
+    family=families(j);
     if replay, e.physical{j}=axlePhysicalCore(models{j},family,plans{j},e.execution,id,stored.physical{j});
     else, e.physical{j}=axlePhysicalCore(models{j},family,plans{j},e.execution,id); end
 end
@@ -39,7 +57,7 @@ if replay, finishReplay(); end
             all(isfinite([t.builder,t.evaluator,t.total])) && all([t.builder,t.evaluator,t.total]>=0),'Invalid axle timing.');
         if ~e.geometryValid, requireSynthesis(t.evaluator==0,'Rejected builder cannot have an assessment time.'); end
         physicalTime=0;
-        for k=1:3
+        for k=1:numel(e.physical)
             p=e.physical{k}; if ~isempty(p), physicalTime=physicalTime+p.solverTime_s+p.analysisTime_s; end
         end
         requireSynthesis(t.total>=t.builder+t.evaluator+physicalTime,'Total time smaller than executed phases.');
