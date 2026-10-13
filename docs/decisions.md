@@ -1,5 +1,31 @@
 # Registro de decisiones
 
+## Cerradas para v0.12
+
+- SYN-001: capa consumidora synthesis, structs/MAT y APIs pequeñas, sin refactor
+  de solvers/evaluador ni nueva tecnología. Seed de una esquina obligatorio.
+- SYN-002: cuatro pivotes UCA/LCA chasis, XYZ por bindings v0.11; límites/fixed
+  explícitos, ningún outboard/rack/actuation sin adapter completo.
+- SYN-003: coordenadas normalizadas, endpoints/frozen/seed explícitos; caché
+  por igualdad exacta de coordenadas físicas dentro de un único espacio.
+- SYN-004: BUMP nuevo por geometría única válida; cinco métricas, preflight
+  rechaza otros pipelines y source identities fijadas antes de buscar.
+- SYN-005: polling local determinista con presupuesto/multiseed, sin
+  penalización HARD ni pesos implícitos; ganador sólo con score completo.
+- SYN-006: guard local orientation/rcond derivado del cierre histórico;
+  adicional a convergencia, sin afirmar unicidad/continuidad global certificada.
+- SYN-007: conservar todos los records/attempts, clasificaciones y tradeoffs;
+  validar evidencia y replay sin solves. Tema local oscuro y claro explícito.
+- SYN-008 (F-01): snapshot canónico al ejecutar y wrapper de evidencia BUMP;
+  no provenance inferida al load ni autenticidad criptográfica prometida.
+- SYN-009 (F-02): allowlist cerrada BUILDER/BUMP/ANALYSIS; desconocidos relanzados.
+  Failure records sin fuentes/score ficticios; conservar sweep anterior al fallo.
+- SYN-010 (F-03): single plot directo, comparación sólo >=2; sin elegibles se
+  muestran intentos/diagnósticos/NO_AUTOMATIC_WINNER, no una solución sustituta.
+- OPEN DECISION: targets/escalas/pesos reales, ramas globales/recorrido continuo,
+  validación experimental y adapters físicos de las familias aún no reconstruidas.
+  [Contrato y límites](inverse-suspension-synthesis.md).
+
 ## Cerradas para v0.11
 
 - DTE-001: separar parámetros, targets/constraints y assessment; structs/MAT,

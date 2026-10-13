@@ -1,5 +1,19 @@
 % FS Suspension Designer engineering core.
 %
+% v0.12 Inverse Suspension Synthesis
+%   fsd.synthesis.createDesignSpace             - Immutable seed/v0.11 bounded bindings.
+%   fsd.synthesis.validateDesignSpace           - Reconstruct supported definition.
+%   fsd.synthesis.normalizeVariables            - SI to normalized closed box.
+%   fsd.synthesis.denormalizeVariables          - Normalized coordinates to SI.
+%   fsd.synthesis.buildCandidateGeometry        - Authorized inboard coordinate mutation.
+%   fsd.synthesis.evaluateSynthesisCandidate    - Explicit fresh BUMP orchestration.
+%   fsd.synthesis.boundedDirectSearch           - Deterministic mathematical poll controller.
+%   fsd.synthesis.runInverseSearch              - Traceable physical candidate set.
+%   fsd.synthesis.validateSynthesisEvaluation   - Native evidence and quality, no solves.
+%   fsd.synthesis.validateSynthesisResult       - Evidence validation and controller replay.
+%   fsd.synthesis.compareSynthesisCandidates    - v0.11 comparison plus HP changes.
+%   fsd.synthesis.plotSynthesisResult           - Trace, variables and native target curves.
+%
 % v0.11 Design Requirements, Targets & Evaluation
 %   fsd.model.createDesignParameter             - Role, availability, provenance.
 %   fsd.model.createDesignTarget                - Explicit scalar/band/curve target.

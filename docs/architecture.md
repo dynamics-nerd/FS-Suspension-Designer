@@ -1,5 +1,22 @@
 # Arquitectura
 
+## Extensión v0.12
+
+`fsd.synthesis` orquesta espacio → builder → BUMP/analysis nuevos → evaluación
+v0.11 → polling local → candidatos/history. Structs/MAT; controlador matemático
+separado de la física. Consume model/kinematics/analysis; geometry sólo se usa
+por los módulos históricos, no se duplican primitivas. No hay dependencias
+de módulos anteriores hacia synthesis, ni ciclos. Evaluación/reporting/replay
+no ejecutan solves. Rules/export/UI intactos; optimization queda reservado
+para extensiones posteriores, sin otra implementación paralela.
+Las correcciones V12-F-01/F-02/F-03 permanecen dentro de synthesis: snapshot
+canónico y asociación de evidencia, política cerrada por etapa, conservación
+de fallos y reporting single/no-candidate. Solvers históricos y contratos de
+comparación v0.11 intactos. Validators reconstruyen opciones/relaciones/análisis
+sin nuevos solves; errores desconocidos se propagan, no son viabilidad física.
+[Contrato](inverse-suspension-synthesis.md). Las exclusiones siguientes son
+históricas por milestone; el estado actual es v0.12.
+
 ## Extensión v0.11
 
 DesignParameter/Target/Constraint/Specification/Candidate y catálogo en model;

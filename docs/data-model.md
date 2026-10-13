@@ -1,4 +1,25 @@
-# Modelo de datos v0.11
+# Modelo de datos
+
+## Contratos v0.12
+
+SynthesisDesignSpace, SynthesisEvaluation y SynthesisResult son structs
+schema0.12.0. No nuevas clases/enums/DB. Space conserva seed/spec/plan y
+bindings v0.11 canónicos, initial/bounds/active. Evaluation conserva geometría,
+identity, fuentes BUMP completas, assessment v0.11, cambios/provenance,
+guard de conditioning/orientación, clasificación, score disponible y tiempos.
+Result conserva problem, records únicos, keys, history por referencia de ID,
+opciones/stop/selección/estadísticas/diagnósticos. Caché exacta local al espacio;
+no estado persistente. Cada intento puede reconstruirse sin perder fallos.
+Validadores reconstruyen geometría/evidencia y replay del controlador sin solves;
+MAT round-trip validado. Schemas históricos intactos.
+Correcciones V12-F-01/F-02: result/evaluation.execution captura inputs canónicos
+del plan; evaluation.bumpEvidence liga snapshot/ID/geometría/sweep al solve.
+failureStage y evidenceStatus distinguen rechazo del builder, excepción BUMP
+sin sweep y fallo de análisis con sweep válido. Candidate/assessment vacíos y
+score NaN son explícitos; no se generan fuentes incompletas para satisfacer
+campos. Validación de fallos reconstruible sin solves. MAT pre-auditoría sin
+estos campos debe regenerarse, no migrar provenance inventada.
+[Campos, APIs y límites](inverse-suspension-synthesis.md).
 
 ## Contratos v0.11
 

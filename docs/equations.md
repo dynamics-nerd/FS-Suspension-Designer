@@ -1,5 +1,18 @@
 # Convenciones y formulación matemática
 
+## Síntesis v0.12 (sin cambiar física histórica)
+
+Span>0: u_i=(x_i-l_i)/(h_i-l_i), x_i=l_i+u_i*(h_i-l_i), 0<=u_i<=1.
+Span=0: u_i=0, x_i=l_i=h_i, sin dividir por cero. Poll en ejes normalizados;
+sin mejora: step_next=step*stepReduction. Comparación estricta sólo entre
+elegibles con compositeScore v0.11 completo; HARD no se suma como penalización.
+Guard local derivado de las cinco longitudes existentes:
+J_i=[Lref*u_ix,Lref*u_iy,cross(B_i-WC,u_i)]/L_i0,
+Lref=max(L_i0). rcond y sign(detJ) vs referencia estática, gate sqrt(eps(double)).
+Son controles/diagnósticos numéricos, no nuevas leyes ni prueba de rama global.
+Derivación, precisión, política de aceptación y limitaciones en
+[contrato v0.12](inverse-suspension-synthesis.md).
+
 ## Comparación de requisitos v0.11 (sin nuevas ecuaciones de suspensión)
 
 Nominal: d=y−t, v=max(abs(d)−tau,0). Banda: d=y−clamp(y,l,u),

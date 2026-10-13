@@ -52,9 +52,12 @@ classdef TestDesignTargetRender < matlab.unittest.TestCase
             dimensions = zeros(2,2); iteration = 0;
             for windowSize = [1100,900;700,600]
                 iteration = iteration+1;
+                % The first PNG is immediate for hidden figures. Only then wait
+                % for frontend mounting before a subsequent resize (also hidden).
+                if iteration > 1, drawnow; pause(1); end
                 set(fig,"Position",[100,100,windowSize']);
-                % Visible-window resize reaches the frontend asynchronously.
-                if Visibility == "on", drawnow; pause(1); end
+                % Window resize reaches the frontend asynchronously in both modes.
+                if Visibility == "on" || iteration > 1, drawnow; pause(1); end
                 designTargetRenderCheck(fig,filename);
                 r = designExteriorTextCheck(fig,filename);
                 t.verifyGreaterThanOrEqual(min(r.textContrast),4.5);

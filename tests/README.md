@@ -1,5 +1,80 @@
 # Testing strategy
 
+## v0.12 synthesis
+
+`setupProject; results=runProjectTests; addpath("tests"); report=verifyV12`.
+719 históricos de base v0.11 conservados, sin cambiar expected físicos.
+Foundation actualiza versión; el test histórico de resize espera mounting y
+propagación también en figuras ocultas, sólo después del primer PNG inmediato.
+No se relajan asserts ni se añaden esperas de tema/resize a producción.
+TestSynthesisSpace: bindings XYZ, inmutabilidad (incluido wheel axis no
+seleccionado bit a bit), límites/fixed/boxes, spans y
+round-trip, referencias inválidas. TestBoundedDirectSearch: expected matemáticos
+independientes 1D/2D, frontera/plano/multimínimos/invalid/HARD/missing/budget,
+multiseed/determinismo/cache. TestSynthesisIntegration: BUMP real, cambio de
+HP/identity/fuentes/métricas y mejora alcanzable, guard Jacobiano contrastado
+con derivadas centradas independientes, impossibles y ataques a todos los
+campos reconstruibles/result replay, MAT/no hidden solves. TestSynthesisReporting:
+PNGs nativos dark/light, fondo efectivo, oracle texto/target v0.11 y perfil cero
+solves. Valores de fixture/perturbación son de verificación, no inputs FS típicos.
+
+verifyV12 reutiliza verifyV08 sin modificar históricos: 12 ejemplos, Analyzer
+de todos los .m y DAG; mide builder/validación/sweep/evaluación/iteración/search
+y candidatos válidos/inválidos, warm-up y tres muestras. Guarda evidencia en
+output (ignorado). Los verificadores con versión fijada v0.9–v0.11 permanecen
+históricos. Engineering change → Unit test → Known case → Validation → Merge
+(merge sólo con autorización humana; esta tarea no lo realiza).
+
+### Auditoría v0.12 F-01/F-02/F-03
+
+Los 813 tests iniciales se conservan sin ediciones durante estas correcciones.
+TestSynthesisAudit: defaults independientes, opciones incompatibles/equivalentes,
+plan/grid/geometry/spec/evidence/assessment y metadata coordinada, MAT, failure
+records y ataques, presupuesto/cache/determinismo/inmutabilidad/no hidden solves.
+El reproductor real tiene UBJ-LBJ paralelo Y, BUMP convergido y excepción nativa
+DegenerateCasterProjection. synthesisFailureFixture BUILDER permite rechazo
+collinear seguido de geometrías elegibles. synthesisAuditTestCall es fault
+injection **privado**, prueba excepciones BUMP sin sweep y rethrow de errores
+desconocidos/infraestructura; no acredita una ejecución física real.
+TestSynthesisPlotAudit: single/failed/one eligible/many/no score/gaps/HARD failed,
+oscuro/claro, objetos y PNG reales, targets/bandas/texto/score gaps, contratos
+comparison/zero-budget y caso combinado failure→plot→MAT→plan tamper.
+
+Sesiones MATLAB nuevas separadas, antes de cualquier figura:
+`setupProject; addpath("tests"); verifyV12Audit("FIRST_SINGLE")` y
+`setupProject; addpath("tests"); verifyV12Audit("FIRST_FAILED")`.
+Después `setupProject; r=runProjectTests; addpath("tests"); verifyV12Audit`:
+12 ejemplos, Analyzer/DAG, warm-up+tres mediciones de validators/failure/search/
+single/multi plot y perfiles de invocaciones reales. PNG/MAT bajo output ignorado.
+[Resultados e inventario](../docs/v0.12-audit-corrections.md).
+Validación final real: **858/858 PASS**, Failed=0, Incomplete=0 (813 conservados
++45 regresiones), **12/12 ejemplos**, **0/375 .m** Analyzer, DAG9. Benchmark físico
+E7/sweeps7/score0; search con cinco fallos: cinco invocaciones, validators0 solves.
+
+### Corrección focalizada v0.12 V12-F-04
+
+TestSynthesisZeroLengthLinks conserva los 858 tests previos y añade regresiones
+UCA/LCA: evaluación individual, búsqueda, continuación, budget, cache, contadores
+reales con profile, rechazo de manipulaciones, snapshot, MAT y PNG dark/light
+sin elegibles. También cubre los pickups AFT. Expected IDs escritos aparte de
+la política bajo prueba; mensajes contrastados con el validador nativo.
+zeroLengthLinkFixture reproduce el prompt UCA y su equivalente LCA, con seed
+admitido y límite en el ball joint. ALL_INVALID empieza collinear (rechazado
+por builder, admitido por model) y después alcanza el link nulo. No se simula
+un seed con link nulo como válido. zeroLengthBuilderFailureCall provoca una
+excepción MATLAB real por field ausente dentro del core privado de BUILDER;
+es sólo test de invariante rota/rethrow, no API ni hook de producción.
+
+Ejecutar `setupProject; runProjectTests; addpath("tests"); report=verifyV12`.
+Los tests nuevos se ejecutan también antes del fix para acreditar RED→GREEN.
+La prueba principal conserva E7/sweeps7/Z .360,.340→.365,.345/score0 y reproduce
+los tres casos principales F-01/F-02/F-03, sin repetir su implementación.
+MAT/PNG bajo output/v0.12-f04-qa y output/v012-f04-*.mat (ignorados por Git).
+Resultados finales en [informe](../docs/v0.12-audit-corrections.md#corrección-focalizada-v12-f-04).
+Fase RED: 44/46 fallan por los abortos esperados. GREEN focalizado: **46/46 PASS**.
+Suite final: **904/904 PASS** (858 previos+46), Failed=0, Incomplete=0; **12/12
+ejemplos**, **Analyzer 0/378 .m**, DAG9. Código histórico y 858 tests sin ediciones.
+
 ## v0.11 requirements/targets/evaluation
 
 `setupProject; results=runProjectTests` ejecuta toda la suite. `addpath("tests");

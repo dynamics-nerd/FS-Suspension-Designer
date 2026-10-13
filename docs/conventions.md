@@ -1,5 +1,16 @@
 # Convenciones
 
+## Síntesis v0.12
+
+Física/signos/SI históricos intactos. Parámetros FREE/RANGE HP_X/Y/Z con
+bounds explícitos; FIXED no autoriza movimientos dentro de su tolerancia.
+u adimensional [0,1], frozen u=0; nunca confundir u con metros ni optimizar
+directamente errores dimensionales. Cambios de coordenada DERIVED con referencia
+a provenance del parámetro; seed inmutable. Calidad local de rama separada del
+assessment HARD/SOFT. Score sólo opt-in explícito v0.11, NaN sin cobertura,
+selectedIndex NaN sin score/eligibilidad. Tiempos sólo diagnóstico.
+[Políticas, límites y controles numéricos](inverse-suspension-synthesis.md).
+
 ## Definición y evaluación v0.11
 
 Mismos X atrás/Y derecha/Z arriba, m/rad/N/kg/s y signs históricos. IDs de

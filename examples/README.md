@@ -1,5 +1,16 @@
 # Examples
 
+## v0.12
+
+`inverseSuspensionSynthesisExample(showPlots)` define un seed 3D ASSUMED,
+dos upper inboard Z FREE con +/-10mm declarados, UBJ FIXED y box nominal,
+curvas camber/toe de una referencia alcanzable resuelta aparte y límite HARD
+toe ilustrativo. Busca con presupuesto explícito, compara seed/candidato,
+imprime todos los intentos físicos con motivo/score, guarda MAT bajo output
+y presenta trace/variables/calidad/paso y curvas/targets. Mejora respecto al
+seed no implica óptimo global ni setup FS recomendado. verifyV12 ejecuta
+los once anteriores y éste: doce ejemplos. Todos aceptan showPlots=false.
+
 ## v0.11
 
 `designTargetEvaluationExample(showPlots)` registra KNOWN/RANGE/FIXED/ASSUMED/

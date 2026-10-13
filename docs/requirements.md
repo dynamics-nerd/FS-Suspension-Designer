@@ -1,5 +1,31 @@
 # Requisitos
 
+## v0.12 Inverse Suspension Synthesis
+
+- REQ-V12-SPACE: seed inmutable, FREE/RANGE/FIXED v0.11, XYZ inboard/SI,
+  límites finitos/boxes y normalización reversible según resolución double.
+- REQ-V12-BUILD: sólo cambios autorizados, fábrica/validators originales,
+  identidad nueva, brazos no degenerados; sin certificar CAD/fabricación.
+- REQ-V12-PIPELINE: BUMP/camber/toe/bumpSteer/caster/KPI reconstruidos realmente;
+  otros targets rechazados antes del search, sin fuentes seed obsoletas.
+- REQ-V12-QUALITY: fuentes nativas completas, gaps/convergence/static reference,
+  guard de rama/conditioning; ningún candidato incompleto presentado factible.
+- REQ-V12-SEARCH: polling determinista/multiseed/budget/stops/cache exacto;
+  HARD antes de score SOFT explícito, sin ganador cuando no hay puntuación.
+- REQ-V12-TRACE: records/attempts íntegros, MAT, validators/replay sin solves,
+  cambios HP/comparación/plots con garantías v0.11.
+- REQ-V12-F01: snapshot de opciones BUMP efectivas ligado a problema/record/
+  evidencia; reject planes incompatibles incluso al cargar MAT, sin re-solve.
+- REQ-V12-F02: allowlist por etapa, fallos conservados/no elegibles/score NaN,
+  evidencia disponible y presupuesto correcto; unknown/infrastructure rethrow.
+- REQ-V12-F03: trace/diagnósticos con una evaluación o sin elegibles; plot single
+  sin comparación artificial; PNG/contraste/primera sesión y contratos nativos.
+- REQ-V12-VALIDATION: 719 históricos conservados, benchmarks independientes,
+  mejora física alcanzable, casos imposibles/ataques, 12 ejemplos, Analyzer0/DAG.
+  Sin commit/merge/tag/release/main ni v0.13.
+
+[Contrato](inverse-suspension-synthesis.md) · [Evidencia](v0.12-validation.md).
+
 ## v0.11 Design Requirements, Targets & Evaluation
 
 - REQ-V11-PARAM: ocho roles compatibles, siete disponibilidades, unknown vacío,

@@ -4,6 +4,41 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+**v0.12 — Inverse Suspension Synthesis** incorpora búsqueda local acotada y
+determinista sobre coordenadas XYZ de cuatro anclajes UCA/LCA inboard de una
+esquina. Reconstruye geometrías, ejecuta BUMP real y evalúa camber, toe,
+bump steer, caster y KPI con v0.11. Conserva candidatos, fallos, HARD/SOFT,
+calidad, cobertura y trazabilidad, sin prometer óptimo global.
+[Contrato y APIs](docs/inverse-suspension-synthesis.md) ·
+[Validación, inventario y límites](docs/v0.12-validation.md).
+
+Validación R2025b tras F-04: **904/904 tests** (858 previos +46 regresiones),
+**12/12 ejemplos**, **0 incidencias /378 archivos MATLAB**, DAG acíclico.
+Caso físico alcanzable: siete geometrías/sweeps nuevos y score0.101722096→0
+con HARD muestreados satisfechos. Sin modificar ecuaciones/solvers históricos.
+[Correcciones, evidencia e inventario](docs/v0.12-audit-corrections.md): opciones
+BUMP ligadas a la ejecución, fallos físicos conservados y reporting single/sin
+elegibles. MAT anteriores sin snapshot de ejecución deben regenerarse.
+Los links UCA/LCA nulos se conservan como intentos geométricos inválidos sin BUMP,
+sin score ni geometría ficticia; errores desconocidos siguen relanzándose.
+
+```matlab
+setupProject
+results = runProjectTests;
+addpath("examples", "tests")
+example = inverseSuspensionSynthesisExample(true);
+report = verifyV12Audit;
+```
+
+El ejemplo ASSUMED alcanza curvas procedentes de otra geometría conocida,
+no targets recomendados de Formula Student. Búsqueda genérica sin toolbox
+obligatoria; BUMP conserva su dependencia histórica de Optimization Toolbox.
+Seed obligatorio es una limitación temporal. Sin UI, CAD, reglas, Adams ni
+optimización global/multiobjetivo. Los verificadores con versión fijada,
+incluido verifyV11, son históricos; para el checkout actual usar **verifyV12Audit**
+(incluye verifyV12).
+Las cifras/secciones siguientes describen sus milestones históricas.
+
 **v0.11 — Design Requirements, Targets & Evaluation** añade especificaciones
 progresivas sin geometría, parámetros con conocimiento/provenance, variables
 con bounds pendientes, targets escalares/curvas, restricciones nominales de

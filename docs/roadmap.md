@@ -1,5 +1,20 @@
 # Roadmap
 
+## v0.12 — Inverse Suspension Synthesis
+
+Implementada como capa local de una esquina: seed DW, XYZ de cuatro pivotes
+inboard, fuentes BUMP reales y cinco métricas, spec v0.11, polling acotado
+determinista, HARD/calidad separados de score, caché exacta, multiseed,
+records/history/candidates/MAT, comparación y plots. Criterio de aceptación:
+cambiar HP → geometría válida nueva → BUMP real → evaluar → mejora alcanzable
+con candidato retenido; tests históricos/nuevos, ejemplos/Analyzer/DAG intactos.
+[Contrato y límites](inverse-suspension-synthesis.md) · [Validación](v0.12-validation.md).
+
+No global/Pareto, múltiples esquinas, inverse steering/actuation/rocker, CAD,
+rules, UI ni Adams. Seed es limitación temporal; evolución conceptual del
+producto sigue vigente. Exclusiones/no-v0.12 de las secciones inferiores
+describen entregas históricas, no el estado actual. No se inicia v0.13.
+
 ## v0.1 — Static Double Wishbone Geometry
 
 Completada y conservada: construcción, validación, consulta, reflexión, geometría elemental, plot y MAT. El schema se amplía en v0.2 con tie rod porque la pose del upright no podía cerrarse físicamente con solo UBJ/LBJ.
