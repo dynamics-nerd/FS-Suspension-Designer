@@ -6,6 +6,7 @@ if startsWith(binding,"HARDPOINT_") || binding == "HARDPOINT_POSITION"
         g = d.geometries{i};
         if g.cornerId ~= scope.cornerId, continue; end
         xyz = g.hardpoints.xyz_m(g.hardpoints.ids == scope.id,:); % already validated model/scope
+        if isempty(xyz), continue; end
         switch binding
             case "HARDPOINT_X", value = xyz(1);
             case "HARDPOINT_Y", value = xyz(2);
@@ -13,6 +14,25 @@ if startsWith(binding,"HARDPOINT_") || binding == "HARDPOINT_POSITION"
             otherwise, value = xyz;
         end
         reason = "AVAILABLE"; return;
+    end
+    models=cell(0,1);
+    if isfield(d,'actuations'), models=d.actuations; end
+    for i=1:numel(d.sources)
+        source=d.sources{i};
+        if source.type=="ACTUATION", models{end+1,1}=source.model; end %#ok<AGROW>
+        if source.type=="MECHANICAL" && ~isempty(source.auxiliary), models{end+1,1}=source.auxiliary; end %#ok<AGROW>
+    end
+    for i=1:numel(models)
+        model=models{i};
+        if model.cornerId~=scope.cornerId || ~ismember(scope.id,model.cornerId+"_"+fsd.model.actuationDesignPointRoles()), continue; end
+        xyz=fsd.model.getActuationDesignPoint(model,scope.id);
+        switch binding
+            case "HARDPOINT_X", value=xyz(1);
+            case "HARDPOINT_Y", value=xyz(2);
+            case "HARDPOINT_Z", value=xyz(3);
+            otherwise, value=xyz;
+        end
+        reason="AVAILABLE"; return;
     end
 elseif any(binding == ["SPRING_RATE","SPRING_PRELOAD"])
     for i = 1:numel(d.sources)

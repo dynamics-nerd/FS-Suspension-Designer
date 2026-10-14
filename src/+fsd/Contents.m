@@ -1,5 +1,20 @@
 % FS Suspension Designer engineering core.
 %
+% v0.15 Actuation Geometry & Motion Ratio Synthesis
+%   fsd.model.actuationDesignPointRoles             - Four native points and canonical axis-line point.
+%   fsd.model.getActuationDesignPoint               - Closed nominal global-coordinate lookup.
+%   fsd.synthesis.createActuationDesignSpace         - Fixed corner, actuation/mechanical seeds and full spec.
+%   fsd.synthesis.validateActuationDesignSpace       - Reconstruct bindings, bounds and independent axis DOFs.
+%   fsd.synthesis.normalizeActuationVariables        - SI to shared normalized box.
+%   fsd.synthesis.denormalizeActuationVariables      - Shared finite/frozen coordinate contract.
+%   fsd.synthesis.buildActuationCandidate            - Native factories, links, rocker and coilover association.
+%   fsd.synthesis.evaluateActuationCandidate         - Fresh BUMP/actuation, native mechanical analysis, assessment.
+%   fsd.synthesis.runActuationInverseSearch          - Unchanged boundedDirectSearch, local immutable cache.
+%   fsd.synthesis.validateActuationSynthesisEvaluation - Evidence/quality/context replay without forward solves.
+%   fsd.synthesis.validateActuationSynthesisResult    - Complete controller/cache/counter/selection replay.
+%   fsd.synthesis.compareActuationSynthesisCandidates - Full native assessments and physical changes.
+%   fsd.synthesis.plotActuationSynthesisResult        - Stored curves/gaps, targets, history and native geometry.
+%
 % v0.14 Steering Geometry & Ackermann Synthesis
 %   fsd.synthesis.createSteeringDesignSpace           - Coherent FRONT corners and native rack seed.
 %   fsd.synthesis.validateSteeringDesignSpace         - Reconstruct authorized joint definition.

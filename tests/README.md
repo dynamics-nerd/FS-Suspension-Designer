@@ -1,5 +1,26 @@
 # Testing strategy
 
+## v0.15 actuación inversa
+
+`setupProject; results=runProjectTests; addpath("tests"); report=verifyV15`.
+Baseline ejecutada1224/1224 PASS,14 ejemplos,Analyzer0/435,DAG10.
+TestActuationSynthesisSpace/Physics/Integration/Reporting/Audit cubren roles XYZ,
+eje YZ/XZ/CUSTOM y DOFs derivados, corners/arquitecturas, seeds y unidades,
+FIXED/frozen/boxes, native rigid bodies/links, signos, inputs mecánicos y regímenes,
+MR por diferencias finitas/derivación implícita, Kw total y resolución F01-1,
+familias individuales/mixtas, HARD incompleto/fallido, budgets/cache/MAT,
+26 ataques de contexto/evidencia/search, unknown rethrow y reporting PNG real.
+No outputs previos necesarios para ejecutar tests desde un checkout limpio.
+Expected geométricos y mecánicos independientes; MR AbsTol2e-5 y Kw .5N/m en
+malla1e-4m documentan truncación del stencil, no tolerancias de fabricación.
+Las pruebas de presentación verifican datos/gaps/inmutabilidad/perfil y PNG
+oscuro/claro; revisión visual adicional registrada en el informe.
+`verifyV15` repite 15 ejemplos y cuatro benchmarks v12/v13/v14, mide diez etapas
+tras warm-up y verifica Analyzer/DAG/perfiles. [Resultados](../docs/v0.15-validation.md).
+Resultado final: **1391/1391 PASS**,1224 históricos+167 nuevos, Failed0,
+Incomplete0;15/15 ejemplos,Analyzer0/465,DAG10, perfiles0 forward solves ocultos.
+Todos los tests requeridos se ejecutaron; no hay pruebas pendientes o omitidas.
+
 ## Auditoría v0.14 V14-F-01: SOFT exclusivamente RACK
 
 `TestSteeringRackOnlyAudit` es una suite nueva independiente; no edita los

@@ -1,5 +1,19 @@
 # Arquitectura
 
+## Extensión v0.15
+
+Una suspensión fija + actuación nativa + modelo mecánico opcional + spec/plan
+explícitos → builder con fábricas existentes → preflight nominal HARD → BUMP
+nuevo → actuación nueva → análisis geométrico/mecánico → assessment original
+completo → boundedDirectSearch inalterado. Los estados físicos proceden del
+candidato; no de curvas del seed. Sin proyecciones auxiliares ACT/MECH.
+`fsd.synthesis` orquesta; model/kinematics/analysis/geometry no dependen de él.
+Validación, comparación y reporting consumen evidencia almacenada sin forward
+solves. Extensiones aditivas: scopes de actuación, registro nominal opcional
+`DesignCandidate.actuations` y métrica ROCKER_ANGLE; contratos sin registro
+conservan la forma anterior. Física, algoritmo, límites UI/rules/export intactos.
+[Contrato](actuation-geometry-synthesis.md) · [Validación](v0.15-validation.md).
+
 ## Extensión v0.14
 
 Un FRONT steering seed y dos corners → mapa de eje con bindings tie rod

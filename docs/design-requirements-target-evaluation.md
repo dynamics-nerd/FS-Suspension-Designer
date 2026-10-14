@@ -89,7 +89,18 @@ HARDPOINT identifica un punto **nominal registrado** en el candidato. No
 comprueba una envolvente durante el movimiento ni colisiones CAD. Tanto
 HARD como SOFT son explícitos; la preferencia SOFT no invalida automáticamente.
 
-## Catálogo real de métricas (23 IDs)
+## Extensión aditiva v0.15
+
+El catálogo actual añade ROCKER_ANGLE como ID24: ACTUATION, CORNER,
+WHEEL_TRAVEL, rad, ángulo nativo unwrapped de mano derecha sobre eje orientado,
+cero nominal. Requiere convergencia/conditioning, no stencil MR. Los 23 IDs
+históricos de la tabla siguiente no cambian semántica/orden.
+DesignCandidate admite registro nominal opcional `actuations`: modelos nativos
+coherentes con geometría y fuentes; permite validar boxes/HP FIXED antes de
+solves sin simular resultados. Registro omitido/vacío conserva shape e identidad
+anteriores. [Contrato consumidor](actuation-geometry-synthesis.md).
+
+## Catálogo histórico v0.11 de métricas (23 IDs)
 
 La API `designMetricCatalog` especifica ID, magnitud, unidad, scope,
 sourceTypes/independentVariables emparejados, escalar/curva, signo,

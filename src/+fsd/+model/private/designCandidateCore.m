@@ -1,5 +1,16 @@
 function candidate = designCandidateCore(input)
 %DESIGNCANDIDATECORE Structural/model validation only; result physics is downstream.
+actuations={};
+if isstruct(input) && isscalar(input) && isfield(input,'actuations')
+    actuations=input.actuations; input=rmfield(input,'actuations');
+end
+designRequire(iscell(actuations) && (isvector(actuations) || isempty(actuations)),"Nominal actuation cell vector required.");
+actuations=actuations(:); actuationIds=cell(size(actuations)); actuationCorners=strings(numel(actuations),1);
+for i=1:numel(actuations)
+    fsd.model.validateActuationGeometry(actuations{i});
+    actuationIds{i}=actuations{i}.identity; actuationCorners(i)=actuations{i}.cornerId;
+end
+designRequire(numel(unique(actuationCorners))==numel(actuationCorners),"Duplicate nominal actuation corners.");
 d = designDefinition(input,struct("id",[],"geometries",{{}},"sources",{{}}, ...
     "vehicle",[],"metadata",struct()),"id");
 d.id = designText(d.id);
@@ -61,8 +72,11 @@ for i = 1:numel(d.sources)
         "auxiliaryIdentity",auxiliaryIdentity,"controls",controls);
 end
 designRequire(numel(unique(sourceIds)) == numel(sourceIds),"Duplicate source IDs.");
+% Absent/empty registry preserves the exact historical definition/identity shape.
+if ~isempty(actuations), d.actuations=actuations; end
 candidate = designRecord("DesignCandidate",d);
 candidate.identity.definitionSI.geometries = geometryIds;
 candidate.identity.definitionSI.sources = references;
 candidate.identity.definitionSI.vehicle = vehicleIdentity;
+if ~isempty(actuations), candidate.identity.definitionSI.actuations=actuationIds; end
 end

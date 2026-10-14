@@ -12,7 +12,7 @@ switch kind
         ok = ~isempty(regexp(id,'^[A-Z][A-Z0-9_]*$','once')) && any(cornerId == ["FL","FR","RL","RR"]);
     case "HARDPOINT"
         ok = any(cornerId == ["FL","FR","RL","RR"]) && ...
-            any(id == cornerId+"_"+fsd.model.requiredHardpointRoles());
+            any(id == cornerId+"_"+[fsd.model.requiredHardpointRoles();fsd.model.actuationDesignPointRoles()]);
     otherwise, ok = false;
 end
 designRequire(ok,"Scope ID/kind/corner mismatch.");

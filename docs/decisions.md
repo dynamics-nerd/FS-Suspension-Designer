@@ -1,5 +1,24 @@
 # Registro de decisiones
 
+## Cerradas para v0.15
+
+- ACS-001: suspensión seed fija, actuación geométrica variable de una esquina;
+  fábricas v0.7/v0.8, BUMP y rocker existentes, controlador v0.12 sin modificaciones.
+- ACS-002: cinco roles globales nominales; eje orientado fijo con punto canónico
+  de dos DOFs. No inventar montaje/local frame ni DOF axial redundante.
+- ACS-003: geometría nueva deriva longitudes y nueva asociación de coilover;
+  spring rate/preload conocidos, FIXED/RANGE como constraints, no FREE mecánico.
+- ACS-004: registro nominal ACT opcional para preflight HARD sin fuentes falsas;
+  catálogos/scopes aditivos, ROCKER_ANGLE nativo sin gate innecesario de MR.
+- ACS-005: ninguna proyección auxiliar de spec; familias individuales conservadas,
+  límites mecánicos declarados respetados, F01-1 y signos nativos intactos.
+- ACS-006: builders recuperables en allowlist cerrada; desconocidos relanzados;
+  snapshot completo/replay sin forward solves y cache local por solicitud SI exacta.
+- ACS-007: DIRECT ACTING no soportado por física histórica; no adaptador ficticio.
+- OPEN DECISION: inputs/targets/tolerancias reales del coche, validación experimental
+  y por refinamiento de malla, ramas continuas, bearings, fuerzas estructurales,
+  buckling/compliance, montaje y colisiones CAD. [Contrato](actuation-geometry-synthesis.md).
+
 ## Cerradas para v0.14
 
 - STS-001: extender privadamente bindings y pipeline de eje; schemas públicos

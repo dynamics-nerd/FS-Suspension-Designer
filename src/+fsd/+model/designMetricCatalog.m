@@ -24,7 +24,8 @@ rows = {
     "TANGENT_WHEEL_RATE","STIFFNESS","CORNER","MECHANICAL","WHEEL_TRAVEL","Complete elastic+geometric rate; negative retained";
     "CORNER_LOAD","FORCE","CORNER",["STATIC_LOADS","GLOBAL_STATIC"],["NONE","NONE"],"Upward tire normal; v0.9 requires available closure";
     "CROSSWEIGHT","FRACTION","VEHICLE",["STATIC_LOADS","GLOBAL_STATIC"],["NONE","NONE"],"(FR+RL)/(M*g) v0.9, /sum(N) global; sources distinct";
-    "REFERENCE_HEIGHT","LENGTH","VEHICLE","GLOBAL_STATIC","NONE","World Z of explicitly named chassis reference point"};
+    "REFERENCE_HEIGHT","LENGTH","VEHICLE","GLOBAL_STATIC","NONE","World Z of explicitly named chassis reference point";
+    "ROCKER_ANGLE","ANGLE","CORNER","ACTUATION","WHEEL_TRAVEL","Unwrapped native angle; right hand about oriented rocker axis; nominal zero"};
 template = struct("id","","quantity","","unit","","scopeKind","", ...
     "sourceTypes",strings(0,1),"independentVariables",strings(0,1), ...
     "valueKinds",strings(0,1),"signConvention","","prerequisites","","validity","" );

@@ -1,5 +1,21 @@
 # Examples
 
+## v0.15
+
+`actuationSynthesisSeed(architecture,corner)` proporciona geometrías ilustrativas
+PUSHROD/PULLROD distintas, reflejadas/traducidas para FL/FR/RL/RR, coilover conocido
+30000N/m, precarga20mm, damping lineal asimétrico1500/2500Ns/m. Todo ASSUMED.
+`actuationSynthesisExample(showPlots)` modifica Y/Z del damper chassis ±10mm,
+mantiene X/rocker/rod FIXED, impone box nominal y límite explícito shortening±30mm.
+Nueve muestras z=[−20:5:20]mm y velocidad cero prescrita; objetivos MR/travel/Kw
+de una referencia nativa desplazada+5mm Y/Z, pesos3/1/1 y escalas .1/.01m/30000N/m.
+E8,attempt9/cache1,BUMP8/ACT8/MECH8,score .231415023063→0; la geometría cambia
+sin modificar suspensión. Repite seleccionado fuera del coordinador, muestra
+PULLROD físico distinto, compara y guarda/revalida MAT. Seis sweeps externos
+(referencia/repetición/pull), aparte de los16 del search:22 en todo el ejemplo.
+`verifyV15` ejecuta los14 históricos+éste, PNGs/perfiles/Analyzer/DAG/costes.
+No datos/setup FS recomendados ni certificación de fabricación.
+
 ## v0.14
 
 `steeringSynthesisExample(showPlots)` define dos corners/steering FRONT ASSUMED,

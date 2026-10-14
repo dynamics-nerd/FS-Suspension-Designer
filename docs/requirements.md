@@ -1,5 +1,22 @@
 # Requisitos
 
+## v0.15 Actuation Geometry & Motion Ratio Synthesis
+
+- REQ-V15-SPACE: una suspensión fija y seeds ACT/MECH coherentes; FL/FR/RL/RR,
+  PUSHROD/PULLROD, cinco roles nominales, FIXED/RANGE/FREE/boxes/frozen y SI.
+- REQ-V15-BUILD: reconstrucción física atómica por fábricas nativas, eje con
+  dos DOFs/dirección fija, geometría de suspensión intacta, cambios/identidades.
+- REQ-V15-PHYSICS: BUMP→actuación nuevos, rigid rocker/rod/attachments,
+  MR/travel/angle y mecánica tangente nativos; no nueva hidráulica/fallback.
+- REQ-V15-ASSESSMENT: spec original completa ACT-only/MECH-only/mixta/HARD-only;
+  HARD antes de score/disponibilidad, pesos/escalas explícitos, gaps no PASS.
+- REQ-V15-EVIDENCE: contexto numérico/mecánico, sources, quality y replay/MAT
+  coherentes; caché local exacta, fallos cerrados, unknown rethrow, contadores reales.
+- REQ-V15-QA: 1224 históricos conservados, tests independientes/adversariales,
+  15 ejemplos, Analyzer0, DAG, perfiles sin solves ocultos, PNG claro/oscuro y costes.
+  Sin commit/merge/tag/release/main/v0.16, CAD ni certificación estructural.
+  [Contrato](actuation-geometry-synthesis.md) · [Evidencia](v0.15-validation.md).
+
 ## v0.14 Steering Geometry & Ackermann Synthesis
 
 - REQ-V14-MECHANISM: FRONT FL/FR/steering seeds explícitos coherentes, pickups y

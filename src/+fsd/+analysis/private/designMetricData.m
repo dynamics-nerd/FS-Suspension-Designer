@@ -100,8 +100,9 @@ switch s.type
                 case "DAMPER_COMPRESSION", y = r.damperCompression_m;
                 case "MOTION_RATIO", y = r.damperMotionRatio;
                 case "INSTALLATION_RATIO", y = r.installationRatio;
+                case "ROCKER_ANGLE", y = r.rockerAngle_rad;
             end
-            if t.metricId ~= "DAMPER_COMPRESSION" && ~startsWith(r.motionRatioStatus,"AVAILABLE")
+            if any(t.metricId == ["MOTION_RATIO","INSTALLATION_RATIO"]) && ~startsWith(r.motionRatioStatus,"AVAILABLE")
                 valid(:) = false; reasons(:) = r.motionRatioStatus;
             end
         else

@@ -1,5 +1,18 @@
 # Roadmap
 
+## v0.15 — Actuation Geometry & Motion Ratio Synthesis
+
+Una esquina fija + actuación seed → modificar anclajes/eje autorizado →
+reconstruir rod/rocker/damper → BUMP/actuación real → MR/travel/angle/mecánica
+→ assessment completo → búsqueda local → mejora → evidencia validada/MAT.
+Aceptación: PUSHROD y PULLROD con geometrías distintas, referencia independiente
+cinemática y tangente, HARD/SOFT/calidad/gaps, 1224 históricos+nuevos,15 ejemplos,
+Analyzer/DAG, perfiles sin solves ocultos, gráficos dark/light y costes medidos.
+[Contrato](actuation-geometry-synthesis.md) · [Evidencia](v0.15-validation.md).
+Sin DIRECT ACTING ficticio, actuación conjunta de eje, nueva hidráulica,
+spring-rate optimization, colisiones/estructura/CAD, UI/Adams ni v0.16.
+Exclusiones de secciones inferiores corresponden a sus entregas históricas.
+
 ## v0.14 — Steering Geometry & Ackermann Synthesis
 
 Extensión FRONT del diseño de eje: XYZ autorizadas de ambos endpoints tie rod,

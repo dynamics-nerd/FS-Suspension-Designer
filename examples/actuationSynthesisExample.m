@@ -1,0 +1,96 @@
+function output = actuationSynthesisExample(showPlots)
+%ACTUATIONSYNTHESISEXAMPLE Real geometry search; all inputs ASSUMED/test-only.
+% Reachable native reference is not a recommended Formula Student design.
+if nargin<1, showPlots=true; end
+[g,a,m,definition,md,units]=actuationSynthesisSeed('PUSHROD','FL');
+plan=struct('travel_m',(-.02:.005:.02)','wheelVelocity_m_per_s',0);
+referenceDefinition=definition;
+referenceDefinition.damper.chassisPoint(2:3)=referenceDefinition.damper.chassisPoint(2:3)+.005;
+referenceActuation=fsd.model.createActuationGeometry(g,referenceDefinition,'m');
+referenceMechanical=fsd.model.createSpringDamperModel(referenceActuation,md,units);
+referenceBump=fsd.kinematics.solveBumpSweep(g,plan.travel_m,'m');
+referenceSweep=fsd.kinematics.solveActuationSweep(referenceActuation,referenceBump);
+referenceAnalysis=fsd.analysis.analyzeActuationSweep(referenceActuation,referenceSweep);
+referenceResponse=fsd.analysis.analyzeSpringDamperSweep(referenceMechanical,referenceActuation, ...
+    referenceSweep,referenceAnalysis,0,'m/s');
+assert(referenceSweep.allConverged && all(isfinite(referenceResponse.wheelRateTotal_N_per_m)));
+parameters=cell(0,1); point=a.damper.chassisPoint.point_m; bindings=["HARDPOINT_X","HARDPOINT_Y","HARDPOINT_Z"];
+for column=[2,3]
+    p=struct('id',"MOUNT_"+extractAfter(bindings(column),'HARDPOINT_'),'quantity',"LENGTH", ...
+        'scope',fsd.model.designScope('HARDPOINT','FL_DAMPER_CHASSIS','FL'), ...
+        'type',"FREE",'binding',bindings(column),'value',point(column),'bounds',point(column)+[-.01,.01], ...
+        'availability',"ASSUMED",'sourceKind',"ASSUMED",'sourceNote',"Illustrative ±10 mm coordinate design window");
+    parameters{end+1,1}=fsd.model.createDesignParameter(p,'m'); %#ok<AGROW>
+end
+p.id="MOUNT_X_FIXED"; p.type="FIXED"; p.binding="HARDPOINT_X"; p.value=point(1); p.bounds=[]; p.comparisonTolerance=0;
+parameters{end+1,1}=fsd.model.createDesignParameter(p,'m');
+p=struct('id',"RATE_FIXED",'quantity',"STIFFNESS",'scope',fsd.model.designScope('COMPONENT','MECH_FRONT','FL'), ...
+    'type',"FIXED",'binding',"SPRING_RATE",'value',30000,'comparisonTolerance',0, ...
+    'availability',"ASSUMED",'sourceKind',"ASSUMED",'sourceNote',"Explicit fixed illustrative spring rate, not FS recommendation");
+parameters{end+1,1}=fsd.model.createDesignParameter(p,'N/m');
+p.id="PRELOAD_FIXED"; p.quantity="LENGTH"; p.binding="SPRING_PRELOAD"; p.value=.02;
+parameters{end+1,1}=fsd.model.createDesignParameter(p,'m');
+constraints=cell(0,1); roles=fsd.model.actuationDesignPointRoles();
+for row=[1,2,3,5]
+    id="FL_"+roles(row);
+    constraints{end+1,1}=fsd.model.createDesignConstraint(struct('id',roles(row)+"_FIXED", ...
+        'type',"HARDPOINT_FIXED",'strength',"HARD",'scope',fsd.model.designScope('HARDPOINT',id,'FL'), ...
+        'position',fsd.model.getActuationDesignPoint(a,id),'comparisonTolerance',0, ...
+        'sourceNote',"Explicit fixed nominal design point; canonical axis point is not a bearing"),'m'); %#ok<AGROW>
+end
+constraints{end+1,1}=fsd.model.createDesignConstraint(struct('id',"MOUNT_BOX",'type',"AXIS_ALIGNED_BOX", ...
+    'strength',"HARD",'scope',fsd.model.designScope('HARDPOINT','FL_DAMPER_CHASSIS','FL'), ...
+    'bounds',[point(1),point(1);point(2)+[-.01,.01];point(3)+[-.01,.01]], ...
+    'sourceNote',"Nominal mounting bounds only, not a CAD envelope"),'m');
+targets={curve("MR_REFERENCE","MOTION_RATIO","ACTUATION","ACT_FRONT",referenceAnalysis.damperMotionRatio,1e-7,.1,3); ...
+    curve("TRAVEL_REFERENCE","DAMPER_COMPRESSION","ACTUATION","ACT_FRONT",referenceAnalysis.damperCompression_m,1e-9,.01,1); ...
+    curve("RATE_REFERENCE","TANGENT_WHEEL_RATE","MECHANICAL","MECH_FRONT",referenceResponse.wheelRateTotal_N_per_m,1e-4,30000,1)};
+band=struct('id',"DAMPER_TRAVEL_HARD",'metricId',"DAMPER_COMPRESSION",'sourceType',"ACTUATION",'sourceId',"ACT_FRONT", ...
+    'scope',fsd.model.designScope('CORNER','FL'),'type',"CURVE_BAND",'strength',"HARD",'independentVariable',"WHEEL_TRAVEL", ...
+    'x',[-.02;.02],'lower',-.03,'upper',.03,'sourceNote',"Explicit benchmark-only ±30 mm sampled shortening limit, not catalog hardware");
+targets{end+1,1}=fsd.model.createDesignTarget(band,'m','m');
+spec=fsd.model.createDesignSpecification(struct('id',"ACTUATION_REACHABLE_REFERENCE",'parameters',{parameters}, ...
+    'constraints',{constraints},'targets',fsd.model.createSuspensionDesignTargets(targets),'compositeScore',true));
+space=fsd.synthesis.createActuationDesignSpace(g,a,m,spec,plan);
+options=struct('maxEvaluations',17,'maxIterations',4,'initialStep',.25,'minimumStep',1/128,'stopAtScore',1e-8);
+result=fsd.synthesis.runActuationInverseSearch(space,options); fsd.synthesis.validateActuationSynthesisResult(result);
+assert(isfinite(result.selectedIndex)); seed=result.search.records{1}; best=result.search.records{result.selectedIndex};
+assert(best.score<seed.score && ~isequaln(best.actuationIdentity,a.identity));
+assert(isequaln(best.geometry,g));
+directBump=fsd.kinematics.solveBumpSweep(g,space.plan.travel_m,'m',space.plan.solverOptions);
+directSweep=fsd.kinematics.solveActuationSweep(best.actuation,directBump);
+directAnalysis=fsd.analysis.analyzeActuationSweep(best.actuation,directSweep);
+directResponse=fsd.analysis.analyzeSpringDamperSweep(best.mechanical,best.actuation,directSweep,directAnalysis, ...
+    space.plan.wheelVelocity_m_per_s,'m/s');
+comparison=fsd.synthesis.compareActuationSynthesisCandidates(result,[1;result.selectedIndex]);
+[pullGeometry,pullActuation,pullMechanical]=actuationSynthesisSeed('PULLROD','FL');
+pullBump=fsd.kinematics.solveBumpSweep(pullGeometry,space.plan.travel_m,'m',space.plan.solverOptions);
+pullSweep=fsd.kinematics.solveActuationSweep(pullActuation,pullBump);
+pullAnalysis=fsd.analysis.analyzeActuationSweep(pullActuation,pullSweep);
+pullResponse=fsd.analysis.analyzeSpringDamperSweep(pullMechanical,pullActuation,pullSweep,pullAnalysis,0,'m/s');
+assert(pullSweep.allConverged && ~isequaln(pullActuation.rocker.axis,a.rocker.axis));
+root=fileparts(fileparts(mfilename('fullpath'))); file=fullfile(root,'output','actuation-synthesis-example.mat');
+save(file,'result'); loaded=load(file,'result'); fsd.synthesis.validateActuationSynthesisResult(loaded.result);
+figures=gobjects(0,1); if showPlots, figures=fsd.synthesis.plotActuationSynthesisResult(result); end
+output=struct('space',space,'result',result,'referenceActuation',referenceActuation, ...
+    'referenceMechanical',referenceMechanical,'referenceBump',referenceBump,'referenceSweep',referenceSweep, ...
+    'referenceAnalysis',referenceAnalysis,'referenceResponse',referenceResponse, ...
+    'directBump',directBump,'directSweep',directSweep,'directAnalysis',directAnalysis,'directResponse',directResponse, ...
+    'comparison',comparison,'pullActuation',pullActuation,'pullSweep',pullSweep,'pullAnalysis',pullAnalysis, ...
+    'pullResponse',pullResponse,'additionalPhysicalSweepInvocations',6,'figures',figures);
+fprintf('ACTUATION: E%d BUMP%d ACT%d MECHANICAL%d; score %.12g -> %.12g; %s\n', ...
+    result.search.evaluationCount,result.statistics.bumpSweeps,result.statistics.actuationSweeps, ...
+    result.statistics.mechanicalAnalyses,seed.score,best.score,result.search.stopReason);
+fprintf('ASSUMED sampled/local reference only; fixed suspension; no global optimum, CAD or structural certification.\n');
+
+    function t = curve(id,metric,family,source,value,tolerance,scale,weight)
+        unit='1'; if metric=="DAMPER_COMPRESSION", unit='m'; end
+        if metric=="TANGENT_WHEEL_RATE", unit='N/m'; end
+        d=struct('id',id,'metricId',metric,'sourceType',family,'sourceId',source, ...
+            'scope',fsd.model.designScope('CORNER','FL'),'type',"CURVE_TARGET",'strength',"SOFT", ...
+            'independentVariable',"WHEEL_TRAVEL",'x',plan.travel_m,'value',value,'tolerance',tolerance, ...
+            'normalizationScale',scale,'normalizationNote',"Explicit benchmark-only scale: ratio .1, travel .01 m or rate 30000 N/m", ...
+            'weight',weight,'sourceNote',"Reachable reference computed independently with native physical APIs");
+        t=fsd.model.createDesignTarget(d,unit,'m');
+    end
+end

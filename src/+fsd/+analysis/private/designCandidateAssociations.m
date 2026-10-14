@@ -7,6 +7,9 @@ d = candidate.definitionSI;
 for i = 1:numel(d.geometries)
     geometry(d.geometries{i},"registered geometry");
 end
+if isfield(d,'actuations')
+    for i=1:numel(d.actuations), actuation(d.actuations{i}.identity,"registered actuation"); end
+end
 if ~isempty(d.vehicle), bind("VEHICLE","VEHICLE",d.vehicle.identity,"registered vehicle"); end
 for i = 1:numel(sources)
     s = sources{i}; m = s.model; owner = s.type+":"+s.id;

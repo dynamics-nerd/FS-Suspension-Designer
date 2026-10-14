@@ -4,6 +4,38 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+**v0.15 — Actuation Geometry & Motion Ratio Synthesis** permite síntesis de
+actuación PUSHROD/PULLROD para una esquina FL/FR/RL/RR con suspensión fija.
+Reconstruye anclajes y eje de rocker, ejecuta BUMP y actuación nativos nuevos,
+evalúa MR firmado, recorrido, ángulo y mecánica tangente v0.8, y reutiliza el
+assessment v0.11 y boundedDirectSearch v0.12. No incorpora otra física.
+[Contrato y APIs](docs/actuation-geometry-synthesis.md) ·
+[Informe de validación e inventario](docs/v0.15-validation.md).
+
+```matlab
+setupProject;
+results = runProjectTests;
+addpath("examples", "tests");
+example = actuationSynthesisExample(true);
+report = verifyV15;
+```
+
+MATLAB R2025b; Optimization Toolbox para el BUMP histórico, controlador base
+MATLAB. Baseline ejecutada:1224/1224 PASS,14 ejemplos,Analyzer0/435,DAG acíclico.
+Benchmark ilustrativo ASSUMED: dos coordenadas del anclaje del damper, nueve
+muestras de rueda, referencias nativas independientes, score0.231415023063→0
+en ocho candidatos. Los límites son declarados, no datos de catálogo.
+Validación completa y costes: informe enlazado; verificadores anteriores son
+históricos y tienen versión fija. **No utilizar resultados para fabricar una
+suspensión real**. Sin DIRECT ACTING, actuación conjunta de eje, colisiones CAD,
+dimensionado estructural, nueva hidráulica, UI final, Adams ni óptimo global.
+No se inicia v0.16 ni se realizan commits/merges/tags/releases.
+Validación final: **1391/1391 tests PASS** (1224 históricos+167 nuevos),
+Failed0/Incomplete0; **15/15 ejemplos**, **Analyzer0/465 archivos MATLAB**,
+DAG10 acíclico, consumidores sin forward solves ocultos,66 exports PNG.
+
+## Historia v0.14
+
 **v0.14 — Steering Geometry & Ackermann Synthesis** coordina suspensión y
 dirección FRONT FL/FR en un único espacio/assessment. Añade XYZ autorizadas de
 TIE_ROD_INBOARD/OUTBOARD a los pivotes de trapecios, rack rígido reconstruido,

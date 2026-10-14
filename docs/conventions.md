@@ -1,5 +1,21 @@
 # Convenciones
 
+## Síntesis de actuación v0.15
+
+Se conserva +X atrás/+Y derecha/+Z arriba, bump +Z y SI m/rad/N/N/m.
+Nominal theta=0; rocker angle unwrapped por regla de mano derecha sobre el eje
+orientado. No copiar signos de ángulos entre lados. Compresión damper positiva
+al acortarse desde L0; MR firmado dc/dz, installation ratio abs(MR), no inverso.
+Compresión de muelle=preload+c; Fs axial no negativa, Fs*MR resistencia
+generalizada firmada, no carga normal. Kw tangente conserva signo y NaN cuando
+la curvatura nativa no es fiable. No fallback elástico ni clipping.
+Anclajes XYZ globales nominales; eje como línea canónica P·u=0, dirección fija,
+dos coordenadas independientes y tercera derivada. ROCKER_AXIS_POINT no es
+montaje físico. u de búsqueda [0,1], congelados0, como v0.12.
+Velocidad mecánica declarada, incluso cero; no se infiere del sweep estático.
+Bounds/boxes nominales y HARD muestreados no certifican packaging ni recorrido
+continuo. [Contrato y supuestos](actuation-geometry-synthesis.md).
+
 ## Síntesis de steering v0.14
 
 SI/+X atrás/+Y derecha/+Z arriba y todos los signs históricos intactos.

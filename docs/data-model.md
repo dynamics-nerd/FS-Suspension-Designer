@@ -1,5 +1,21 @@
 # Modelo de datos
 
+## Contratos v0.15
+
+ActuationSynthesisDesignSpace/Evaluation/Result son structs schema0.15.0/MAT;
+no clases/handles persistentes. Space conserva seeds físicos nativos inmutables,
+spec completa, plan canónico, aliases, cinco puntos nominales, variables/bounds
+y componente dependiente del eje. Evaluation guarda modelos reconstruidos,
+changes solicitados/logrados, identidades, snapshot, preflight y assessment,
+wrappers BUMP/ACTUATION/MECHANICAL, fallos, calidad, score y tiempos.
+Result conserva search v0.12 íntegro, selección, contadores y diagnósticos.
+Las matrices de puntos son 5×3; el quinto representa una línea, no un bearing.
+`DesignCandidate.definitionSI.actuations` sólo existe cuando se registran modelos
+nominales. Omitido/vacío deja definición/identidad anteriores exactamente iguales.
+Snapshot incluye parámetros mecánicos y contexto numérico, separados de
+identidades físicas. Cada fuente se asocia al mismo mecanismo y BUMP.
+[Campos/APIs/replay](actuation-geometry-synthesis.md).
+
 ## Contratos v0.14
 
 SteeringSynthesisDesignSpace/Evaluation/Result y snapshot: structs0.14.0/MAT.

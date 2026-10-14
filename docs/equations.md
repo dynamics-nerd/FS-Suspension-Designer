@@ -1,5 +1,23 @@
 # Convenciones y formulación matemática
 
+## Síntesis de actuación v0.15 (física histórica sin cambios)
+
+Rocker: ambos attachments usan la misma rotación rígida nativa R(u,theta),
+conservando distancias durante el sweep. Longitudes nominales rod/damper se
+derivan de los nuevos endpoints, no son variables de movimiento independientes.
+Se reutilizan cierre circle/sphere v0.7, c=L0−L, MR=dc/dz e installation=abs(MR).
+En régimen engaged ideal v0.8: Fs=k(preload+c), Fw=Fs*MR y
+Kw=k*MR²+Fs*dMR/dz. Unseated/bind/límites y derivada F01-1 mantienen sus gates;
+Kw elástico solo no sustituye el total. No nueva ecuación hidráulica.
+Único mapa geométrico nuevo: P·u=0; k=argmax(abs(u)), primer índice en empate,
+P_k=−sum(i≠k,P_i*u_i)/u_k. Elimina la traslación redundante a lo largo del eje;
+canonicalización/redondeo nativos no se alteran. No representa un bearing.
+Normalización y RMS SOFT se reutilizan literalmente de v0.12/v0.11.
+Oracle de tests: diferenciación implícita del círculo/esfera del caso ASSUMED
+UPRIGHT de traslación circular de radio0.3m; MR/curvatura/Kw contrastados con
+solves públicos independientes. No es otro solver de producción.
+[Dominio, datos y tolerancias](actuation-geometry-synthesis.md).
+
 ## Síntesis de steering v0.14 (sin nuevas ecuaciones físicas)
 
 Reutiliza rack/cierre/headings/Ackermann v0.5 y score v0.11 descritos abajo.
