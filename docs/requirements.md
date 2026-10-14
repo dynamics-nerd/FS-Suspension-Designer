@@ -1,5 +1,23 @@
 # Requisitos
 
+## v0.16 Vehicle Concept & Engineering Project Workflow
+
+- REQ-V16-CONCEPT: concepto parcial, masas sin doble cómputo, estados/unidades/
+  procedencia/rangos/confirmación explícitos y derivaciones mediante v0.9.
+- REQ-V16-PROJECT: Concept/Scenario/Result separados, corners opcionales,
+  recursos nativos asociados, identidades/revisiones y ledger inmutable.
+- REQ-V16-READINESS: doce acciones adaptadas, diagnósticos concretos y estados
+  READY/MISSING_DATA/INVALID_INPUT/UNSUPPORTED/BLOCKED_BY_DEPENDENCY; sin solves
+  ni búsqueda oculta, ni inferencia de seeds/gravedad/CG/targets óptimos.
+- REQ-V16-EXECUTION: cuatro síntesis y análisis públicos históricos delegados,
+  specs HARD/SOFT originales, evidencia validada y obsolescencia selectiva.
+- REQ-V16-MAT: schema explícito, validación al guardar/cargar, rechazo de
+  asociaciones/manipulaciones incoherentes, MAT históricos intactos.
+- REQ-V16-QA: baseline1391, nuevas pruebas independientes/adversariales,
+  16 ejemplos, Analyzer/DAG/perfiles/costes, física/controlador/main intactos.
+  Sin commits/merge/tag/release/v0.17, nuevos modelos/UI/certificación.
+  [Contrato](vehicle-concept-project-workflow.md) · [Validación](v0.16-validation.md).
+
 ## v0.15 Actuation Geometry & Motion Ratio Synthesis
 
 - REQ-V15-SPACE: una suspensión fija y seeds ACT/MECH coherentes; FL/FR/RL/RR,

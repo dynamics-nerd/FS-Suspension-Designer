@@ -4,6 +4,37 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+**v0.16 — Vehicle Concept & Engineering Project Workflow** añade proyectos
+conceptuales incompletos, incertidumbres y procedencia explícitas, derivaciones
+v0.9, escenarios, readiness sin solves, ejecución delegada de análisis y de las
+cuatro síntesis v0.12–v0.15, revisiones selectivas y persistencia MAT validada.
+No genera seeds ni targets óptimos desde masas/dimensiones. Núcleo MATLAB
+R2025b independiente de UI; Optimization Toolbox sólo donde lo requiere la
+cinemática histórica. SI y +X atrás/+Y derecha/+Z arriba sin cambios.
+
+```matlab
+setupProject;
+r = runProjectTests;
+addpath("examples", "tests");
+example = vehicleConceptProjectExample(false);
+report = verifyV16;
+```
+
+[Contrato y APIs](docs/vehicle-concept-project-workflow.md) ·
+[Informe de validación e inventario](docs/v0.16-validation.md).
+Baseline confirmada: 1391/1391 PASS; 15 ejemplos, Analyzer 0/465 y DAG acíclico.
+Suite global v0.16: **1516/1516 PASS** (1391 históricos+125 nuevos), Failed0,
+Incomplete0. Consultar el informe para ejemplos, perfiles y costes. READY significa inputs
+estructurales disponibles, no convergencia ni certificación. **No utilizar los
+resultados para fabricar una suspensión real**. Sin App Designer, nuevos modelos
+dinámicos/neumáticos/rules/Adams, optimizador global ni v0.17. Sin commits,
+merges, tags o releases en esta tarea. Las secciones siguientes son históricas;
+los verificadores con versión fija se ejecutan en su checkout correspondiente.
+Validación final: **16/16 ejemplos**, **Analyzer0/515**, **DAG15 acíclico**,
+readiness sin búsqueda/solves y validadores/MAT sin nuevos solves físicos.
+
+## Historia v0.15
+
 **v0.15 — Actuation Geometry & Motion Ratio Synthesis** permite síntesis de
 actuación PUSHROD/PULLROD para una esquina FL/FR/RL/RR con suspensión fija.
 Reconstruye anclajes y eje de rocker, ejecuta BUMP y actuación nativos nuevos,

@@ -1,5 +1,19 @@
 # Roadmap
 
+## v0.16 — Vehicle Concept & Engineering Project Workflow
+
+Flujo A: concepto incompleto → incertidumbres/procedencia → derivaciones
+disponibles → diagnóstico de datos ausentes → MAT válido, sin CG/seed inventados.
+Flujo B: concepto → seed explícito/especificación histórica → escenario READY
+→ análisis/síntesis física delegada → candidatos nuevos → evidencia/revisión/MAT.
+Criterios: ambos flujos operativos, doce adaptadores de preparación, cuatro
+motores de síntesis reutilizados, masa/CG/seed/spec/opciones con obsolescencia
+selectiva, tests adversariales/oracles nativos, 1391 históricos conservados,
+16 ejemplos, Analyzer0/DAG/perfiles y ocho costes medidos. Revisión humana pendiente.
+[Contrato](vehicle-concept-project-workflow.md) · [Validación](v0.16-validation.md).
+No generación autónoma desde cero ni targets óptimos sin física de prestaciones;
+sin v0.17/App Designer/nuevo optimizador/dinámica/tire/rules/Adams.
+
 ## v0.15 — Actuation Geometry & Motion Ratio Synthesis
 
 Una esquina fija + actuación seed → modificar anclajes/eje autorizado →

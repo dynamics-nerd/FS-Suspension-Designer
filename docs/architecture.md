@@ -1,5 +1,17 @@
 # Arquitectura
 
+## Extensión v0.16
+
+`fsd.project` es consumidor de model/geometry/kinematics/analysis/synthesis;
+ninguno de esos módulos depende de project. ConceptParameter reutiliza el
+DesignParameter nativo. Concept → Scenario → preparación sin forwards → ejecución
+explícita por API histórica → EngineeringResult con contexto original → MAT.
+No nueva física ni controlador. Los recursos son opcionales por corner, no
+cuatro suspensiones ficticias. Readiness valida sólo la configuración consumida;
+`validateEngineeringProject` valida además el ledger histórico, con replay nativo
+sin nuevos solves. La ejecución reside exclusivamente en executeScenarioCore.
+[Contrato](vehicle-concept-project-workflow.md) · [Evidencia](v0.16-validation.md).
+
 ## Extensión v0.15
 
 Una suspensión fija + actuación nativa + modelo mecánico opcional + spec/plan

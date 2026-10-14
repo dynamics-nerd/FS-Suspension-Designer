@@ -114,3 +114,16 @@ Todos los hardpoints son ficticios y no constituyen targets ni recomendaciones d
   `springDamperWheelRateExample(false)` omite figuras para validación batch.
 
 Example geometry and mechanical parameters only — not a Formula Student setup recommendation.
+
+## v0.16 Vehicle Concept & Engineering Project Workflow
+
+`vehicleConceptProjectExample(showPlots)` demuestra dos flujos. Primero registra
+masas/dimensiones ASSUMED sin CG ni geometría, deriva270kg y guarda un proyecto
+parcial con readiness MISSING_DATA. Después incorpora los seeds/spec/targets
+EXPLÍCITOS de actuationSynthesisExample, ejecuta BUMP y síntesis de actuación,
+obtiene ocho candidatos, valida/asocia resultados y guarda revisiones MAT.
+Masa irrelevante permite reutilizar evidencia, sin reetiquetar la ejecución;
+opciones relevantes la vuelven STALE. El ejemplo heredado de preparación hace
+22 sweeps físicos, separados del presupuesto nuevo:9 BUMP/8 ACT/8 MECH.
+No genera una suspensión autónoma desde datos conceptuales ni recomienda MR.
+`verifyV16` ejecuta los 15 anteriores y éste, con regresiones v12–v15.

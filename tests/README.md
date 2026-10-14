@@ -1,5 +1,65 @@
 # Testing strategy
 
+## Corrección v0.16 V16-F-01: RULE no es input físico
+
+`setupProject; addpath("tests"); verifyV16F01;` ejecuta 48 regresiones nuevas
+en TestRulePhysicalInput, sin editar las 1516 pruebas de la baseline. Cubre las
+18 cantidades conceptuales, rol separado de disponibilidad/source/confirmation,
+RULE con referencias UNVERIFIED/VERIFIED (ficticias), TARGET/unknown/range,
+ASSUMED/KNOWN/FIXED/DERIVED, selección explícita de rangos físicos, dependencias,
+readiness/ejecución, inmutabilidad, revisiones selectivas, siete rutas de rechazo
+de evidencia antigua y round-trips MAT. Perfil comprueba cero forwards/búsquedas
+en readiness/validadores/MAT; recomputación algebraica nativa sigue permitida.
+
+rulePhysicalInputFixture declara Mveh125kg, Mdriver64.8kg, EXCLUDES_DRIVER,
+wb2.4m, tracks1.4/1.2m, CG[.9,0,.37]m, g9.7m/s², contactos explícitos y cierre
+simétrico ASSUMED. Expected independiente: M189.8kg, W1841.06N y normales
+[575.33125;575.33125;345.19875;345.19875]N, sólo si Mveh es dato físico explícito.
+Con RULE la masa física y total están ausentes, STATIC_LOADS=MISSING_DATA.
+AbsTol1e-12kg/1e-10N comprueba roundoff del fixture, no tolerancias de diseño.
+
+legacyRuleEvidence codifica deliberadamente el defecto antiguo usando física
+nativa genuina y sustituyendo sólo el concepto/contexto. No es API productiva.
+`verifyV16F01("LEGACY")` se ejecutó ANTES del fix y comprobó igualdad completa
+contra la ejecución pública antigua, ignorando únicamente cronómetros, además
+de aceptación de derivación/resultado/proyecto/MAT. Después del fix ese modo
+debe fallar: no modifica producción ni tiene un bypass para aprobar RULE.
+Los tests nuevos no requieren ese MAT ni ningún output previo; crean/eliminan
+sus MAT temporales con teardown. Evidencia de auditoría intencional bajo output.
+
+Baseline del auditor:1516/1516 PASS en **23 bloques/procesos limpios** después
+de timeout gráfico de steering en el intento monolítico. No confundir con un
+monolítico concluido. El informe registra por separado el intento final de
+`setupProject; r=runProjectTests` y su método real de cierre/cobertura por nombre.
+[Informe focalizado](../docs/v0.16-validation.md#corrección-v16-f-01-rule-vs-physical-input).
+
+Cierre de esta corrección: **48/48 focalizados** y **1564/1564 globales PASS**
+(1516+48), Failed0/Incomplete0, monolítico limpio completado sin timeout ni
+fallback segmentado. Cobertura anterior por nombre, sin faltantes/duplicados.
+verifyV16 posterior:16/16 ejemplos,Analyzer0/519,DAG15,forwards ocultos0,
+readiness sin búsquedas. Los cinco benchmarks v0.12–v0.15 mantienen contadores
+y scores auditados. No cambios de tests anteriores, física ni controlador.
+
+## Proyecto de ingeniería v0.16
+
+`setupProject; r=runProjectTests; addpath("tests"); report=verifyV16`.
+Baseline real1391/1391 PASS; tests anteriores se conservan salvo expected de
+versión de Foundation. Nuevas clases VehicleConceptWorkflow,
+EngineeringProjectWorkflow/Integrity/Integration prueban masas/CG/rangos/estados,
+unidades, datos ausentes, identidad/revisión, doce capacidades, cuatro motores
+delegados, oracles nativos independientes, perfiles sin forwards/búsqueda en
+readiness, manipulación de snapshots/assessment/MAT y obsolescencia selectiva.
+Known case explícito M270kg,g10m/s²,CGx.8m/wb1.6m:675N/corner bajo simetría
+ASSUMED, no setup FS. Tolerancias verifican aritmética y equivalencia de llamadas
+nativas (1e-10rad,1e-7N/m), no fabricación. Tests temporales tienen teardown.
+El verifier mide ocho etapas tras warm-up, audita DAG/Analyzer y ejecuta16
+ejemplos/regresiones. [Resultados e inventario](../docs/v0.16-validation.md).
+Suite global final: **1516/1516 PASS**,1391 históricos+125 nuevos,
+Failed0/Incomplete0. Nuevas clases:36/46/36/7 casos respectivamente.
+Conservación histórica verificada por nombre contra la baseline, no sólo recuento.
+`verifyV16` final:16/16 ejemplos,Analyzer0/515,DAG15,perfiles sin forwards
+ocultos/búsquedas en readiness y ocho medianas tras warm-up en proceso limpio.
+
 ## v0.15 actuación inversa
 
 `setupProject; results=runProjectTests; addpath("tests"); report=verifyV15`.

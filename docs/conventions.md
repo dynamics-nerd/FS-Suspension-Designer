@@ -1,5 +1,16 @@
 # Convenciones
 
+## Concepto y proyecto v0.16
+
+No cambios físicos: +X atrás/+Y derecha/+Z arriba, SI, conversiones en fábricas.
+CG conceptual es del vehículo operativo total; masa vehículo debe declarar
+EXCLUDES_DRIVER/INCLUDES_DRIVER, nunca doble suma silenciosa. Intervalos sin
+nominal no se convierten en valor por defecto. Rol FIXED/RANGE/TARGET no es
+procedencia KNOWN/ASSUMED/DERIVED ni confirmación VERIFIED. Targets no son hechos.
+Las referencias reglamentarias no certifican cumplimiento. Revise devuelve
+otra configuración; el resultado viejo conserva su revisión aunque sus
+dependencias permitan reutilizarlo. [Contrato](vehicle-concept-project-workflow.md).
+
 ## Síntesis de actuación v0.15
 
 Se conserva +X atrás/+Y derecha/+Z arriba, bump +Z y SI m/rad/N/N/m.

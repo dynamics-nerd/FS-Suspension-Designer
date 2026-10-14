@@ -1,5 +1,30 @@
 % FS Suspension Designer engineering core.
 %
+% v0.16 Vehicle Concept & Engineering Project Workflow
+%   fsd.project.conceptParameterCatalog             - Concept quantities, not performance targets.
+%   fsd.project.createConceptParameter              - Native parameter plus origin and confirmation.
+%   fsd.project.validateConceptParameter            - Canonical quantity/provenance reconstruction.
+%   fsd.project.createVehicleConcept                - Progressive, optional vehicle data.
+%   fsd.project.validateVehicleConcept              - Concept definition and identity integrity.
+%   fsd.project.deriveVehicleConcept                - Explicit native v0.9 conditioned derivations.
+%   fsd.project.validateConceptDerivation            - Original inputs and algebraic evidence.
+%   fsd.project.selectConceptValues                 - Explicit interval samples, not robustness.
+%   fsd.project.createEngineeringScenario            - Explicit action/spec/plan/control intent.
+%   fsd.project.validateEngineeringScenario          - Canonical scenario identity.
+%   fsd.project.createEngineeringProject             - Optional resources/scenarios, historical ledger.
+%   fsd.project.validateEngineeringProject           - Complete configuration and evidence integrity.
+%   fsd.project.reviseEngineeringProject             - Immutable engineering configuration revisions.
+%   fsd.project.specificationSources                 - Authoritative native target/source catalogue.
+%   fsd.project.designReadiness                      - Actionable preparation without solves/searches.
+%   fsd.project.prepareEngineeringScenario           - Public native input adapters, no execution.
+%   fsd.project.runEngineeringScenario               - Explicit native analysis/synthesis delegation.
+%   fsd.project.validateEngineeringResult            - Original snapshot and native payload reconstruction.
+%   fsd.project.resultCompatibility                  - Current/reusable/stale/incompatible dependencies.
+%   fsd.project.attachEngineeringResult              - Associate original evidence without revision change.
+%   fsd.project.saveEngineeringProject               - Validated versioned MAT, explicit overwrite.
+%   fsd.project.loadEngineeringProject               - Trusted MAT integrity; no hidden forward solves.
+%   fsd.synthesis.searchSettings                     - Pure existing controller option normalizer.
+%
 % v0.15 Actuation Geometry & Motion Ratio Synthesis
 %   fsd.model.actuationDesignPointRoles             - Four native points and canonical axis-line point.
 %   fsd.model.getActuationDesignPoint               - Closed nominal global-coordinate lookup.

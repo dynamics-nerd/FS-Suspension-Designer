@@ -1,5 +1,20 @@
 # Modelo de datos
 
+## Contratos v0.16
+
+Structs funcionales consumidores, schema 0.16.0: ConceptParameter (parámetro
+v0.11+estado/confirmación/origen), VehicleConcept (cantidades progresivas),
+ConceptDerivation (inputs+modelo+outputs condicionados), EngineeringScenario
+(intent/scope/spec/planes/opciones), EngineeringProject (configuración/revisión,
+recursos/escenarios opcionales y ledger), EngineeringResult (snapshot ORIGINAL,
+contexto preparado, payload nativo y assessment). Sin clases, handles o servicios.
+`[]` significa valor ausente acompañado de estado; NaN sólo donde el contrato
+físico histórico lo requiere. Identidades completas sin hash. El ledger no
+cambia la identidad de configuración. La compatibilidad se calcula, no se
+confía en un flag almacenado. MAT envelope FsdEngineeringProjectFile0.16.0;
+los MAT anteriores siguen con sus APIs, sin migración de metadata inventada.
+[Campos/APIs y estados](vehicle-concept-project-workflow.md).
+
 ## Contratos v0.15
 
 ActuationSynthesisDesignSpace/Evaluation/Result son structs schema0.15.0/MAT;

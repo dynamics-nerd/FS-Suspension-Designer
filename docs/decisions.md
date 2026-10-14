@@ -1,5 +1,25 @@
 # Registro de decisiones
 
+## Capa de proyecto v0.16
+
+- PRJ-001: consumidor fsd.project con structs/MAT; capas físicas independientes.
+- PRJ-002: reutilizar DesignParameter/Specification y catálogo de métricas,
+  añadir confirmación/origen sólo en el wrapper conceptual; no otro evaluador.
+- PRJ-003: inclusión de piloto explícita; CG total operativo, sin CG inventado.
+- PRJ-004: derivación v0.9 condicionada a inputs/contactos/gravedad declarados;
+  v0.10 no auto-adaptado sin cuatro paths/tyres y demás inputs explícitos.
+- PRJ-005: preparar sin forwards ni búsqueda; ejecutar sólo por acción explícita;
+  searchSettings es adaptador puro de las opciones históricas, no optimizador.
+- PRJ-006: snapshots originales, ledger separado y compatibilidad selectiva.
+  Dependencias justificativas conceptuales adicionales deben declararse.
+- PRJ-007: MAT versionado de fuentes fiables; sin migración ni autenticación
+  criptográfica ficticias. Readiness no certifica el ledger ni convergencia.
+- OPEN DECISION: datos/hipótesis/arquitecturas/targets de un coche REAL, criterios
+  experimentales de confirmación, modelos de prestaciones/neumático para generar
+  targets, robustez continua y eventual adaptación explícita v0.10.
+- LOW conservados: V14-OBS-01 título/exponente Ackermann; V15-OBS-01 diagnóstico
+  AXLE en actuación; V15-OBS-02 ejes en intervalos extremadamente pequeños.
+
 ## Cerradas para v0.15
 
 - ACS-001: suspensión seed fija, actuación geométrica variable de una esquina;
