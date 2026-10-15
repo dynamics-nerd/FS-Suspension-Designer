@@ -1,5 +1,23 @@
 % FS Suspension Designer engineering core.
 %
+% v0.17 Concept-to-Seed & Parametric Suspension Geometry
+%   fsd.construction.seedParameterCatalog           - Required decisions, no physical defaults.
+%   fsd.construction.createSeedParameter            - Native units/roles for a catalogued decision.
+%   fsd.construction.createParametricSeedDefinition  - Progressive corner or explicit FRONT family.
+%   fsd.construction.validateParametricSeedDefinition - Canonical input record reconstruction.
+%   fsd.construction.seedReferenceIds               - Only consumed vehicle dimensions.
+%   fsd.construction.parametricSeedReadiness         - Missing inputs, no build/solves.
+%   fsd.construction.buildParametricSeed             - Deterministic native geometry/derivations.
+%   fsd.construction.validateParametricSeedResult     - Rebuild nominal evidence, no solves.
+%   fsd.construction.checkConceptGeometryConsistency - Nominal dimensions/frame/wheel datum.
+%   fsd.project.checkConceptGeometryConsistency      - Physical concept gate before comparison.
+%   fsd.project.checkParametricSeedBump               - Explicit native sampled verification.
+%   fsd.project.validateParametricSeedBump            - Stored source/plan/quality replay.
+%   fsd.project.createSeedSteering                    - Optional explicit native steering adapter.
+%   fsd.project.registerParametricSeed                - Atomic adoption with historical origin.
+%   fsd.synthesis.validateNominalSeed                 - Pure existing builder checks, no search.
+%   fsd.synthesis.bumpSweepQuality                    - Existing local closure guard, no solve.
+%
 % v0.16 Vehicle Concept & Engineering Project Workflow
 %   fsd.project.conceptParameterCatalog             - Concept quantities, not performance targets.
 %   fsd.project.createConceptParameter              - Native parameter plus origin and confirmation.

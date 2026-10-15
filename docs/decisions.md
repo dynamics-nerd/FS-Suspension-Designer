@@ -1,5 +1,22 @@
 # Registro de decisiones
 
+## Construcción v0.17
+
+- CTS-001: constructor determinista y familia pequeña, no otra física/search.
+- CTS-002: líneas de pivotes + offsets upright, no renombrar XYZ globales.
+- CTS-003: radio circular efectivo declarado, no inferido del descargado.
+- CTS-004: toe/camber/clocking explícitos y reflexión/rotación nativas.
+- CTS-005: wheelbase/track aplicable físicos; masa/CG no consumidos.
+- CTS-006: readiness de inputs sin build/solves; bindings ya registrados pueden
+  reconstruirse algebraicamente. Nominal y BUMP explícitos separados.
+- CTS-007: reutilizar builder/assessment/quality históricos por adapters puros.
+- CTS-008: adopción atómica con origin binding; sin borrar históricos ni
+  inventar recursos dependientes incompatibles.
+- CTS-009: schemas físicos/envelope preservados, versiones elegibles explícitas.
+- OPEN DECISION: datos reales, rueda efectiva, upright/hub/packaging, recorridos,
+  targets/tolerancias, incertidumbre y validación experimental.
+[Contrato](concept-to-seed.md).
+
 ## Capa de proyecto v0.16
 
 - PRJ-001: consumidor fsd.project con structs/MAT; capas físicas independientes.

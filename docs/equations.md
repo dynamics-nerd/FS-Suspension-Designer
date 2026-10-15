@@ -1,5 +1,17 @@
 # Convenciones y formulación matemática
 
+## Construcción geométrica v0.17 (sin cambiar física histórica)
+
+C=[0,s*frontTrack/2,0] o [wheelbase,s*rearTrack/2,0], s=-1 left/+1 right.
+b=s*toe, alpha=-s*atan(tan(camber)*cos(toe)), R0=Rz(b)*Rx(alpha),
+a=R0*[0;s;0], R=Ra(-s*clocking)*R0, ejecutados por rotaciones nativas.
+d=geometricWheelContact([0,0,0],a,rEffective), WC=C-d.point_m.
+P=WC+R*[offsetX;s*offsetOutboard;offsetZ]. rEffective no se deduce del descargado.
+Pivotes: M=[Cx+centerX,s*lateral,height], D=[span,s*lateralDelta,heightDelta];
+FWD=M-D/2, AFT=M+D/2. Reflexión S=diag([1,-1,1]), frame propio Rright=S*Rleft*S.
+S no es rotación propia. Dominios/provenance/tolerancias en [contrato](concept-to-seed.md).
+No se modifican BUMP, steering, actuación, wheel rate, cargas, equilibrio o search.
+
 ## Síntesis de actuación v0.15 (física histórica sin cambios)
 
 Rocker: ambos attachments usan la misma rotación rígida nativa R(u,theta),

@@ -1,5 +1,15 @@
 # Roadmap
 
+## v0.17 — Concept-to-Seed & Parametric Suspension Geometry
+
+Concepto parcial -> decisiones -> geometría nativa -> BUMP explícito -> síntesis
+histórica -> revisión/proyecto/MAT. Corner4/FRONT simétrico o independiente.
+Aceptación: entradas incompletas sin geometría inventada, consistencia conceptual,
+oracles independientes, tres variantes con distinta física, gaps, adversariales,
+revisiones frente a masa/descripción, persistencia sin solves, regresiones,
+17 ejemplos/Analyzer0/DAG y costes reales. [Contrato](concept-to-seed.md).
+Sin v0.18/App Designer/CAD/normativa/targets óptimos/nueva física ni optimizador.
+
 ## v0.16 — Vehicle Concept & Engineering Project Workflow
 
 Flujo A: concepto incompleto → incertidumbres/procedencia → derivaciones

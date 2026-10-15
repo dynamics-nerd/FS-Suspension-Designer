@@ -1,5 +1,14 @@
 # Arquitectura
 
+## Extensión v0.17
+
+`construction` usa model/geometry, assessment nominal analysis y adapters puros
+del builder synthesis. No duplica criterios geométricos ni ejecuta search/solves.
+`project` aplica el gate físico v0.16 y prepara PARAMETRIC_SEED/PARAMETRIC_BUMP;
+construcción/BUMP se ejecutan explícitamente. Los módulos físicos/controlador
+no dependen de construction. Origin bindings bloquean recursos obsoletos sin
+reescribir históricos. UI permanece ausente. [Contrato](concept-to-seed.md).
+
 ## Extensión v0.16
 
 `fsd.project` es consumidor de model/geometry/kinematics/analysis/synthesis;
@@ -96,7 +105,10 @@ Los límites de las secciones históricas siguientes corresponden a su milestone
 
 ## Objetivo y límite actual
 
-FS Suspension Designer pretende conducir un flujo desde requisitos del vehículo hasta geometría, análisis, selección y validación externa. **v0.11** incorpora definición y evaluación asistida sobre modelos v0.1–v0.10, incluido equilibrio global reducido. Rules, optimización, dinámica y UI siguen sin implementación funcional. Los límites de las secciones históricas se refieren a su versión.
+FS Suspension Designer pretende conducir desde requisitos hasta validación externa.
+v0.17 añade construcción paramétrica al proyecto v0.16 y síntesis v0.12–v0.15.
+Targets de prestaciones, rules, dinámica, CAD, Adams y UI permanecen fuera.
+Los límites de secciones históricas se refieren a su versión, no al estado actual.
 
 ## Capas
 

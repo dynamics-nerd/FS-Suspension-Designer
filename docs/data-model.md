@@ -1,5 +1,18 @@
 # Modelo de datos
 
+## Contratos v0.17
+
+ParametricSeedDefinition/Result0.17.0 son structs con decisiones DesignParameter
+nativas, referencias físicas conceptuales, corner/symmetry, constraints,
+readiness, nominalStatus, sampledStatus, geometries/axle/frames/derivations,
+consistency, assessment e identity. Derivaciones conservan IDs por punto e inputs.
+ParametricSeedBumpCheck0.17.0 retiene plan, fuentes nativas, análisis, quality y
+snapshots. EngineeringScenario/Project/Result y envelope MAT0.16 permanecen
+aditivos; software0.16/0.17 se admite explícitamente, construcción sólo0.17.
+resources.seedBindings opcional liga escenario/proyecto/revisión y construcción
+a geometrías registradas. Ausente conserva la forma anterior. Sin migración ni
+clases nuevas. [Campos y estados](concept-to-seed.md).
+
 ## Contratos v0.16
 
 Structs funcionales consumidores, schema 0.16.0: ConceptParameter (parámetro

@@ -1,6 +1,9 @@
 function prepared = prepareScenarioCore(project,scenario)
 %PREPARESCENARIOCORE Dependency selection and native structural adapters only.
 d=scenario.definition; engine=d.engine; scope=d.scope; registry=project.definition.resources;
+if ismember(engine,["PARAMETRIC_SEED","PARAMETRIC_BUMP"])
+    prepared=prepareSeedScenario(project,scenario); return;
+end
 supported=["STATIC_GEOMETRY","BUMP","ROLL","RACK","ACTUATION","MECHANICAL","TARGET_EVALUATION", ...
     "STATIC_LOADS","CORNER_SYNTHESIS","AXLE_SYNTHESIS","STEERING_SYNTHESIS","ACTUATION_SYNTHESIS"];
 r=struct('scenarioId',d.id,'engine',engine,'scope',scope,'status',"READY", ...
@@ -32,7 +35,24 @@ end
 for id=ids'
     g=resourceFind(registry,'geometries',id);
     if isempty(g), r.missing(end+1,1)="GEOMETRY:"+id;
-    else, prepared.resources.geometries{end+1,1}=g; end
+    else
+        prepared.resources.geometries{end+1,1}=g;
+        if isfield(registry,'seedBindings')
+            for k=1:numel(registry.seedBindings)
+                binding=registry.seedBindings{k}; corners=cellfun(@(a)a.cornerId,binding.construction.geometries);
+                if ~ismember(id,corners), continue; end
+                [current,diagnostic]=seedBindingCurrent(project,binding);
+                if ~current
+                    r.status="BLOCKED_BY_DEPENDENCY"; r.missing(end+1,1)=diagnostic;
+                end
+                if ~isfield(prepared.resources,'seedBindings'), prepared.resources.seedBindings={}; end
+                existing=prepared.resources.seedBindings;
+                if ~any(cellfun(@(b)b.scenarioId==binding.scenarioId,existing))
+                    prepared.resources.seedBindings{end+1,1}=binding;
+                end
+            end
+        end
+    end
     axleName="front"; if startsWith(id,'R'), axleName="rear"; end
     architecture=project.definition.concept.definitionSI.architectures.(axleName+"Suspension");
     if ~ismember(architecture,["UNSELECTED","DOUBLE_WISHBONE"])
@@ -130,7 +150,7 @@ try
         if ~isempty(c.model) && ~isfinite(c.model.cg_m(1)), r.missing(end+1,1)="CONCEPT:CG_X_OR_LONGITUDINAL_WEIGHT_FRACTION"; end
     end
     if ~isempty(r.missing)
-        if r.status~="INVALID_INPUT", r.status="MISSING_DATA"; end
+        if ~ismember(r.status,["INVALID_INPUT","BLOCKED_BY_DEPENDENCY"]), r.status="MISSING_DATA"; end
         prepared.readiness=r; return;
     end
     g=[]; if ~isempty(ids), g=resourceFind(prepared.resources,'geometries',ids(1)); end

@@ -1,5 +1,14 @@
 # Examples
 
+## v0.17 — Concept to Seed
+
+`setupProject; addpath("examples"); out=conceptToSeedExample(false);`.
+Concepto parcial y decisiones ausentes -> definición completa explícita ->
+FRONT simétrico -> BUMP real -> síntesis nativa desde geometría generada ->
+registro/revisiones/MAT. parametricSeedInputs declara dimensiones/offsets/líneas,
+sin matriz inicial de hardpoints. Datos/targets ilustrativos ASSUMED, no setup FS.
+Steering es acción opcional explícita; no generación de actuación ni prestaciones.
+
 ## v0.15
 
 `actuationSynthesisSeed(architecture,corner)` proporciona geometrías ilustrativas

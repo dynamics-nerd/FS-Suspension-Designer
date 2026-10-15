@@ -1,6 +1,7 @@
 function resources = resourceCore(input)
 %RESOURCECORE Optional native resources, canonical ordering and association checks.
 resources=struct('geometries',{{}},'steerings',{{}},'actuations',{{}},'mechanicals',{{}});
+if isfield(input,'seedBindings'), resources.seedBindings={}; end
 projectRequire(isstruct(input) && isscalar(input) && all(ismember(string(fieldnames(input)), ...
     string(fieldnames(resources)))),'Invalid resource registry.');
 for name=string(fieldnames(input))', resources.(name)=input.(name); end
@@ -14,10 +15,32 @@ for name=string(fieldnames(resources))'
             case "steerings", fsd.model.validateSteeringSystemGeometry(r); ids(j)="FRONT";
             case "actuations", fsd.model.validateActuationGeometry(r); ids(j)=r.cornerId;
             case "mechanicals", fsd.model.validateSpringDamperModel(r); ids(j)=r.cornerId;
+            case "seedBindings", validateSeedBinding(r); ids(j)=r.scenarioId;
         end
     end
     projectRequire(numel(unique(ids))==numel(ids),'Duplicate resource IDs.');
     [~,order]=sort(ids); resources.(name)=entries(order);
+end
+if isfield(resources,'seedBindings')
+    boundCorners=strings(numel(resources.geometries),1); boundCount=0;
+    for j=1:numel(resources.seedBindings)
+        b=resources.seedBindings{j};
+        for k=1:numel(b.construction.geometries)
+            original=b.construction.geometries{k}; g=resourceFind(resources,'geometries',original.cornerId);
+            projectRequire(~isempty(g) && isequaln(g,original), 'Registered geometry differs from its parametric origin binding.');
+            projectRequire(~ismember(original.cornerId,boundCorners(1:boundCount)),'Corner has multiple parametric origins.');
+            boundCount=boundCount+1; boundCorners(boundCount)=original.cornerId;
+        end
+        if ~isempty(b.construction.axle)
+            refs=b.construction.referenceParameters; index=cellfun(@(p)p.definitionSI.id=="WHEELBASE",refs);
+            wb=refs{index}.definitionSI.value; tol=fsd.model.numericTolerances();
+            for k=1:numel(resources.steerings)
+                rear=resources.steerings{k}.rearAxleX_m;
+                projectRequire(abs(rear-wb)<=tol.AbsTol_m+tol.RelTol*max([1,abs(rear),abs(wb)]), ...
+                    'Steering rear reference disagrees with its generated seed wheelbase.');
+            end
+        end
+    end
 end
 for j=1:numel(resources.actuations)
     a=resources.actuations{j}; g=resourceFind(resources,'geometries',a.cornerId);

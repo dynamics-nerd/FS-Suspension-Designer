@@ -1,5 +1,14 @@
 # Convenciones
 
+## Construcción v0.17
+
+SI/signs históricos intactos. Radio efectivo explícito separado del descargado;
+contacto sobre Z=0 determina WC con el círculo ideal nativo. Offsets upright
+[X,s*outboard,Z] usan rotación propia; normalizar lado no es un frame reflejado
+para momentos. Toe/camber/clocking y deltas de pivotes son explícitos, sin defaults.
+RULE/TARGET/intervalos no seleccionados/confirmación pendiente no dan dimensiones.
+READY != nominal VALID != sampled PASS. [Contrato](concept-to-seed.md).
+
 ## Concepto y proyecto v0.16
 
 No cambios físicos: +X atrás/+Y derecha/+Z arriba, SI, conversiones en fábricas.

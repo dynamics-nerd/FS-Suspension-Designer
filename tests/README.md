@@ -1,5 +1,19 @@
 # Testing strategy
 
+## v0.17 Parametric Seed
+
+`setupProject; r=runProjectTests; addpath("tests"); report=verifyV17;`.
+TestParametricSeedInputs/Geometry/Project cubren decisiones ausentes, RULE/TARGET,
+rangos, unidades, corners, matriz golden independiente, orientación/reflexión,
+upright rígido, restricciones/degeneraciones, tres variantes, BUMP con gaps,
+asociaciones, revisiones selectivas, persistencia y ataques a fuentes/MAT.
+Expected de XYZ y distancias1e-14/1e-12m comprueban aritmética del fixture;
+closure1e-8m y ángulos1e-12rad son controles de verificación, no fabricación.
+Datos ASSUMED identificados; fuentes públicas independientes y no sólo el builder.
+verifyV17 repite17 ejemplos/benchmarks, Analyzer/DAG/perfiles y nueve costes nuevos
+tras warm-up. Baseline intacta y cifras realmente ejecutadas en
+[informe](../docs/v0.17-validation.md), no inferidas del número de tests escritos.
+
 ## Corrección v0.16 V16-F-01: RULE no es input físico
 
 `setupProject; addpath("tests"); verifyV16F01;` ejecuta 48 regresiones nuevas

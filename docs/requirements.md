@@ -1,5 +1,22 @@
 # Requisitos
 
+## v0.17 Concept-to-Seed
+
+- REQ-V17-INPUT: concepto/definición progresivos, roles y unidades nativos,
+  decisiones identificadas, sin promoción RULE ni midpoint.
+- REQ-V17-BUILD: corners4/FRONT simétrico o independiente, líneas UCA/LCA,
+  offsets upright, referencias de contacto y transformaciones rígidas nativas.
+- REQ-V17-STAGES: readiness/nominal/sampled independientes; BUMP explícito.
+- REQ-V17-CONSISTENCY: MATCH/MISMATCH/UNKNOWN/NOT_APPLICABLE, frames/dimensiones/
+  wheel datum, tolerancia numérica documentada y boxes/FIXED nominales nativos.
+- REQ-V17-PROJECT: escenarios deterministas, adopción y origin binding, revisiones
+  selectivas, histórico inmutable, MAT revalidado sin solves.
+- REQ-V17-SEED: uso directo por síntesis histórica, steering opcional explícito,
+  sin actuación/targets/prestaciones ficticias.
+- REQ-V17-QA:1564 históricos, oracles/adversariales nuevos,17 ejemplos,
+  Analyzer/DAG/perfiles/costes; resultados reales en informe.
+[Contrato](concept-to-seed.md) · [Evidencia](v0.17-validation.md).
+
 ## v0.16 Vehicle Concept & Engineering Project Workflow
 
 - REQ-V16-CONCEPT: concepto parcial, masas sin doble cómputo, estados/unidades/

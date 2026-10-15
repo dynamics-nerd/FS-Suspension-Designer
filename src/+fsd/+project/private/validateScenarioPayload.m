@@ -1,6 +1,19 @@
 function assessment = validateScenarioPayload(p,payload)
 %VALIDATESCENARIOPAYLOAD Native algebraic evidence validators, never forward solves.
 engine=p.scenario.definition.engine; assessment=[];
+if ismember(engine,["PARAMETRIC_SEED","PARAMETRIC_BUMP"])
+    projectRequire(isstruct(payload) && isscalar(payload) && ...
+        isequal(sort(string(fieldnames(payload))),sort(["seed";"bumpCheck"])), 'Invalid construction payload.');
+    expected=fsd.construction.buildParametricSeed(p.seedDefinition,p.seedReferences);
+    projectRequire(isequaln(payload.seed,expected),'Construction does not match original inputs.');
+    if engine=="PARAMETRIC_BUMP" && expected.nominalStatus=="VALID"
+        fsd.project.validateParametricSeedBump(payload.bumpCheck,expected);
+        projectRequire(isequaln(payload.bumpCheck.plan,p.plan),'Seed BUMP numerical plan differs.');
+    else
+        projectRequire(isempty(payload.bumpCheck),'Unrequested or impossible physical evidence.');
+    end
+    return;
+end
 if endsWith(engine,'SYNTHESIS')
     switch engine
         case "CORNER_SYNTHESIS", fsd.synthesis.validateSynthesisResult(payload);

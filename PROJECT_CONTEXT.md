@@ -2,15 +2,23 @@
 
 ## Milestone actual
 
-v0.15 Actuation Geometry & Motion Ratio Synthesis, rama feature/v0.15-actuation-synthesis,
-base v0.14.0. Suspensión fija de una esquina, PUSHROD/PULLROD, anclajes/eje
-autorizados, BUMP/actuación nativos, MR/travel/angle/mecánica tangente, un
-assessment/controlador y evidencia MAT. Física/signs/SI históricos intactos.
-Contrato docs/actuation-geometry-synthesis.md; validación docs/v0.15-validation.md.
-No commit/merge/tag/release/main/v0.16, estructura ni colisiones CAD.
+v0.17 Concept-to-Seed & Parametric Suspension Geometry, rama existente
+feature/v0.17-concept-to-seed, base local v0.16.0/main 746bdde.
+Concepto -> decisiones -> geometrías nativas -> BUMP explícito -> síntesis
+histórica -> proyecto/revisiones/MAT. Radio efectivo no inferido del descargado.
+Contrato docs/concept-to-seed.md; evidencia real en docs/v0.17-validation.md.
+No modificar main/commit/merge/tag/release/v0.18/App Designer ni física histórica.
 
 ## Propósito
 
+Diseño Formula Student trazable, sin presentar supuestos como mediciones.
+
 ## Alcance
 
+Familia rígida double wishbone, corner o FRONT simétrico/independiente.
+No certificación CAD, prestaciones, fabricación ni normativa.
+
 ## Contexto
+
+v0.16 cerrada con1564 tests/16 ejemplos/Analyzer0 de519 archivos. La revisión
+posterior identificó como primer bloqueo la ausencia de seeds paramétricas.

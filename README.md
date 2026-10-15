@@ -4,6 +4,34 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+**v0.17 — Concept-to-Seed & Parametric Suspension Geometry** construye corners
+FL/FR/RL/RR o un par FRONT explícitamente simétrico/independiente desde concepto
+y decisiones geométricas, sin matriz inicial de hardpoints absolutos. Radio
+efectivo, orientación, upright y pivotes se declaran; no se infieren desde masa
+o radio descargado. Readiness, validez nominal y BUMP muestreado son independientes.
+
+```matlab
+setupProject;
+r = runProjectTests;
+addpath("examples", "tests");
+example = conceptToSeedExample(false);
+report = verifyV17;
+```
+
+[Parámetros y APIs](docs/concept-to-seed.md) ·
+[Validación e inventario](docs/v0.17-validation.md).
+Suite global ejecutada monolíticamente: **1701/1701 PASS** (1564 históricos +137
+nuevos), Failed0/Incomplete0. El informe distingue los tests de la verificación
+de ejemplos, perfiles y costes.
+**17/17 ejemplos**, **Analyzer0/559 archivos MATLAB**, grafo de llamadas entre
+módulos acíclico y perfiles sin nuevos solves físicos ocultos. Las medianas de
+asociación/persistencia incluyen su validación; consultar sus costes en el informe.
+MATLAB R2025b y Optimization Toolbox donde lo exige la cinemática histórica.
+No App Designer, targets óptimos, nueva dinámica/neumáticos, CAD, rules ni Adams.
+**No usar para fabricar una suspensión real.** Sin commits/merge/tag/release/v0.18.
+
+## Historia v0.16
+
 **v0.16 — Vehicle Concept & Engineering Project Workflow** añade proyectos
 conceptuales incompletos, incertidumbres y procedencia explícitas, derivaciones
 v0.9, escenarios, readiness sin solves, ejecución delegada de análisis y de las
@@ -23,14 +51,14 @@ report = verifyV16;
 [Contrato y APIs](docs/vehicle-concept-project-workflow.md) ·
 [Informe de validación e inventario](docs/v0.16-validation.md).
 Baseline confirmada: 1391/1391 PASS; 15 ejemplos, Analyzer 0/465 y DAG acíclico.
-Suite global v0.16: **1516/1516 PASS** (1391 históricos+125 nuevos), Failed0,
+Suite global v0.16 tras V16-F-01: **1564/1564 PASS** (1516 previos+48 nuevos), Failed0,
 Incomplete0. Consultar el informe para ejemplos, perfiles y costes. READY significa inputs
 estructurales disponibles, no convergencia ni certificación. **No utilizar los
 resultados para fabricar una suspensión real**. Sin App Designer, nuevos modelos
 dinámicos/neumáticos/rules/Adams, optimizador global ni v0.17. Sin commits,
 merges, tags o releases en esta tarea. Las secciones siguientes son históricas;
 los verificadores con versión fija se ejecutan en su checkout correspondiente.
-Validación final: **16/16 ejemplos**, **Analyzer0/515**, **DAG15 acíclico**,
+Validación final tras V16-F-01: **16/16 ejemplos**, **Analyzer0/519**, **DAG15 acíclico**,
 readiness sin búsqueda/solves y validadores/MAT sin nuevos solves físicos.
 
 ## Historia v0.15

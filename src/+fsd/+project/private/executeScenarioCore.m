@@ -2,6 +2,14 @@ function [payload,assessment] = executeScenarioCore(p)
 %EXECUTESCENARIOCORE Only entry point permitted to call native forward/search APIs.
 engine=p.scenario.definition.engine; plan=p.plan; resources=p.resources;
 assessment=[];
+if ismember(engine,["PARAMETRIC_SEED","PARAMETRIC_BUMP"])
+    seed=fsd.construction.buildParametricSeed(p.seedDefinition,p.seedReferences);
+    payload=struct('seed',seed,'bumpCheck',[]);
+    if engine=="PARAMETRIC_BUMP" && seed.nominalStatus=="VALID"
+        payload.bumpCheck=fsd.project.checkParametricSeedBump(seed,p.plan);
+    end
+    return;
+end
 if endsWith(engine,'SYNTHESIS')
     switch engine
         case "CORNER_SYNTHESIS", payload=fsd.synthesis.runInverseSearch(p.space,p.options);

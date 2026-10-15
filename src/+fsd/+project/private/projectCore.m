@@ -18,6 +18,12 @@ ids=strings(numel(d.scenarios),1);
 for j=1:numel(d.scenarios), fsd.project.validateEngineeringScenario(d.scenarios{j}); ids(j)=d.scenarios{j}.definition.id; end
 projectRequire(numel(unique(ids))==numel(ids),'Duplicate scenario IDs.'); [~,order]=sort(ids); d.scenarios=d.scenarios(order);
 id=d.concept.definitionSI.id;
+if isfield(d.resources,'seedBindings')
+    for j=1:numel(d.resources.seedBindings)
+        b=d.resources.seedBindings{j};
+        projectRequire(b.projectId==id && b.projectRevision<=d.revision, 'Cross-project/future seed binding.');
+    end
+end
 resultIds=strings(numel(d.results),1);
 for j=1:numel(d.results)
     r=d.results{j}; fsd.project.validateEngineeringResult(r);
