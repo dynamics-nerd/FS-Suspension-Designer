@@ -1,5 +1,13 @@
 # Examples
 
+## v0.18 — flujo guiado
+
+`app = launchFSSuspensionDesigner;` desde la raíz. Project → Illustrative inputs
+carga únicamente el fixture nativo `parametricSeedInputs`; después se ejecutan
+explícitamente Build, BUMP y síntesis. El botón de targets ilustrativos ejecuta
+un NUEVO BUMP de referencia con confirmación; no usa resultados precalculados.
+[Pasos completos A/B/C](../docs/guided-design-interface.md).
+
 ## v0.17 — Concept to Seed
 
 `setupProject; addpath("examples"); out=conceptToSeedExample(false);`.

@@ -1,5 +1,20 @@
 # Requisitos
 
+## v0.18 Guided Design Interface
+
+- REQ-V18-APP: shell auténtico editable/guardable/ejecutable App Designer R2026b;
+  controles de workflow dinámicos separados del núcleo.
+- REQ-V18-FLOW: proyecto parcial -> datos explícitos ->28 decisiones -> DW/3D ->
+  BUMP explícito -> targets/variables -> síntesis nativa -> comparación -> MAT.
+- REQ-V18-TRUTH: unknown no es cero; RULE no es dato físico; no midpoint,
+  targets óptimos, física nueva ni resultados precalculados como ejecución.
+- REQ-V18-STATE: escenarios/ledger nativos, adopción explícita, revisión y STALE.
+- REQ-V18-ASYNC: procesos con snapshots/IDs/epochs, un escritor, cancelación real
+  y cierre seguro; sin paralelizar búsqueda histórica sin ganancia demostrada.
+- REQ-V18-QA: pruebas de inputs/workflow/worker/UI reales, equivalencia nativa,
+  regresión completa, ejemplos, Analyzer, integridad y revisión visual documentadas.
+[Alcance detallado](guided-design-interface.md) · [Ejecución](v0.18-validation.md).
+
 ## v0.17 Concept-to-Seed
 
 - REQ-V17-INPUT: concepto/definición progresivos, roles y unidades nativos,

@@ -1,5 +1,16 @@
 # Arquitectura
 
+## Extensión v0.18
+
+Shell App Designer R2026b de texto generado por el editor -> vista dinámica
+`app/+fsdui/View` -> Controller (sesión, snapshots, IDs/epochs, ownership) ->
+adaptador value-only perform -> APIs públicas project/construction/analysis/
+synthesis/geometry. Ningún módulo físico depende de app. Worker de procesos
+opcional para tareas completas; búsqueda histórica secuencial e intacta.
+Sólo un escritor MAT; publicación temporal condicionada a operación vigente.
+Esquemas físicos y envelope nativo sin cambios; whitelist de software amplía0.18.
+[Contrato y límites UI](guided-design-interface.md).
+
 ## Extensión v0.17
 
 `construction` usa model/geometry, assessment nominal analysis y adapters puros

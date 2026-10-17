@@ -1,4 +1,9 @@
-# Application UI
+# Application UI — v0.18 Guided Design
 
-Reserved for the future MATLAB App Designer interface. UI callbacks may collect input, present validation messages and call the `fsd` core; they must not contain engineering calculations.
+Launch from the repository: `app = launchFSSuspensionDesigner;`.
+Edit with `appdesigner('app/FSSuspensionDesigner.m')` in MATLAB R2026b.
+Keep the App Designer-generated XML companion. The native shell mounts dynamic
+controls in `+fsdui/View.m`; `Controller.m` owns session and worker operations.
+Callbacks collect presentation input and delegate engineering to public `fsd`
+APIs. See [the complete guide](../docs/guided-design-interface.md).
 

@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# Native App Designer R2026b compares generated code including Windows line endings.
+app/FSSuspensionDesigner.m text eol=crlf

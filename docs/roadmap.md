@@ -1,5 +1,15 @@
 # Roadmap
 
+## v0.18 — Guided Suspension Design Interface
+
+Base correctiva v0.17.1. Primer flujo guiado con proyecto/concepto parcial,
+decisiones explícitas, construcción DW,3D,BUMP,targets manuales,síntesis corner/
+FRONT,comparación/adopción y MAT. Shell App Designer R2026b; core inalterado.
+Aceptación: recorridos incompletos y completos reales, equivalencia con APIs,
+resultados/epochs/STALE, ownership worker/cancelación, regresión y visual reales.
+[Guía](guided-design-interface.md) · [Validación real](v0.18-validation.md).
+No iniciar v0.19 ni publicar esta rama sin auditoría independiente.
+
 ## v0.17 — Concept-to-Seed & Parametric Suspension Geometry
 
 Concepto parcial -> decisiones -> geometría nativa -> BUMP explícito -> síntesis

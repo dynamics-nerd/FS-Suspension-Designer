@@ -1,5 +1,17 @@
 # Modelo de datos
 
+## Sesión UI v0.18
+
+No nuevo formato físico ni persistencia paralela. El Controller handle vive sólo
+en memoria; contiene EngineeringProject nativo, epoch, operationId, Future y
+ownership del pool. Los requests/responses entre procesos son structs/celdas
+de valores y no contienen handles gráficos. Las tablas son borradores de
+presentación; Apply usa las fábricas originales. MAT conserva envelope0.16 y
+ledger original; fsdVersion0.18 se admite como consumidor compatible junto a0.16/0.17.
+Las decisiones construidas mantienen schema0.17. Cambios invalidan respuestas
+por epoch y resultados dependientes mediante resultCompatibility nativo.
+[Datos UI y persistencia](guided-design-interface.md).
+
 ## Contratos v0.17
 
 ParametricSeedDefinition/Result0.17.0 son structs con decisiones DesignParameter

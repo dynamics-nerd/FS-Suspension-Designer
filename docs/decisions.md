@@ -1,5 +1,29 @@
 # Registro de decisiones
 
+## UI v0.18
+
+- UI-010 (V18-F-01): conservar históricos en Analysis, marcar compatibilidad
+  canónica junto a curvas y poses, y separar convergencia original de vigencia.
+  Las revisiones identifican ejecuciones, no sustituyen resultCompatibility.
+- UI-011 (V18-F-02): Extra JSON sólo admite ruleReference/derivationReference;
+  columnas explícitas autoritativas. Rechazo previo de claves/tipos no admitidos
+  con fila/ID/clave; sin mutaciones parciales ni cambios de semántica física.
+- UI-001: base correctiva v0.17.1, no reescritura del tag anterior ni historia.
+- UI-002: formato oficial R2026b `.m`+`.xml`, generado/normalizado por App Designer;
+  shell visual editable con startup mínimo, layout de workflow dinámico en View.
+- UI-003: core y controlador de búsqueda auditados intactos. UI sin ecuaciones.
+- UI-004: SI visible inicialmente; no selector de unidades ambiguo ni defaults físicos.
+- UI-005: PCT para parfeval de operaciones completas, no parfor del optimizador;
+  pruebas previas N1/4/16 no demostraron aceleración numérica.
+- UI-006: snapshots, operationId, epoch, una operación/escritor y cancelación real.
+- UI-007: guardado temporal nativo y adopción explícita; sin autosave ni formato nuevo.
+- UI-008: el proyecto declara software0.18; whitelist de EngineeringResult aditiva,
+  sin modificar schemas físicos/envelope ni referencias históricas de ejecución.
+- UI-009: tema claro local explícito para evitar texto oscuro sobre controles
+  heredados del tema oscuro de MATLAB; no cambiar preferencias del usuario.
+- OPEN DECISION: dimensiones reales, fuentes, regiones/bounds, dominios y targets
+  de rendimiento siguen requiriendo al ingeniero. Fixtures no son recomendaciones.
+
 ## Construcción v0.17
 
 - CTS-001: constructor determinista y familia pequeña, no otra física/search.

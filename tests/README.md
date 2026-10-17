@@ -1,5 +1,18 @@
 # Testing strategy
 
+## v0.18 Guided UI
+
+`setupProject; r=runProjectTests;` conserva todos los nombres históricos.
+Tests nuevos: TestGuidedDesignInputs (parser sin ejecución, unknown/rangos,
+28 decisiones/corners y procedencia), TestGuidedDesignWorkflow (caso nativo7/7,
+BUMP/gaps,configuración,MAT,adopción/STALE,compatibilidad de versión),
+TestGuidedDesignAsync (procesos,snapshots,epochs,cancelación,ownership,errores,
+MAT temporal y búsqueda completa) y TestGuidedDesignUI (`matlab.uitest`, app
+auténtica,gestos,controles y gráficos reales). No ejecutar la suite en paralelo:
+las pruebas gráficas/históricas comparten recursos y evidencias. Usar copia de
+validación aislada para proteger MAT/PNG históricos. Resultados y límites en
+[v0.18-validation](../docs/v0.18-validation.md); un test escrito no implica PASS.
+
 ## v0.17 Parametric Seed
 
 `setupProject; r=runProjectTests; addpath("tests"); report=verifyV17;`.

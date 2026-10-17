@@ -4,6 +4,35 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+**v0.18.0 implementada localmente — pendiente de auditoría independiente**, sobre la
+publicación correctiva estable **v0.17.1** (código auditado `f14ed1e`). MATLAB
+R2026b / Windows 11. App Designer nativo de texto `.m` + `.xml`, con controlador
+y vista separados del núcleo. Desde esta carpeta:
+
+```matlab
+app = launchFSSuspensionDesigner;
+% Editar el shell auténtico:
+appdesigner(fullfile(pwd,'app','FSSuspensionDesigner.m'));
+```
+
+Project → Vehicle → 28 decisiones → geometría/3D → BUMP → targets HARD/SOFT →
+síntesis de esquina/FRONT → comparación → MAT. Iniciar un worker de procesos
+desde Project mantiene las operaciones largas fuera del hilo gráfico; la búsqueda
+nativa sigue secuencial. Sin PCT, seleccionar explícitamente el modo síncrono.
+No se infieren inputs ni targets óptimos. Aplicar borradores antes de guardar.
+
+[Guía de uso](docs/guided-design-interface.md) ·
+[Validación v0.18 y límites](docs/v0.18-validation.md).
+Validación R2026b: los1701 tests históricos no fallaron en la ejecución completa;
+los40 nuevos pasan tras las correcciones de UI, en una ejecución separada.
+No se presenta como1741/1741 PASS monolítico. También17 ejemplos, siete benchmarks,
+Analyzer0/580 y dependencias sin ciclos. Véanse incidencias y tiempos en el informe.
+El shell es editable en Design View; el layout dinámico se edita en `View.m`.
+Sin commits, merges, tags ni releases. Las secciones siguientes son históricas.
+**No utilizar esta aplicación para fabricar una suspensión real.**
+
+## Historia v0.17
+
 **v0.17 — Concept-to-Seed & Parametric Suspension Geometry** construye corners
 FL/FR/RL/RR o un par FRONT explícitamente simétrico/independiente desde concepto
 y decisiones geométricas, sin matriz inicial de hardpoints absolutos. Radio
