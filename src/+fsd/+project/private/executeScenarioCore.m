@@ -2,6 +2,9 @@ function [payload,assessment] = executeScenarioCore(p)
 %EXECUTESCENARIOCORE Only entry point permitted to call native forward/search APIs.
 engine=p.scenario.definition.engine; plan=p.plan; resources=p.resources;
 assessment=[];
+if engine=="PACKAGING"
+    payload=fsd.packaging.evaluate(p.packagingDefinition,p.packagingGeometry,p.plan,p.packagingSource); return;
+end
 if ismember(engine,["PARAMETRIC_SEED","PARAMETRIC_BUMP"])
     seed=fsd.construction.buildParametricSeed(p.seedDefinition,p.seedReferences);
     payload=struct('seed',seed,'bumpCheck',[]);

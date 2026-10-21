@@ -85,7 +85,17 @@ classdef TestGuidedDesignWorkflow < matlab.unittest.TestCase
             c.run('SAVE',struct('file',file,'overwrite',false),false);
             loaded=fsd.project.loadEngineeringProject(file);
             t.verifyEqual(loaded,t.SearchProject); stored=load(file);
-            t.verifyEqual(string(fieldnames(stored)),"envelope");
+            % Nonempty histories use the bounded native0.19 envelope. Check
+            % its complete inventory, not the legacy single-variable layout;
+            % the exact logical-project assertion above remains mandatory.
+            count=numel(t.SearchProject.definition.results);
+            names=compose("FSD_RESULT_%06d",(1:count)');
+            t.verifyEqual(sort(string(fieldnames(stored))),sort(["envelope";names]));
+            t.verifyEqual(stored.envelope.kind,'FsdEngineeringProjectStorage');
+            t.verifyEqual(stored.envelope.schemaVersion,'0.19.0');
+            t.verifyEqual(stored.envelope.encoding,'FSD_VALUE_GRAPH_V1');
+            t.verifyEqual(string(stored.envelope.resultNames(:)),names);
+            t.verifyEqual(stored.envelope.resultShape,[count 1]);
             t.verifyFalse(c.Dirty); t.verifyFalse(c.Busy);
         end
         function saveRefusesImplicitOverwrite(t)
@@ -117,9 +127,11 @@ classdef TestGuidedDesignWorkflow < matlab.unittest.TestCase
             t.verifyEqual(s.camber_rad,independent.camber_rad,'AbsTol',1e-12);
         end
         function v018ResultsAndHistoricalSoftwareRemainValid(t)
-            t.verifyEqual(t.SearchResult.fsdVersion,"0.18.0");
+            t.verifyEqual(t.SearchResult.fsdVersion,"0.19.0");
             t.verifyTrue(fsd.project.validateEngineeringResult(t.SearchResult));
             old=t.SearchResult; old.fsdVersion="0.17.0";
+            t.verifyTrue(fsd.project.validateEngineeringResult(old));
+            old.fsdVersion="0.18.0";
             t.verifyTrue(fsd.project.validateEngineeringResult(old));
         end
         function readinessDoesNotAppendEvidence(t)

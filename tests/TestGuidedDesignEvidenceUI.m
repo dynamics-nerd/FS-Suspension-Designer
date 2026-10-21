@@ -15,7 +15,7 @@ classdef TestGuidedDesignEvidenceUI < matlab.uitest.TestCase
             t.addTeardown(@()path(old)); addpath(fullfile(root,'src'),fullfile(root,'app'),fullfile(root,'examples'));
             folder=t.applyFixture(matlab.unittest.fixtures.TemporaryFolderFixture); t.Folder=folder.Folder;
             t.BaseFile=string(fullfile(t.Folder,'base.mat')); t.SearchFile=string(fullfile(t.Folder,'search.mat'));
-            c=fsdui.Controller(); t.addTeardown(@()c.close()); c.run('DEMO',struct(),false);
+            c=fsdui.Controller(); cleanup=onCleanup(@()c.close()); c.run('DEMO',struct(),false);
             c.run('BUILD',struct('scope',"FRONT",'resultId',c.nextResultId()),false);
             % Deliberately sorts AFTER generated UI_RESULT IDs: lexical ID is not execution order.
             c.run('BUMP',struct('scope',"FL",'plan',struct('travel_m',[-.01;0;.01]),'resultId',"Z_BASE_BUMP"),false);
@@ -36,6 +36,18 @@ classdef TestGuidedDesignEvidenceUI < matlab.uitest.TestCase
         end
     end
     methods (Test)
+        function closedViewReleasesOwnedDataAndCallbacks(t)
+            c=t.View.Controller; original=c.Project;
+            sample=t.View.UI.Sample;
+            t.View.shutdown();
+            t.verifyEmpty(sample.UserData,'A retained hidden figure must not retain its old raw BUMP record.');
+            t.verifyEmpty(t.View.Controller);
+            t.verifyEmpty(fieldnames(t.View.UI)); t.verifyEmpty(t.View.Figure);
+            t.verifyEmpty(fieldnames(t.View.Packaging.UI));
+            t.verifyEmpty(t.View.Packaging.Axes);
+            t.verifyEqual(c.Project,original,'Release view ownership, never mutate external snapshots.');
+            t.View.shutdown(); % Idempotent cleanup of a retained closed View.
+        end
         function geometryEditHistoricalAndReanalysis(t,ChangedGroup)
             c=t.View.Controller; original=c.Project.definition.results;
             info=t.View.UI.StateEvidence.UserData;

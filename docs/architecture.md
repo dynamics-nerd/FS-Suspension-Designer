@@ -1,5 +1,53 @@
 # Arquitectura
 
+## Extensión v0.19 — Packaging
+
+`fsd.packaging` consume modelos y estados nativos inmutables; no ejecuta
+solvers ni búsquedas. Primitivas explícitas -> resolución de bindings ->
+distancias exactas admitidas -> cobertura/diagnóstico -> resultado almacenado.
+`fsd.project` incorpora el recurso opcional packaging y el motor PACKAGING
+mediante preparación/compatibilidad/MAT canónicos. Cambiar sólo sus recursos
+no altera las dependencias de BUMP. La vista `app/+fsdui/PackagingView` edita
+borradores y muestra evidencia; las operaciones completas usan el worker ya
+existente, sin paralelizar física histórica. No dependencia inversa desde los
+solvers, reglas o síntesis. [Contrato](packaging-physical-feasibility.md).
+Las fuentes usan PackagingSourceReference: proyección explícita sin escenarios
+ni recursos Packaging, con igualdad exigida de preparación nativa. Evita copiar
+recursivamente todo el proyecto padre; el EngineeringResult original se conserva
+intacto en el ledger. resultCompatibility es la única clasificación canónica,
+también para esas referencias verificadas, sin fingir una nueva ejecución.
+
+La frontera de transporte/persistencia usa un grafo de valores reversible con
+diccionario de texto e interning local de subárboles exactamente iguales, sin
+tocar datos numéricos. El MAT de Packaging guarda configuración y registros
+en variables separadas del mismo archivo para acotar la serialización. No cambia
+el proyecto lógico ni las revisiones; se conservan lector y escritor clásicos.
+El Controller amplía sólo el transporte: ENCODING (conversión cooperativa)
+-> EXECUTING (ProcessPool, ingeniería/archivos) -> DECODING (conversión cooperativa).
+Los mismos IDs/epochs, guard de reentrada, cancelación y escritor único abarcan
+las tres fases. La conversión cede callbacks cada256 visitas/nodos, con guard
+de reentrada activo y cancelación comprobada; no inicia backgroundPool. Este
+quantum es de planificación, no una tolerancia ni límite de capacidad. Ningún
+solver se mueve a threads ni se altera el controlador histórico de síntesis.
+
+Corrección F-02: el dueño conserva el historial completo. El request transfiere
+sólo los registros requeridos como padres; SAVE/VALIDATE/COMPATIBILITY conservan
+el input completo y devuelven sólo el valor, mientras LOAD/NEW/DEMO reemplazan.
+La fusión canónica valida ambas entradas una vez, conserva sus registros exactos,
+comprueba asociación/IDs y reconstruye configuración sin volver a validar el
+ledger que acaba de validar. El epoch se comprueba también después de fusionar.
+La clasificación singular y masiva comparten compatibilityCore. Las garantías
+de datos simples son composicionales sobre campos cerrados; no se eliminan
+validadores de entradas externas. Sólo recursos/conceptos y replay nativo de
+síntesis se memoizan localmente por contenido completo, nunca snapshots enteros
+ni flags por revisión. No caché global ni cambio de física.
+`[result,project]=runEngineeringScenario(...)` permite ejecutar y añadir en una
+misma operación: entrada e input ledger completos validados, resultado nuevo
+validado, unión exacta de esos valores inmutables con IDs únicos y orden canónico.
+El output único previo y `attachEngineeringResult` independiente siguen vigentes;
+no se introduce un flag para omitir validadores. La UI usa esta composición en
+BUMP, SYNTHESIS y PACKAGING, no cambia solvers ni el controlador de búsqueda.
+
 ## Extensión v0.18
 
 Shell App Designer R2026b de texto generado por el editor -> vista dinámica

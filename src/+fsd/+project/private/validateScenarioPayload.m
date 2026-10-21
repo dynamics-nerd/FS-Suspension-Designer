@@ -1,6 +1,13 @@
-function assessment = validateScenarioPayload(p,payload)
+function assessment = validateScenarioPayload(p,payload,context)
 %VALIDATESCENARIOPAYLOAD Native algebraic evidence validators, never forward solves.
 engine=p.scenario.definition.engine; assessment=[];
+if nargin<3, context=validationContext(); end
+if engine=="PACKAGING"
+    fsd.packaging.validateResult(payload);
+    projectRequire(isequaln(payload.definition,p.packagingDefinition) && isequaln(payload.geometry,p.packagingGeometry) && ...
+        isequaln(payload.plan,p.plan) && isequaln(payload.source,p.packagingSource),'Packaging inputs/source differ from original execution.');
+    return;
+end
 if ismember(engine,["PARAMETRIC_SEED","PARAMETRIC_BUMP"])
     projectRequire(isstruct(payload) && isscalar(payload) && ...
         isequal(sort(string(fieldnames(payload))),sort(["seed";"bumpCheck"])), 'Invalid construction payload.');
@@ -15,12 +22,7 @@ if ismember(engine,["PARAMETRIC_SEED","PARAMETRIC_BUMP"])
     return;
 end
 if endsWith(engine,'SYNTHESIS')
-    switch engine
-        case "CORNER_SYNTHESIS", fsd.synthesis.validateSynthesisResult(payload);
-        case "AXLE_SYNTHESIS", fsd.synthesis.validateAxleSynthesisResult(payload);
-        case "STEERING_SYNTHESIS", fsd.synthesis.validateSteeringSynthesisResult(payload);
-        case "ACTUATION_SYNTHESIS", fsd.synthesis.validateActuationSynthesisResult(payload);
-    end
+    context.nativeSynthesis(payload,engine);
     projectRequire(isequaln(payload.problem,p.space) && isequaln(payload.search.options,p.options),'Native synthesis problem/options differ.');
     if isfinite(payload.selectedIndex), assessment=payload.search.records{payload.selectedIndex}.assessment; end
     return;

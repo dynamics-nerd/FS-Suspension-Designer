@@ -1,6 +1,10 @@
-function prepared = prepareScenarioCore(project,scenario)
+function prepared = prepareScenarioCore(project,scenario,validation)
 %PREPARESCENARIOCORE Dependency selection and native structural adapters only.
+if nargin<3, validation=validationContext(); end
 d=scenario.definition; engine=d.engine; scope=d.scope; registry=project.definition.resources;
+if engine=="PACKAGING"
+    prepared=preparePackagingScenario(project,scenario,validation); return;
+end
 if ismember(engine,["PARAMETRIC_SEED","PARAMETRIC_BUMP"])
     prepared=prepareSeedScenario(project,scenario); return;
 end

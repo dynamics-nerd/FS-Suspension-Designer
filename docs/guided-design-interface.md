@@ -1,8 +1,101 @@
 # v0.18 — Guided Suspension Design Interface
 
+## v0.19 Packaging extension
+
+The native R2026b app gains an eighth Packaging page. The App Designer shell is
+retained; dynamic layout is editable in `app/+fsdui/PackagingView.m`. This page
+does not create physical dimensions from the concept or kinematic hardpoints.
+
+1. Load/build an existing geometry. Choose the corner on Packaging.
+2. Add volumes, pairs and point regions; every dimension, source, fidelity,
+   revision, transform and margin must be explicit. Tables scroll horizontally.
+   Choose Volumes/Pairs/Regions from the editor selector. Lengths are metres,
+   rotation entries are the nine columns of a proper R. Circular dimension1 is
+   radius, or explicitly prefix `D:` to enter a diameter; stored output is radius.
+   SEGMENT uses two canonical point IDs and only a radius, with identity T.
+   Imported frames are preserved for existing IDs. New/renamed IDs in a definition
+   containing incompatible frames require explicit core-API declarations: an ID
+   edit never silently reinterprets their coordinates in the selected corner frame.
+3. Apply definitions. Invalid drafts are not partially committed. Alternatively,
+   explicitly confirm Illustrative solids to load the labelled software fixture;
+   its numbers are not recommended vehicle dimensions.
+4. Run nominal. For sampled motion, run BUMP on Analysis first, then select its
+   stored parent on Packaging and Check stored BUMP. This action never solves BUMP.
+5. Select an actual pair check to highlight both declared components and show
+   its sample. Separated witnesses are shown only when provided by the kernel.
+   Sample dropdown changes the stored pose, not the model. Filters select issues
+   or clear checks; the worst observed pair margin is initially selected. Point
+   region violations are listed separately with their sample indices. Scroll the
+   page vertically on small displays; the 3D viewport keeps a useful fixed height.
+6. Change a solid or margin and Apply: historical packaging remains visible as
+   STALE while unchanged BUMP is reusable. Rerun explicitly for new evidence.
+7. Select compatible corner/axle synthesis evidence and an actual candidate index;
+   Compare seed + index consumes their stored BUMP sources. History/compare shows
+   original score alongside packaging, never a new combined objective or ranking.
+   Choose Pair checks/Point regions/History from the evidence selector.
+8. Save/reopen through Project's trusted native MAT workflow. Old projects have
+   no inferred packaging resources. Use the existing process worker for long
+   operations; navigation remains independent of the numerical worker snapshot.
+
+v0.19 transport has three observable stages: ENCODING and DECODING perform only
+lossless plain-data conversion cooperatively; EXECUTING runs engineering and
+file operations on the existing ProcessPool. No solver runs on a thread.
+Conversion dispatches navigation/edit/cancellation callbacks every256 visits or
+nodes, under the completion and single-writer guards. It does not start the
+global backgroundPool: a measured trivial background task added about1.1GiB to
+the owned runtime footprint before any engineering calculation. No shared pool
+or global computational-thread setting is modified. A process Future exists
+only in EXECUTING; the codec input is released on transition/finish. Read
+completed values through Controller.LastValue, not internal Future outputs.
+Idle shutdown breaks the Packaging callbacks back to the main View and releases
+closed-view project/result/control references. It is idempotent and leaves any
+external immutable snapshots unchanged; borrowed worker work is still protected
+by Controller.close. A closed View is not an active Controller session.
+
+F-02 uses FSD_VALUE_GRAPH_V1 for that lossless conversion. Unrelated ledger
+records are retained at the owner instead of sent/returned for every update.
+Returned deltas are validated and merged without discarding history; epochs
+are checked again after the merge. SAVE/VALIDATE/COMPATIBILITY return no project
+copy. The previous FSD_TEXT_V1 MAT development files remain readable.
+
+The cooperative scheduling quantum applies to graph conversion, not to every
+canonical validator or the owner's final history merge. Those synchronous
+sections, and actual rendering, can still delay callbacks. Navigation demonstrated
+in EXECUTING/DECODING is not a guarantee of continuous responsiveness throughout
+the entire operation. The correction record distinguishes measured wall time,
+worker-adapter time, pool startup and observed callback gaps; these are not
+interchangeable engineering-calculation times.
+
+Packaging and all nonempty histories use a versioned native storage envelope
+with one ledger variable per record and a reversible value graph. Old MAT files
+remain readable; empty non-Packaging projects retain the old writer. Newly
+written history files require v0.19. Use fsd.project.loadEngineeringProject
+rather than raw envelope.project access for these files. See data-model
+and the validation record for memory/performance evidence and remaining limits.
+
+F-01 selection is keyed by result/project/revision, pair ID and actual sample,
+not a row number. A filter explicitly reconciles both the native selection and
+the stored pose even when another click emits no event. If a selected check is
+hidden, the first visible check is explicitly chosen; an empty filter has no
+pair selection. A manual sample with no visible check clears the highlight.
+The status area identifies the selected result/pair/sample separately from the
+aggregate classification. Replacing a project/result clears an obsolete pose.
+
+Statuses are not certification: CLEAR_SAMPLED checks only declared simplified
+solids/pairs/regions and resolved requested samples. Missing dimensions/poses
+prevent CLEAR; failed source states are not reconstructed or interpolated.
+ROLL/RACK sweeps, actuation mobile solids, CAD, manufacturing approval and combined
+motion are outside this first integrated adapter. See the
+[complete packaging contract](packaging-physical-feasibility.md) and
+[actual validation evidence](v0.19-validation.md).
+
 ## Runtime and launch
 
 MATLAB R2026b / Windows 11. From the repository folder run:
+
+Use an ordinary MATLAB Desktop session for the interactive app. `-batch` is
+appropriate for automated tests, not a substitute for Desktop visual acceptance:
+the observed batch CEF helper deferred tab contents until real navigation.
 
 ```matlab
 app = launchFSSuspensionDesigner;
@@ -50,7 +143,10 @@ Core physical modules never import the app package. Only the software-version
 eligibility list in `validateEngineeringResult` expands to accept0.18; physical
 schemas, equations, solvers, tolerances and search controller are unchanged.
 Historical0.16/0.17 EngineeringResults remain accepted. Construction retains its
-0.17 schema and the project MAT envelope retains its0.16 schema.
+0.17 schema. The original0.18 UI wrote the0.16 MAT envelope; the0.19 audit
+correction now writes bounded0.19 storage for any project with results, even
+without Packaging. Legacy0.16/0.18 files remain readable. Empty non-Packaging
+projects retain the legacy writer; new history files require the0.19 loader.
 
 ## Inputs and units
 
@@ -198,6 +294,12 @@ Adams, deployment and v0.19 are outside this interface milestone. Existing such
 evidence in a native project is preserved, not deleted or relabeled as UI support.
 
 ## Asynchronous operation contract
+
+The v0.19 [RF-03 reception contract](v0.19-rf03-operation-contract.md) additionally
+binds canonical native content to the immutable owner operation, not only to
+response IDs/policy. Its matrix covers all19 actions, APPEND/REPLACE/UNCHANGED,
+reference sweep evidence and requested MAT content. Canonical receipt can still
+block UI callbacks; asynchrony is not a guarantee of continuous responsiveness.
 
 Parallel Computing Toolbox is used for coarse `parfeval` process tasks, not
 parallel candidate evaluation. An existing local process pool may be reused; only a

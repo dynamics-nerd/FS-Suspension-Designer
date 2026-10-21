@@ -15,7 +15,7 @@ classdef TestGuidedDesignUI < matlab.uitest.TestCase
     end
     methods (Test)
         function nativeClassAndNavigation(t)
-            t.verifyClass(t.App,'FSSuspensionDesigner'); t.verifyNumElements(t.View.Tabs.Children,7);
+            t.verifyClass(t.App,'FSSuspensionDesigner'); t.verifyNumElements(t.View.Tabs.Children,8);
             t.choose(t.View.UI.VehicleTab); t.verifyEqual(t.View.Tabs.SelectedTab,t.View.UI.VehicleTab);
             t.choose(t.View.UI.GeometryTab); t.verifyEqual(t.View.Tabs.SelectedTab,t.View.UI.GeometryTab);
         end
@@ -47,6 +47,41 @@ classdef TestGuidedDesignUI < matlab.uitest.TestCase
             c.run('READINESS',struct('scenarioId',"UI_BUILD_FRONT"),false);
             t.verifyError(@()c.run('READINESS',struct('scenarioId',"NO_SUCH_SCENARIO"),false),'fsd:project:MissingScenario');
             t.verifyTrue(contains(string(t.View.UI.Diagnostics.Value),'fsd:project:MissingScenario'));
+        end
+        function readonlyOperationsPreserveStoredPlotObjectsAndSample(t)
+            c=t.View.Controller; c.run('DEMO',struct(),false);
+            t.choose(t.View.UI.ProjectTab);
+            c.run('BUILD',struct('scope',"FRONT",'resultId',c.nextResultId()),false);
+            t.verifyEmpty(t.View.GeometryAxes.Children,'Do not allocate hidden geometry graphics.');
+            t.verifySize(t.View.UI.Hardpoints.Data,[20 4]);
+            original=c.Project;
+            t.choose(t.View.UI.GeometryTab); drawnow;
+            t.verifyGreaterThan(numel(t.View.GeometryAxes.Children),20);
+            t.verifyEqual(c.Project,original,'Navigation renders stored data only.');
+            t.choose(t.View.UI.AnalysisTab);
+            c.run('BUMP',struct('scope',"FL",'plan',struct('travel_m',[-.01;0;.01]), ...
+                'resultId',c.nextResultId()),false);
+            t.choose(t.View.UI.Sample,'2'); drawnow;
+            original=c.Project; curves=t.View.CurveAxes.Children;
+            state=t.View.UI.StateAxes.Children;
+            t.choose(t.View.UI.VehicleTab); t.choose(t.View.UI.AnalysisTab); drawnow;
+            t.verifyEqual(t.View.CurveAxes.Children,curves);
+            t.verifyEqual(t.View.UI.StateAxes.Children,state);
+            t.verifyEqual(string(t.View.UI.Sample.Value),"2");
+            for action=["VALIDATE","COMPATIBILITY"]
+                c.run(action,struct(),false); drawnow;
+                t.verifyEmpty(c.LastError); t.verifyEqual(c.Project,original);
+                t.verifyEqual(t.View.CurveAxes.Children,curves);
+                t.verifyEqual(t.View.UI.StateAxes.Children,state);
+                t.verifyEqual(string(t.View.UI.Sample.Value),"2");
+            end
+            folder=t.applyFixture(matlab.unittest.fixtures.TemporaryFolderFixture);
+            c.run('SAVE',struct('file',string(fullfile(folder.Folder,'unchanged.mat')), ...
+                'overwrite',false),false); drawnow;
+            t.verifyEmpty(c.LastError); t.verifyEqual(c.Project,original);
+            t.verifyEqual(t.View.CurveAxes.Children,curves);
+            t.verifyEqual(t.View.UI.StateAxes.Children,state);
+            t.verifyEqual(string(t.View.UI.Sample.Value),"2");
         end
         function resizeKeepsControlsAndNativeXml(t)
             fig=t.App.UIFigure; fig.Position(3:4)=[1100 760]; drawnow;

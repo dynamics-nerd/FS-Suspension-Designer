@@ -5,6 +5,9 @@ projectRequire(any(string({variables.name})=="envelope"), ...
     'No engineering project envelope; use historical APIs for old synthesis MATs.');
 stored=load(file,'envelope');
 e=stored.envelope; plainProjectData(e);
+if isstruct(e) && isscalar(e) && isfield(e,'kind') && isequal(e.kind,'FsdEngineeringProjectStorage')
+    project=loadPackagingProject(e,file,variables); return;
+end
 projectRequire(isstruct(e) && isscalar(e) && isequal(sort(string(fieldnames(e))), ...
     sort(["kind";"schemaVersion";"project"])) && e.kind=="FsdEngineeringProjectFile" && ...
     e.schemaVersion=="0.16.0",'Unsupported or invalid project MAT schema.');

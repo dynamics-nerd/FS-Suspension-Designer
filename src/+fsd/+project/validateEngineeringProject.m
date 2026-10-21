@@ -1,5 +1,4 @@
-function valid = validateEngineeringProject(project)
-%VALIDATEENGINEERINGPROJECT Structural integrity; missing inputs remain permissible.
-projectRequire(isequaln(project,projectCore(project.definition)),'Project identity or definition mismatch.');
-valid=true;
+function valid=validateEngineeringProject(project)
+%VALIDATEENGINEERINGPROJECT Full canonical input and historical ledger boundary.
+context=validationContext(); valid=context.project(project);
 end

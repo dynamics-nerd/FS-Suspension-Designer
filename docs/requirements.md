@@ -1,5 +1,22 @@
 # Requisitos
 
+## v0.19 Packaging & Physical Feasibility
+
+- REQ-V19-SOLIDS: esfera/cápsula/AABB/OBB explícitas, transformaciones propias,
+  unidades SI, material frente a espacio libre y procedencia sin dimensiones ocultas.
+- REQ-V19-DISTANCE: separación/testigos exactos para pares admitidos; broad-phase
+  no sustituye narrow-phase; no profundidad de penetración inventada.
+- REQ-V19-COVERAGE: nominal/BUMP almacenado, fallos y datos ausentes visibles;
+  ningún CLEAR ante cobertura requerida incompleta ni garantía entre muestras.
+- REQ-V19-PROJECT: recursos versionados, MAT retrocompatible, staleness selectivo,
+  comparaciones seed/candidato sin cambiar score, HARD, elegibilidad o controlador.
+- REQ-V19-UI: tablas editables, selección de pares/muestras, 3D, históricos/STALE,
+  persistencia nativa y operaciones largas por el worker de procesos existente.
+- REQ-V19-VALIDATION: oráculos analíticos, estados reales, regresión, ejemplos,
+  Analyzer/DAG, integridad y costes secuencial/paralelo documentados sin falsos PASS.
+
+[Contrato](packaging-physical-feasibility.md) y [ejecuciones](v0.19-validation.md).
+
 ## v0.18 Guided Design Interface
 
 - REQ-V18-APP: shell auténtico editable/guardable/ejecutable App Designer R2026b;

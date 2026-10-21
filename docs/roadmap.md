@@ -1,5 +1,15 @@
 # Roadmap
 
+## v0.19 — Packaging & Physical Feasibility
+
+Base publicada v0.18.0, rama feature/v0.19-packaging-feasibility. Volúmenes
+explícitos, distancias verificables, nominal/BUMP almacenado, regiones de puntos,
+exenciones locales, recurso/proyecto/MAT, comparación y página Packaging.
+Aceptación verificable: casos analíticos independientes, fallos/datos ausentes
+sin falso CLEAR, staleness selectivo, recorrido real UI/MAT, scores históricos
+inalterados, regresiones y límites documentados. [Contrato](packaging-physical-feasibility.md)
+· [estado real de validación](v0.19-validation.md). No publicación ni v0.20 autorizadas.
+
 ## v0.18 — Guided Suspension Design Interface
 
 Base correctiva v0.17.1. Primer flujo guiado con proyecto/concepto parcial,

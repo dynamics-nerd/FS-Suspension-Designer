@@ -1,5 +1,24 @@
 % FS Suspension Designer engineering core.
 %
+% v0.19 Packaging & Physical Feasibility
+%   fsd.packaging.createVolume          - Explicit SI solid/free-region declaration.
+%   fsd.packaging.createDefinition      - Required pairs, margins, local exemptions, regions.
+%   fsd.packaging.distance              - Exact supported finite-primitive separation.
+%   fsd.packaging.segmentDistance       - Closed-segment independent geometric kernel.
+%   fsd.packaging.resolveVolumes        - Native stored pose/endpoint bindings, no solves.
+%   fsd.packaging.evaluate              - Nominal or supplied BUMP sampled evidence.
+%   fsd.packaging.validateVolume        - Canonical volume reconstruction.
+%   fsd.packaging.validateDefinition    - Canonical declaration reconstruction.
+%   fsd.packaging.validateResult        - Algebraic evidence replay, no forward solve.
+%   fsd.packaging.plotResult            - Actual declared solids/stored sample/witnesses.
+%   fsd.project.createPackagingScenario - Native project scenario with explicit parent.
+%   fsd.project.createPackagingSource   - Verified bounded dependency projection, not execution.
+%   fsd.project.validatePackagingSource - Native source/context integrity without forward solves.
+%   fsd.project.resultCompatibilities   - Canonical classification of a validated ledger.
+%   fsd.project.mergeEngineeringProjectHistory - Validated immutable worker-delta union.
+%   fsd.project.encodeStorageGraph      - Lossless plain-value transport/storage DAG.
+%   fsd.project.decodeStorageGraph      - Checked backward-reference DAG reconstruction.
+%
 % v0.17 Concept-to-Seed & Parametric Suspension Geometry
 %   fsd.construction.seedParameterCatalog           - Required decisions, no physical defaults.
 %   fsd.construction.createSeedParameter            - Native units/roles for a catalogued decision.
@@ -35,7 +54,7 @@
 %   fsd.project.specificationSources                 - Authoritative native target/source catalogue.
 %   fsd.project.designReadiness                      - Actionable preparation without solves/searches.
 %   fsd.project.prepareEngineeringScenario           - Public native input adapters, no execution.
-%   fsd.project.runEngineeringScenario               - Explicit native analysis/synthesis delegation.
+%   fsd.project.runEngineeringScenario               - Native execution; optional validated append output.
 %   fsd.project.validateEngineeringResult            - Original snapshot and native payload reconstruction.
 %   fsd.project.resultCompatibility                  - Current/reusable/stale/incompatible dependencies.
 %   fsd.project.attachEngineeringResult              - Associate original evidence without revision change.
@@ -146,7 +165,7 @@
 %   fsd.vehicle      - Future whole-vehicle composition.
 %   fsd.tire         - Future replaceable tire-model contracts.
 %   fsd.dynamics     - Future vehicle-dynamics calculations.
-%   fsd.packaging    - Future clearance and envelope checks.
+%   fsd.packaging    - Explicit primitive clearance and sampled envelope checks.
 %   fsd.rules        - Future rules evaluation, independent of kinematics.
 %   fsd.optimization - Future optimization orchestration.
 %   fsd.export       - Future external-format adapters.

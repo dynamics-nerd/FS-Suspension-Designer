@@ -9,10 +9,15 @@ classdef View < handle
         CurveAxes
         ResultAxes
         ResultCurveAxes
+        Packaging
     end
     properties (Access=private)
         PollTimer
         DrawnProject = []
+        DrawnCompatibility = {}
+        GeometryPlotPending = true
+        AnalysisPlotPending = true
+        ResultPlotPending = true
         SeedRows
         Definition
         ActiveGroup = "Wheel / References"
@@ -26,17 +31,19 @@ classdef View < handle
         function obj=View(fig)
             obj.Figure=fig; obj.Controller=fsdui.Controller();
             screen=get(groot,'ScreenSize');
-            fig.Name='FS Suspension Designer | v0.18.0';
+            fig.Name='FS Suspension Designer | v0.19.0';
             fig.Position=[40 40 min(1280,screen(3)-80) min(820,screen(4)-100)];
             theme(fig,'light'); % Explicit local theme; never change the user's MATLAB preference.
             fig.Color=[.96 .97 .98]; fig.CloseRequestFcn=@(~,~)obj.close();
             fig.DeleteFcn=@(~,~)obj.figureDeleted();
-            obj.build(); obj.Controller.Changed=@()obj.refresh(); obj.refresh();
+            obj.build(); obj.Tabs.SelectionChangedFcn=@(~,~)obj.drawSelectedTab();
+            obj.Controller.Changed=@()obj.refresh(); obj.refresh();
             obj.PollTimer=timer('ExecutionMode','fixedSpacing','Period',.3, ...
                 'BusyMode','drop','TimerFcn',@(~,~)obj.Controller.poll());
             start(obj.PollTimer);
         end
         function invoke(obj,action,args)
+            if obj.Closing || isempty(obj.Controller), return; end
             try
                 if nargin<3, args=struct(); end
                 action=string(action); allowed=strings(0,1);
@@ -45,6 +52,7 @@ classdef View < handle
                     case "DECISIONS", allowed="Geometry";
                     case "SPECIFICATION", allowed=["Targets";"Synthesis";"Analysis"];
                     case "BUMP", allowed="Analysis";
+                    case {"PACKAGING_DEFINITION","PACKAGING_DEMO"}, allowed="Packaging";
                     case {"NEW","LOAD","DEMO"}, allowed=obj.DraftPages;
                 end
                 if ~isempty(setdiff(obj.DraftPages,allowed))
@@ -60,6 +68,7 @@ classdef View < handle
             end
         end
         function refresh(obj)
+            if isempty(obj.Controller), return; end
             if obj.Closing || ~isgraphics(obj.Figure)
                 if ~obj.Controller.Busy, obj.shutdown(); end
                 return;
@@ -73,6 +82,8 @@ classdef View < handle
                     case "DECISIONS", obj.DraftPages=setdiff(obj.DraftPages,"Geometry");
                     case "SPECIFICATION", obj.DraftPages=setdiff(obj.DraftPages,["Targets";"Synthesis";"Analysis"]);
                     case "BUMP", obj.DraftPages=setdiff(obj.DraftPages,"Analysis");
+                    case {"PACKAGING_DEFINITION","PACKAGING_DEMO"}
+                        obj.DraftPages=setdiff(obj.DraftPages,"Packaging"); obj.Packaging.committed();
                     case {"NEW","LOAD","DEMO"}, obj.DraftPages=strings(0,1);
                 end
                 obj.PendingCommit="";
@@ -83,7 +94,9 @@ classdef View < handle
                 'Readiness ≠ nominal validity ≠ sampled feasibility. No manufacturing certification.'; ...
                 'Edits are drafts until Apply. Blank numeric inputs mean unknown, not zero.'; ...
                 'Only open trusted MAT files. Save uses the native project envelope.'};
-            if ~isequaln(p,obj.DrawnProject)
+            projectChanged=~isequaln(p,obj.DrawnProject);
+            compatibilityChanged=~isequaln(c.Compatibility,obj.DrawnCompatibility);
+            if projectChanged
                 obj.fillVehicle(); obj.loadDecisions();
                 updatePlan=ismember(c.LastAction,["REFERENCE_TARGETS","SPECIFICATION","LOAD","DEMO","NEW"]);
                 obj.fillSearch(updatePlan); obj.fillResults();
@@ -105,9 +118,13 @@ classdef View < handle
                 for k=1:min(numel(c.LastValue),size(rows,1)), rows{k,5}=char(c.LastValue{k}.status); end
                 obj.UI.Ledger.Data=rows;
             end
-            obj.drawAnalysis();
+            if projectChanged || compatibilityChanged
+                obj.drawAnalysis(); obj.DrawnCompatibility=c.Compatibility;
+            end
+            obj.Packaging.refresh();
         end
         function close(obj)
+            if obj.Closing || isempty(obj.Controller), return; end
             if obj.Controller.Busy
                 uialert(obj.Figure,'An operation still owns its resources. Request cancellation and wait for completion before closing.', ...
                     'Operation active','Icon','warning'); return;
@@ -117,18 +134,30 @@ classdef View < handle
                     'Options',{'Keep open','Close without saving'},'DefaultOption',1,'CancelOption',1);
                 if string(answer)~="Close without saving", return; end
             end
-            obj.shutdown(); delete(obj.Figure);
+            figure=obj.Figure; obj.shutdown(); delete(figure);
         end
         function shutdown(obj)
             % Explicit idle-only shutdown also used by automated UI tests.
+            if isempty(obj.Controller), return; end
             assert(~obj.Controller.Busy,'fsd:ui:Busy','Wait for worker completion before shutdown.');
+            obj.Closing=true;
+            if isgraphics(obj.Figure), obj.Figure.Visible='off'; end
             if ~isempty(obj.PollTimer) && isvalid(obj.PollTimer), stop(obj.PollTimer); delete(obj.PollTimer); end
+            obj.PollTimer=[];
             obj.Controller.Changed=[]; obj.Controller.close();
+            if isfield(obj.UI,'Sample') && isgraphics(obj.UI.Sample), obj.UI.Sample.UserData=[]; end
+            if ~isempty(obj.Packaging) && isvalid(obj.Packaging), obj.Packaging.release(); end
+            obj.DrawnProject=[]; obj.DrawnCompatibility={}; obj.Definition=[]; obj.SeedRows=[];
+            obj.Controller=[]; obj.UI=struct(); obj.Tabs=[];
+            obj.GeometryAxes=[]; obj.CurveAxes=[]; obj.ResultAxes=[]; obj.ResultCurveAxes=[];
+            obj.Figure=[];
         end
     end
     methods (Access=private)
         function figureDeleted(obj)
             obj.Closing=true;
+            obj.Figure=[];
+            if isempty(obj.Controller), return; end
             if obj.Controller.Busy
                 obj.Controller.cancel(); % Timer retains ownership until completion.
             else
@@ -139,12 +168,12 @@ classdef View < handle
             root=uigridlayout(obj.Figure,[4 1]); root.RowHeight={64,34,'1x',60}; root.Padding=[16 12 16 12];
             header=uigridlayout(root,[1 2]); header.ColumnWidth={'1x',350};
             uilabel(header,'Text','FS  /  SUSPENSION DESIGNER','FontSize',23,'FontWeight','bold','FontColor',[.08 .17 .25]);
-            uilabel(header,'Text','v0.18  •  GUIDED ENGINEERING WORKSPACE','HorizontalAlignment','right','FontColor',[.22 .34 .42]);
+            uilabel(header,'Text','v0.19  •  PACKAGING & PHYSICAL FEASIBILITY','HorizontalAlignment','right','FontColor',[.22 .34 .42]);
             bar=uigridlayout(root,[1 2]); bar.ColumnWidth={'1x',170}; bar.Padding=0;
             obj.UI.Status=uilabel(bar,'Text','Ready','FontWeight','bold');
             obj.UI.Cancel=uibutton(bar,'Text','Request cancellation','ButtonPushedFcn',@(~,~)obj.Controller.cancel());
             obj.Tabs=uitabgroup(root);
-            names=["Project","Vehicle","Geometry","Analysis","Targets","Synthesis","Results"];
+            names=["Project","Vehicle","Geometry","Analysis","Targets","Synthesis","Results","Packaging"];
             for name=names, obj.UI.(name+"Tab")=uitab(obj.Tabs,'Title',name); end
             footer=uitextarea(root,'Editable','off','Value', ...
                 {'EXPERIMENTAL ENGINEERING SOFTWARE — not suitable for manufacturing a real suspension.'; ...
@@ -153,6 +182,7 @@ classdef View < handle
             footer.FontColor=[.18 .20 .22];
             obj.projectPage(); obj.vehiclePage(); obj.geometryPage(); obj.analysisPage();
             obj.targetsPage(); obj.synthesisPage(); obj.resultsPage();
+            obj.Packaging=fsdui.PackagingView(obj.UI.PackagingTab,obj.Controller,@(action,args)obj.invoke(action,args),@()obj.draft());
         end
         function projectPage(obj)
             g=uigridlayout(obj.UI.ProjectTab,[6 1]); g.RowHeight={38,38,38,130,'1x',40};
@@ -496,19 +526,22 @@ classdef View < handle
         function drawGeometry(obj)
             gs=obj.Controller.Project.definition.resources.geometries; ax=obj.GeometryAxes; cla(ax); hold(ax,'on');
             rows=cell(0,4); scope=string(obj.UI.Scope.Value);
+            visible=obj.Tabs.SelectedTab==obj.UI.GeometryTab;
             for j=1:numel(gs)
                 g=gs{j};
                 if scope=="FRONT" && ~ismember(g.cornerId,["FL","FR"]), continue; end
                 if scope~="FRONT" && g.cornerId~=scope, continue; end
-                fsdui.drawGeometry(g,ax);
+                if visible, fsdui.drawGeometry(g,ax); end
                 rows=[rows;[cellstr(g.hardpoints.ids),num2cell(g.hardpoints.xyz_m)]]; %#ok<AGROW>
             end
             hold(ax,'off'); obj.UI.Hardpoints.Data=rows; view(ax,3); title(ax,scope+" geometry [m] — data tips identify points");
+            obj.GeometryPlotPending=~visible;
         end
         function drawAnalysis(obj)
             rs=obj.Controller.Project.definition.results; rows=cell(0,8); samples="No samples";
             evidence={}; lastEvidence=[];
             ax=obj.CurveAxes; cla(ax); hold(ax,'on'); selected=string(obj.UI.AnalysisCorner.Value); last=[];
+            visible=obj.Tabs.SelectedTab==obj.UI.AnalysisTab;
             for j=1:numel(rs)
                 r=rs{j}; if r.engine~="BUMP", continue; end
                 corner=r.scenarioAtExecution.definition.scope.id;
@@ -516,7 +549,9 @@ classdef View < handle
                 if selected=="FRONT" && ~ismember(corner,["FL","FR"]), continue; end
                 display=fsdui.bumpDisplay(r); a=display.analysis;
                 info=obj.evidenceFor(r,j); evidence{end+1,1}=info; %#ok<AGROW> Stored display records only.
-                metric=string(obj.UI.Metric.Value); plot(ax,a.requestedWheelTravel_m,a.(metric),'o-','DisplayName',r.id+" "+corner+" ["+info.status+"] rev "+info.executedRevision);
+                if visible
+                    metric=string(obj.UI.Metric.Value); plot(ax,a.requestedWheelTravel_m,a.(metric),'o-','DisplayName',r.id+" "+corner+" ["+info.status+"] rev "+info.executedRevision);
+                end
                 rows=[rows;display.rows]; %#ok<AGROW> Presentation rows, no physical loop.
                 % Prefer applicable stored poses, then latest execution revision;
                 % revision orders evidence, but NEVER determines compatibility.
@@ -526,7 +561,7 @@ classdef View < handle
                 end
             end
             hold(ax,'off'); xlabel(ax,'Requested wheel travel [m]'); ylabel(ax,strrep(obj.UI.Metric.Value,'_',' ')); grid(ax,'on');
-            if ~isempty(rows), legend(ax,'Location','best','Interpreter','none'); end
+            if visible && ~isempty(rows), legend(ax,'Location','best','Interpreter','none'); end
             obj.UI.AnalysisTable.Data=rows;
             obj.UI.CurveEvidence.UserData=evidence;
             if isempty(evidence)
@@ -552,6 +587,7 @@ classdef View < handle
             end
             obj.UI.StateEvidence.UserData=lastEvidence;
             obj.UI.Sample.UserData=last; obj.UI.Sample.Items=samples; obj.UI.Sample.Value=samples(1); obj.drawState();
+            obj.AnalysisPlotPending=~visible;
         end
         function drawState(obj)
             ax=obj.UI.StateAxes; cla(ax); r=obj.UI.Sample.UserData;
@@ -559,6 +595,7 @@ classdef View < handle
                 obj.UI.StateEvidence.Value={'No stored BUMP pose for this scope.'}; title(ax,'No converged stored sample'); return;
             end
             info=obj.UI.StateEvidence.UserData; obj.UI.StateEvidence.Value=cellstr(info.detail);
+            if obj.Tabs.SelectedTab~=obj.UI.AnalysisTab, return; end
             if string(obj.UI.Sample.Value)=="No samples", title(ax,'No converged stored sample — '+info.status,'Interpreter','none'); return; end
             index=str2double(obj.UI.Sample.Value); g=r.prepared.resources.geometries{1};
             handles=fsd.kinematics.plotBumpResult(g,r.nativePayload.sweep.results(index),ax);
@@ -579,6 +616,7 @@ classdef View < handle
             for j=1:numel(rs), if rs{j}.id==id, r=rs{j}; break; end, end
             if isempty(r)
                 obj.UI.Candidates.Data=cell(0,6); cla(obj.ResultAxes); cla(obj.ResultCurveAxes);
+                obj.ResultPlotPending=false;
                 obj.UI.ResultDetails.Value={'No stored synthesis in the current project.'}; return;
             end
             p=r.nativePayload; rows=cell(numel(p.search.records),6);
@@ -588,7 +626,14 @@ classdef View < handle
             obj.UI.Candidates.Data=rows; index=obj.UI.Candidate.Value;
             if index>numel(p.search.records)
                 cla(obj.ResultAxes); cla(obj.ResultCurveAxes);
+                obj.ResultPlotPending=false;
                 obj.UI.ResultDetails.Value={'Candidate index is outside this stored history.'}; return;
+            end
+            obj.UI.ResultDetails.Value={char("Original revision "+r.projectRevision+" | selected index "+p.selectedIndex); ...
+                char("Stop reason: "+p.search.stopReason); char("Inspected index "+index+" | score "+p.search.records{index}.score+" | HARD "+p.search.records{index}.hardFeasibility); ...
+                'Geometries are overlaid from stored evidence. No new forward solves on redraw. Check compatibility before adoption.'};
+            if obj.Tabs.SelectedTab~=obj.UI.ResultsTab
+                cla(obj.ResultAxes); cla(obj.ResultCurveAxes); obj.ResultPlotPending=true; return;
             end
             ax=obj.ResultAxes; cla(ax); hold(ax,'on');
             e=p.search.records{index};
@@ -615,9 +660,16 @@ classdef View < handle
             hold(curves,'off'); grid(curves,'on'); xlabel(curves,'Wheel travel [m]'); ylabel(curves,strrep(obj.UI.ResultMetric.Value,'_',' '));
             title(curves,'Stored seed / candidate curves; NaN gaps retained');
             if ~isempty(curves.Children), legend(curves,'Interpreter','none','Location','best'); end
-            obj.UI.ResultDetails.Value={char("Original revision "+r.projectRevision+" | selected index "+p.selectedIndex); ...
-                char("Stop reason: "+p.search.stopReason); char("Inspected index "+index+" | score "+e.score+" | HARD "+e.hardFeasibility); ...
-                'Geometries are overlaid from stored evidence. No new forward solves on redraw. Check compatibility before adoption.'};
+            obj.ResultPlotPending=false;
+        end
+        function drawSelectedTab(obj)
+            if obj.Closing || isempty(obj.Controller), return; end
+            % Render stored data on demand; hidden pages must not allocate
+            % fresh graphics on every immutable project/history update.
+            if obj.Tabs.SelectedTab==obj.UI.GeometryTab && obj.GeometryPlotPending, obj.drawGeometry();
+            elseif obj.Tabs.SelectedTab==obj.UI.AnalysisTab && obj.AnalysisPlotPending, obj.drawAnalysis();
+            elseif obj.Tabs.SelectedTab==obj.UI.ResultsTab && obj.ResultPlotPending, obj.drawResults();
+            end
         end
         function adopt(obj)
             answer=uiconfirm(obj.Figure,'Explicitly replace registered geometry with this eligible candidate? Historical results remain unchanged.', ...

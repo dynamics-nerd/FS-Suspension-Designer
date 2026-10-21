@@ -2,6 +2,7 @@ function resources = resourceCore(input)
 %RESOURCECORE Optional native resources, canonical ordering and association checks.
 resources=struct('geometries',{{}},'steerings',{{}},'actuations',{{}},'mechanicals',{{}});
 if isfield(input,'seedBindings'), resources.seedBindings={}; end
+if isfield(input,'packaging'), resources.packaging={}; end
 projectRequire(isstruct(input) && isscalar(input) && all(ismember(string(fieldnames(input)), ...
     string(fieldnames(resources)))),'Invalid resource registry.');
 for name=string(fieldnames(input))', resources.(name)=input.(name); end
@@ -16,6 +17,7 @@ for name=string(fieldnames(resources))'
             case "actuations", fsd.model.validateActuationGeometry(r); ids(j)=r.cornerId;
             case "mechanicals", fsd.model.validateSpringDamperModel(r); ids(j)=r.cornerId;
             case "seedBindings", validateSeedBinding(r); ids(j)=r.scenarioId;
+            case "packaging", fsd.packaging.validateDefinition(r); ids(j)=r.definitionSI.id;
         end
     end
     projectRequire(numel(unique(ids))==numel(ids),'Duplicate resource IDs.');

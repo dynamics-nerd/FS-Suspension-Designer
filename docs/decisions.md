@@ -1,5 +1,107 @@
 # Registro de decisiones
 
+## Packaging v0.19
+
+- PKG-020 (V19-RF-03): la autoridad de recepción es la operación pendiente del
+  propietario. Tras validar canónicamente el payload, reconstruir el contrato
+  declarativo compartido con ejecución y vincular escenario, snapshot, motor,
+  IDs, revisión, recursos, padre, plan y opciones reales. No ejecutar de nuevo
+  un solver/búsqueda ni confiar en un fingerprint reenviado. Verificar también
+  configuración y resultados no físicos de todas las operaciones. La evidencia
+  transitoria referenceSweep permite verificar los targets ilustrativos sin
+  repetir BUMP; SAVE/LOAD verifican contenido MAT solicitado. Sin modificar el
+  formato persistido ni la física. Contrato, matriz y resultados en
+  [RF-03](v0.19-rf03-operation-contract.md); se conservan los límites de latencia.
+
+- PKG-010 (V19-F-01): selección estable por resultado/par/muestra y reconciliación
+  explícita de Selection al cambiar Data/filtro; gestos reales de regresión.
+- PKG-011 (V19-F-02): validación por componentes y límites de confianza sobre
+  valores inmutables. Fusión de dos ledgers ya validados, no omisión de su
+  validación externa. Clasificación masiva con el mismo core canónico. No caché
+  global ni memoización de snapshots/proyectos completos: el prototipo de caché
+  grande añadió coste y presión de memoria y fue retirado.
+- PKG-012 (V19-F-02): request reducido al padre requerido, retorno incremental y
+  recheck de epoch después de fusionar. No borrar registros ni reparentar resultados.
+- PKG-013 (V19-F-02): DAG local reversible FSD_VALUE_GRAPH_V1 para MAT/PCT.
+  Interning estructural por shape, campos ordenados y referencias exactas a hijos
+  ya codificados; primitivas densas pequeñas por clase/shape/flags/bits íntegros.
+  No hash aproximado ni caché de árboles originales. El umbral de128 elementos
+  limita sólo el tamaño de claves; arrays mayores y sparse se guardan intactos.
+  Leer también TEXT_V1 y MAT clásico0.16; no sidecars ni otra tecnología.
+- PKG-014 (V19-F-02): conversión cooperativa cancelable, no backgroundPool en
+  producción. La sonda de una suma trivial midió unos1.1GiB adicionales al
+  activar el runtime de threads. Se conserva un único worker de ingeniería;
+  no se cambia maxNumCompThreads, pools ajenos, física o datos. Busy/Completing
+  y comprobación posterior de epoch protegen los callbacks cedidos.
+- PKG-015 (V19-F-02): búfer local de32MiB para grafos MAT ya codificados durante
+  el preflight. Evita una segunda codificación cuando caben; si no, se conserva
+  la ruta por registro, sin recortar datos. Es presupuesto de trabajo I/O,
+  no hipótesis física ni límite funcional. Se libera al terminar cada guardado.
+- PKG-016 (V19-F-02): shutdown idempotente de View libera sus datos y callbacks
+  Packaging -> View; no invalida snapshots externos ni cancela trabajo de pools
+  prestados. Romper referencias de una vista cerrada no demuestra por sí solo
+  una fuga; la retención del runtime y la RAM se miden aparte.
+- PKG-017 (V19-F-02): guardado acotado0.19 también para historiales sin Packaging.
+  La traza gráfica alcanzó síntesis/validación y localizó otro pico en SAVE del
+  escritor antiguo. Se reutiliza la misma codificación reversible por registro;
+  no se cambia el modelo lógico ni se omite validación. Lectura de MAT0.18
+  conservada; ficheros nuevos con historial requieren el lector0.19. El escritor
+  clásico permanece para proyectos sin Packaging y sin resultados.
+- PKG-018 (V19-F-02): las vistas no se reconstruyen por VALIDATE/SAVE si proyecto
+  y compatibilidad no cambian. Pestañas ocultas difieren gráficos hasta su visita;
+  tablas e identidades se mantienen, y un cambio real invalida la presentación.
+  Navegar entre vistas ya vigentes conserva muestra/cámara; no es una caché de
+  ingeniería ni una autorización para reutilizar resultados físicos obsoletos.
+- PKG-019 (V19-F-02): el codec reutiliza descriptores exactos de nombres de campos
+  ordenados -> IDs de texto, sólo dentro de una codificación. La clave incluye
+  cantidad, longitudes y UTF-16 íntegro; se visitan todos los valores y se conserva
+  el orden original de registro de textos/nodos. No cachea subárboles originales.
+  Caso nativo202228597bytes:31.5014s ->26.5799s en procesos frescos -nojvm,
+  con grafo codificado exactamente igual (1622 nodos). Una pareja controlada,
+  no una garantía universal de velocidad. Se descarta el Map al retornar.
+
+- PKG-001: kernel analítico MATLAB; Navigation sólo contraste opcional. No nueva
+  dependencia obligatoria, CAD cóncavo, fuerzas de contacto ni solver físico.
+- PKG-002: modelos simplificados declarados por el ingeniero; radio efectivo no
+  proporciona ancho/offset/llanta/freno. Espacio libre de llanta no es material.
+- PKG-003: bindings nominales FIXED, pose UPRIGHT y cápsula SEGMENT con dos
+  IDs explícitos. No se infiere un volumen completo desde conectividad o hardpoints.
+- PKG-004: NOMINAL/BUMP almacenado en la primera cobertura integrada. Adaptadores
+  ROLL/RACK/actuación móvil quedan pendientes de verificación; no composición ficticia.
+- PKG-005: margen físico explícito, tolerancia numérica histórica separada;
+  contactos exentos sólo por par/componente y justificación persistida/visible.
+- PKG-006: compatibilidad canónica y recurso opcional; optimizador, scores,
+  elegibilidad y modelos físicos históricos sin cambios.
+- PKG-007: tras medir87,7s en una actualización, reemplazar la copia recursiva
+  del padre por PackagingSourceReference con snapshot de dependencias verificadas.
+  Sólo se omiten escenarios/recursos Packaging, que los motores nativos permitidos
+  no consumen; la fábrica exige igualdad exacta de toda la preparación original.
+  Se conserva el original completo en el ledger y su identity en la referencia.
+  resultCompatibility comparte su lógica para el nuevo tipo, sin otro sistema
+  de staleness, sin ejecución física y sin fingir CURRENT_EXECUTION.
+- PKG-008 (histórica; escritura ampliada por PKG-017): detener una prueba propia
+  que alcanzó24GB privados en un equipo de16GB
+  durante SAVE; no aceptar el recorrido como PASS. Representar strings de forma
+  reversible sin objetos string en la frontera MAT/PCT, preservando shape,
+  missing, Unicode, tipos y valores numéricos. Escapar nombres reservados.
+  Para Packaging, usar un único MAT con configuración y variables por resultado;
+  conservar lectura0.16 y la escritura clásica para proyectos sin Packaging.
+  No sustituir el historial completo por resúmenes ni eliminar sus evidencias.
+- PKG-009 (histórica, sustituida por PKG-014): conversión pura en backgroundPool
+  y cálculos/archivos únicamente en
+  ProcessPool. Extensión explícita del Controller UI, no del controlador físico.
+  Propagar cancelación y ownership durante ENCODING/EXECUTING/DECODING; no cerrar
+  pools de threads compartidos. Verificar invariantes con los tests previos y
+  nuevos, no asumir que un round-trip pequeño prueba un historial grande.
+- OPEN DECISION PKG-PHYSICAL: dimensiones, fidelidad, contactos locales permitidos,
+  márgenes de ingeniería y refinamiento adecuado deben fijarse para cada vehículo.
+  Ningún fixture ilustrativo es una recomendación universal de Formula Student.
+- OPEN DECISION PKG-CAPACITY: acordar tamaño de historial y límites de memoria/
+  latencia aceptables antes de ampliar uso. El flujo completo validado conserva
+  todos los registros, pero transporte/validación siguen siendo muy costosos.
+  No prometer que más RAM o un pool mayor resolverán el coste sin medirlo;
+  cualquier rediseño de identidades/historial requiere una tarea y auditoría propias.
+
 ## UI v0.18
 
 - UI-010 (V18-F-01): conservar históricos en Analysis, marcar compatibilidad

@@ -1,5 +1,27 @@
 # Testing strategy
 
+## v0.19 Packaging
+
+TestPackagingGeometry uses independent Euclidean cases and optional Navigation
+oracle; TestPackagingEvaluation consumes real native BUMP, including failed,
+intermediate/rebound and missed-between-samples cases. TestPackagingProject
+verifies canonical revisions, MAT and no implicit solves. TestPackagingPresentation
+checks table round trips/invalid input and stored-geometry rendering.
+TestPackagingUI exercises the native app workflow; a written test is not PASS.
+TestProjectStorageValue checks exact classes/shapes/missing/Unicode, reserved-name
+escaping, old/new MAT and tamper rejection. TestPackagingStorageAsync checks
+actual background conversion, process-stage cancellation with foreign work and
+staleness during decoding before MAT publication. Original TestGuidedDesignAsync
+tests are retained, not replaced. Full-history GUI acceptance is separate from
+small serializer probes; an earlier run was stopped for severe memory pressure.
+`verifyV19` reproduces all17 prior examples and seven score/counter benchmarks
+without relaxed expectations, adds packagingFeasibilityExample, Analyzer and DAG.
+`benchmarkPackaging` explicitly measures serialization/transfer and deterministic
+small/large batches in its own two-process pool; no production acceleration is
+enabled by that diagnostic. Never run graphical/historical tests in parallel.
+Use isolated copies because historical tests/examples write fixed output names.
+[Actual runs, failures and pending checks](../docs/v0.19-validation.md).
+
 ## v0.18 Guided UI
 
 `setupProject; r=runProjectTests;` conserva todos los nombres históricos.
@@ -709,3 +731,26 @@ después para resize. Sus PNG finales cambian realmente de 1154×787 a 949×685.
 - validación autónoma de `SteeringCornerResult` antes de consumirlo;
 - invalid payloads, mezcla de geometrías y propagación NaN;
 - visualización de estado y cuatro curvas de análisis.
+
+## RF-03 operation/result binding
+
+`TestGuidedOperationSemantics` compares the immutable owner operation with genuine
+canonical alternative results/configurations, including the two independently
+reported RF-03 cases. Rejections compare the complete project/session and exact
+MAT round trips; positives cover serial/process execution and multi-corner BUMP.
+`TestGuidedPackagingBinding` adds canonical candidate-index, physically equal
+SEED/CANDIDATE relabelling and alternate sampled-parent/grid regressions.
+`TestGuidedResponseProtocol` retains RF-01/RF-02 malformed-envelope/policy and
+char/string regression coverage. These use explicit synthetic cases, not vehicle
+performance assumptions. MATLAB R2026b and local ProcessPool/PCT are required
+for the worker cases; absence must be reported, not counted as PASS.
+
+```matlab
+setupProject; addpath('app');
+results = runtests({'tests/TestGuidedOperationSemantics.m', ...
+                   'tests/TestGuidedPackagingBinding.m', ...
+                   'tests/TestGuidedResponseProtocol.m'});
+assertSuccess(results);
+```
+
+See [RF-03 contracts and actual evidence](../docs/v0.19-rf03-operation-contract.md).

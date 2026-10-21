@@ -1,5 +1,18 @@
 # Examples
 
+## v0.19 — packaging explícito
+
+`setupProject; addpath('examples'); out=packagingFeasibilityExample(false);`
+construye la geometría nativa, declara los sólidos de packagingInputs, comprueba
+nominal y BUMP real, verifica STALE frente a un cambio sólo del margen y guarda/
+recupera MAT. `true` dibuja el par y la peor muestra observada. Todas las medidas
+son ASSUMED para verificar software: no son recomendaciones de Formula Student.
+El ejemplo no modifica el optimizador ni garantiza el espacio entre muestras.
+Para comparar seed/candidato desde la app, seguir la sección Packaging de la
+[guía](../docs/guided-design-interface.md). Los resultados reales y costes,
+no sólo la existencia del ejemplo, se registran en
+[v0.19-validation](../docs/v0.19-validation.md).
+
 ## v0.18 — flujo guiado
 
 `app = launchFSSuspensionDesigner;` desde la raíz. Project → Illustrative inputs

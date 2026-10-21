@@ -4,6 +4,55 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+Seguimiento actual: [RF-03 — correspondencia operación/resultado](docs/v0.19-rf03-operation-contract.md).
+Implementación local y validación focalizada completas:286/286 casos únicos PASS,
+48 nuevos; Analyzer0/643. Inventario1954, sin repetir la suite completa. Sin
+publicación ni aprobación independiente; preparada para reauditoría de RF-03.
+
+Registro histórico anterior a RF-03: correcciones focalizadas RF-01 (IDs char/string) y RF-02
+(protocolo APPEND/REPLACE) en
+[informe RF](docs/v0.19-final-rf-corrections.md). Las cifras1872 de la baseline
+inferior no representan una repetición completa después de estas correcciones;
+155/155 pruebas focalizadas PASS (34 nuevas), Analyzer0/639. El inventario actual
+contiene1906 casos; no se afirma una ejecución completa de todos ellos.
+
+**v0.19.0 — Packaging & Physical Feasibility, correcciones V19-F-01/V19-F-02
+implementadas y verificadas localmente, pendientes de reauditoría**, sobre la
+base publicada v0.18.0 (`ce3ced0`). Rama `feature/v0.19-packaging-feasibility`.
+Añade sólidos simplificados explícitos, pares/márgenes, regiones de hardpoints,
+evaluación nominal/BUMP almacenado, comparación y persistencia MAT; una sección
+Packaging extiende la aplicación existente. No modifica los solvers ni los scores.
+
+```matlab
+app = launchFSSuspensionDesigner;
+% Ejemplo API con entradas sintéticas explícitas:
+setupProject; addpath('examples');
+e = packagingFeasibilityExample(false);
+```
+
+[Contrato y límites](docs/packaging-physical-feasibility.md) ·
+[Informe final y evidencias](docs/v0.19-validation.md) ·
+[Correcciones y estado vigente](docs/v0.19-audit-corrections.md) ·
+[Interfaz](docs/guided-design-interface.md).
+CLEAR_SAMPLED no certifica ausencia de colisiones entre muestras, CAD ni fabricación.
+El flujo gráfico completo corregido terminó con PASS:940,8s, guardado y reapertura
+exacta de nueve resultados y operación asíncrona157,8s. Pico privado muestreado:
+1,94GiB del motor principal y4,13GiB agregados de procesos propios; compromiso
+privado no equivale a RAM residente. Son mediciones de ese caso en16GB, no una
+garantía para historiales arbitrarios. La referencia anterior a la corrección
+(21,8GiB privados del principal/unos20min asíncronos) se conserva en el informe.
+Cobertura por37 particiones:1872/1872 identidades únicas PASS;18 ejemplos,
+siete benchmarks conservados y Analyzer0/638. Inspección Desktop real realizada;
+el cierre manual final no obtuvo resultado (presupuesto de observación y después
+reserva de RAM), separado de los tests de ciclo de vida que sí pasaron.
+No se afirma un PASS monolítico ni aprobación de la reauditoría.
+La validación/fusión final puede bloquear callbacks: no se garantiza respuesta
+continua durante toda la operación (45s medidos antes de RF-03, no cota garantizada).
+Usar MATLAB Desktop para la UI, no `-batch`.
+**No utilizar para fabricar una suspensión real.** Sin commits ni publicación v0.19.
+
+## Historia v0.18 (registro de la implementación original)
+
 **v0.18.0 implementada localmente — pendiente de auditoría independiente**, sobre la
 publicación correctiva estable **v0.17.1** (código auditado `f14ed1e`). MATLAB
 R2026b / Windows 11. App Designer nativo de texto `.m` + `.xml`, con controlador

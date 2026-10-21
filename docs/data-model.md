@@ -1,5 +1,55 @@
 # Modelo de datos
 
+## Packaging v0.19
+
+Structs canónicos de valores (schema0.19), sin handles en el núcleo:
+PackagingVolume conserva definición SI e identity, bindings FIXED/UPRIGHT/
+SEGMENT, frame y procedencia; PackagingDefinition agrupa celdas de volúmenes,
+pares y regiones; PackagingResult conserva definición, geometría, plan, fuente,
+estados resueltos, checks, cobertura y limitaciones. Los validadores reconstruyen
+el resultado sin solves físicos. Las dimensiones vacías significan desconocidas.
+`resources.packaging` es opcional: no se añade a proyectos anteriores al leerlos.
+PACKAGING usa EngineeringScenario/EngineeringResult históricos; sus valores
+lógicos conservan schema0.16 y el software nuevo es0.19.0. Las dependencias consumidas se incluyen
+en el contexto canónico de compatibilidad, no en un sistema paralelo de staleness.
+PackagingSourceReference conserva sourceIdentity, revisión/ID/software de origen,
+payload/assessment nativos y un dependencySnapshot sin ledger, escenarios ni
+recursos Packaging. Su preparación debe ser exactamente igual a la del resultado
+original; no se etiqueta como su configuración original completa ni como ejecución.
+El ledger conserva el EngineeringResult íntegro. La compatibilidad de la referencia
+usa resultCompatibility; nunca se clasifica como CURRENT_EXECUTION por una proyección.
+Ver [campos y APIs](packaging-physical-feasibility.md).
+
+Persistencia de proyectos con Packaging o con historial de resultados: un único MAT nativo, cabecera física
+`FsdEngineeringProjectStorage`0.19 / `FSD_VALUE_GRAPH_V1`, configuración y una variable
+`FSD_RESULT_000001` por registro. Se reconstruye exactamente el proyecto original;
+no se eliminan históricos ni se modifican tipos/valores numéricos. Un DAG local
+con referencias hacia nodos anteriores conserva shapes, clases y bits numéricos;
+un diccionario char distingue missing de texto literal. Los structs del usuario
+no se reinterpretan como marcadores. La igualdad de contenedores se demuestra
+por shape, campos ordenados y referencias exactas a hijos ya codificados;
+las primitivas densas de hasta128 elementos usan claves con sus bits íntegros.
+Arrays mayores y sparse se conservan sin interning; no se limita su capacidad.
+No se comparan ni retienen árboles originales completos, ni se usa un hash.
+Un diccionario local reutiliza listas exactas de nombres de campos ordenados e
+IDs de texto; su clave contiene cantidad, longitudes y UTF-16 completo. No omite
+visitar valores ni cambia el orden de nodos/textos. Se descarta con el codec.
+El lector sigue
+admitiendo el anterior `FSD_TEXT_V1` de desarrollo, además de
+`FsdEngineeringProjectFile`0.16. Los proyectos clásicos sin Packaging y SIN
+resultados siguen escribiendo ese formato anterior. Cualquier historial nuevo
+usa la escritura acotada0.19, incluso sin Packaging: el serializador antiguo
+también generaba picos de memoria con snapshots de síntesis. Los ficheros nuevos
+de historial requieren el lector0.19; la lectura de MAT0.18 anteriores se mantiene.
+Usar las APIs canónicas de carga, no
+suponer que todos los MAT nuevos exponen `envelope.project` directamente.
+El cambio responde a presión de memoria observada, no a una nueva física o DB.
+
+No se guarda ningún contexto de validación, callback, Map ni pool dentro de un
+proyecto. Los contextos privados de una operación se descartan al retornar.
+Cada resultado conserva su configuración ORIGINAL completa; reducir el request
+del worker no reduce ese snapshot, porque el ledger ya estaba excluido de él.
+
 ## Sesión UI v0.18
 
 No nuevo formato físico ni persistencia paralela. El Controller handle vive sólo
