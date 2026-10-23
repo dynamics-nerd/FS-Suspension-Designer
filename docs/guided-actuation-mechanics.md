@@ -1,5 +1,10 @@
 # v0.20 — Guided actuation and mechanics
 
+v0.21 consumes the same registered actuation/coilover resources independently for
+FL/FR/RL/RR in GLOBAL_STATIC. It generates new native MECHANICAL paths at explicit
+rest during the requested global run; existing actuation analysis/synthesis and
+adoption contracts remain unchanged. [Global integration](guided-global-static.md).
+
 ## Scope and authority
 
 The existing v0.7/v0.8/v0.15 models remain authoritative. The guided flow selects

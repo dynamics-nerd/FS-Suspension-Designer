@@ -1,5 +1,20 @@
 # Testing strategy
 
+## v0.21 — global static integration
+
+`TestGuidedGlobalStatic` tests native production paths, independent nominal
+closure/load balance, CG world lever balances/reflection, four different mechanics,
+readiness, no solution, full-content dependencies, tampering, response ownership,
+receipt without forward solves, unit boundaries and MAT. `TestGuidedGlobalStaticUI`
+drives real native controls; `TestGuidedGlobalStaticWorker` uses one real ProcessPool
+for solve/MAT, cancellation, epoch discard and an alternate-vehicle response.
+`verifyV21` checks Analyzer/DAG/inventory only; it does not claim suite execution.
+Actual runs and exact counts are recorded in docs/v0.21-validation.md. Historical
+oracles/tolerances remain unchanged. The two expected current software-version
+assertions advance to0.21; no deleted test identity or relaxed numeric benchmark.
+The existing GLOBAL_STATIC/CORNER negative case now expects INVALID_INPUT (wrong
+scope), rather than UNSUPPORTED (engine now integrated); its test identity remains.
+
 ## v0.20 — guided actuation/mechanics
 
 The six original TestGuidedActuationConfiguration cases are retained. New focused
@@ -787,3 +802,16 @@ assertSuccess(results);
 ```
 
 See [RF-03 contracts and actual evidence](../docs/v0.19-rf03-operation-contract.md).
+
+## V21-F-01 pending native tires
+
+`TestGlobalStaticPendingTires` covers each missing corner and all four missing,
+exact preservation of existing rows/paths/provenance, complete configuration,
+retry of the same project after an injected final-render failure, and native
+MAT load / real FR cell edits / Apply / READY / GLOBAL_STATIC / Save / Load.
+`GlobalStaticRenderController` is a presentation-only fault-injection double;
+the end-to-end case uses the actual View and Controller. No solver is mocked.
+Run with `setupProject; addpath('app','tests','examples');
+r=runtests('tests/TestGlobalStaticPendingTires.m'); assertSuccess(r);`.
+Focused related regressions and actual results are recorded in
+[the correction report](../docs/v0.21-f01-validation.md).

@@ -1,5 +1,27 @@
 # Registro de decisiones
 
+## GSE-001/002/003 — integración v0.21,23 octubre2026
+
+Decisiones nuevas del desarrollo autorizado, sin atribución retrospectiva:
+
+- GSE-001: generar paths ACTUATION_BUMP_3D en cada GLOBAL_RUN explícito; evita
+  referencias recursivas a cuatro ledgers y obliga a usar la geometría/actuación/
+  coilover vigentes. Alternativa descartada: copiar curvas BUMP/MR por ID sin
+  comprobar contexto. Los paths ideales históricos sólo son oráculos declarados.
+- GSE-002: masa y CG proceden del concepto y conceptPreparation existentes; se
+  evita una segunda contabilidad editable independiente. Los contactos conceptuales
+  sólo alimentan la referencia v0.9; el sistema global usa WC reales transformados.
+- GSE-003: exponer globalStaticSolverSettings como envoltorio del normalizador
+  histórico. Readiness puro, sin duplicar algoritmo/presupuestos ni llamar solver.
+
+El esquema lógico y almacenamiento se mantienen por compatibilidad; sólo se añade
+una familia de escenario/payload al consumidor. Las posiciones de esquinas se
+comprueban en el frame canónico: izquierda Y<0, derecha Y>0, estaciones traseras
+detrás de las delanteras. No se fuerza igualdad de geometrías ni simetría implícita.
+No justificación nueva de PCHIP/Newton/tolerancias históricas: referencias/motivos
+documentados en [contrato0.10](global-static-equilibrium.md); lo desconocido sigue
+pendiente de reconstrucción. [Contrato nuevo](guided-global-static.md).
+
 ## Integración guiada v0.20 — decisiones nuevas
 
 - **GAM-001:** reutilizar fábricas, preparación, ejecución y validadores históricos
@@ -529,3 +551,16 @@ No hay decisiones abiertas al cerrar v0.7.
   referencia estática usa el target solicitado exactamente igual a cero.
 - **ARB-001:** la futura estrategia de producto será `INTEGRATED`,
   `POST_DESIGN` o `DISABLED`. No se implementa ARB en v0.7.
+
+## V21-F-01 — representación de neumáticos pendientes (2026-10-23)
+
+Un neumático nativo ausente se representa con campos vacíos en su esquina;
+readiness conserva la responsabilidad de diagnosticar los recursos pendientes.
+La lectura directa de campos de `[]` impedía continuar proyectos válidos e
+incompletos. Se descartan neumáticos sustitutivos y ceros porque inventarían
+datos físicos. El marcador de dibujo se confirma al finalizar el refresco:
+confirmarlo antes impedía reintentarlo tras un fallo. Se conserva la propagación
+de errores; un catch general ocultaría fallos de programación. No se cambian
+ecuaciones, unidades, modelos, esquema MAT ni normalización numérica existente.
+Contrato y pruebas: [flujo global](guided-global-static.md),
+[validación focalizada](v0.21-f01-validation.md).

@@ -20,6 +20,17 @@ switch request.action
         project=fsdui.upsertScenario(project,buildScenario(definition));
     case "READINESS"
         value=fsd.project.designReadiness(project,a.scenarioId);
+    case "GLOBAL_CONFIG"
+        scenario=fsd.project.createEngineeringScenario(a.definition);
+        assert(scenario.definition.engine=="GLOBAL_STATIC",'fsd:ui:InvalidOperation','GLOBAL_STATIC scenario required.');
+        project=fsdui.upsertScenario(project,scenario);
+        value=fsd.project.designReadiness(project,scenario.definition.id);
+    case "GLOBAL_RUN"
+        scenarios=project.definition.scenarios;
+        found=cellfun(@(s)string(s.definition.id)==string(a.scenarioId),scenarios);
+        assert(nnz(found)==1 && scenarios{found}.definition.engine=="GLOBAL_STATIC", ...
+            'fsd:ui:InvalidOperation','Select an existing GLOBAL_STATIC scenario.');
+        [value,project]=runScenario(project,a.scenarioId,a.resultId);
     case "ACTUATION_CONFIG"
         [project,value]=fsd.project.configureActuationResources(project,a.cornerId, ...
             a.definition,a.lengthUnit,a.mechanicalDefinition,a.units);

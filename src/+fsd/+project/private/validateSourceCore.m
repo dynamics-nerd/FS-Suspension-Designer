@@ -11,7 +11,7 @@ projectRequire(isempty(snapshot.definition.results) && isempty(snapshot.definiti
     ~any(cellfun(@(s)s.definition.engine=="PACKAGING",snapshot.definition.scenarios)), ...
     'Dependency projection must contain no packaging scenarios/resources or historical ledger.');
 projectRequire(ismember(source.engine,["BUMP","CORNER_SYNTHESIS","AXLE_SYNTHESIS"]) && ...
-    ismember(source.fsdVersion,["0.16.0","0.17.0","0.18.0","0.19.0","0.20.0"]), 'Unsupported native packaging source.');
+    ismember(source.fsdVersion,["0.16.0","0.17.0","0.18.0","0.19.0","0.20.0","0.21.0"]), 'Unsupported native packaging source.');
 scenario=scenarioFind(snapshot,source.scenarioAtExecution.definition.id);
 projectRequire(isequaln(scenario,source.scenarioAtExecution),'Projected source scenario mismatch.');
 p=context.prepare(snapshot,scenario);

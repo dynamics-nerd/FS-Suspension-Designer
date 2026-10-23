@@ -1,5 +1,16 @@
 # v0.10 — Coupled Chassis Pose & Global Static Equilibrium
 
+## v0.21 consumer integration
+
+The historical physical model, algorithms and budgets below are unchanged.
+`fsd.project` now adapts GLOBAL_STATIC and the application exposes it through
+Global static; the historical statement excluding UI describes v0.10 delivery,
+not the current consumer. New production paths are generated explicitly from
+four current corner resources during execution. `globalStaticSolverSettings`
+exposes the same existing normalizer without a solve. No dynamic/ARB/Tilt model
+is added. [Integration contract](guided-global-static.md),
+[actual developer validation](v0.21-validation.md).
+
 Modelo estático reducido de siete coordenadas; no sustituye a Adams ni valida
 un vehículo fabricable. Todas las hipótesis ideales siguientes son explícitas.
 

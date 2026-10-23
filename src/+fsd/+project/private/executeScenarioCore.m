@@ -2,6 +2,18 @@ function [payload,assessment] = executeScenarioCore(p)
 %EXECUTESCENARIOCORE Only entry point permitted to call native forward/search APIs.
 engine=p.scenario.definition.engine; plan=p.plan; resources=p.resources;
 assessment=[];
+if engine=="GLOBAL_STATIC"
+    sources=cell(4,1);
+    for k=1:4
+        cp=p.corners{k}; native=executeScenarioCore(cp);
+        sources{k}=struct('geometry',cp.resources.geometries{1},'actuation',cp.resources.actuations{1}, ...
+            'springDamper',cp.resources.mechanicals{1},'mechanical',native.analysis, ...
+            'bump',native.bump,'pathKind',"ACTUATION_BUMP_3D");
+    end
+    system=globalScenarioSystem(p,sources);
+    equilibrium=fsd.analysis.solveGlobalStaticEquilibrium(system,plan.initialGuesses,p.options);
+    payload=struct('system',system,'equilibrium',equilibrium); return;
+end
 if engine=="PACKAGING"
     payload=fsd.packaging.evaluate(p.packagingDefinition,p.packagingGeometry,p.plan,p.packagingSource); return;
 end

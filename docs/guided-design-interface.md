@@ -1,5 +1,16 @@
 # v0.18 — Guided Suspension Design Interface
 
+## v0.21 Global static extension
+
+The tenth section configures four explicit native vertical tires, rest paths,
+vehicle physical options and seven-coordinate solver declarations. Geometry and
+actuation remain in their original editors, including independent RL/RR scopes.
+GLOBAL_CONFIG and GLOBAL_RUN share the v0.19 operation reconstruction and owner
+ledger protocol. New drafts participate in the same save/run/replacement guards.
+No whole-app redesign, hidden example input or presentation-level engineering.
+Stored attempts/alternatives and comparisons use exact historical evidence and
+display compatibility/revision. [Contract and use](guided-global-static.md).
+
 ## v0.20 Actuation/Mechanical extension
 
 The ninth Actuation page adds explicit native configuration, ACTUATION/MECHANICAL,

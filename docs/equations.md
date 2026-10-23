@@ -1,5 +1,23 @@
 # Convenciones y formulación matemática
 
+## v0.21 — integración, sin nueva ley física
+
+Se reutiliza íntegramente [global-static-equilibrium.md](global-static-equilibrium.md):
+q=[h,theta,phi,zFL,zFR,zRL,zRR], R=Rx(phi)Ry(theta), U=Ug+sum(Us)+sum(Ut),
+residual=grad(U), con Fz/Mx/My independientes en world. La UI sólo convierte
+m→mm y rad→deg. No mueve fuerzas de damping a un equilibrio en reposo.
+
+Oráculo nuevo de integración: geometría paralelogramo analítica explícita del
+ejemplo actuationSynthesisSeed; en nominal dPattachment/dz=eZ. Derivando cierre
+de longitud constante de varilla, v=Prod-Pattachment,
+theta'=dot(v,eZ)/dot(v,cross(axis,Prod-Paxis)).
+MR=-dot(Pdamper-Pchassis,cross(axis,Pdamper-Paxis))/Ldamper*theta'.
+Preload=500/(ks*MR) produce FsMR=500N por esquina en nominal para M=200kg,g=10.
+Con kt=100000N/m,R0=.25m, cuatro normales500N exigen delta=.005m,h=-.005m,
+theta=phi=z_i=0. El solver usa derivada de PCHIP, no esa fórmula del fixture;
+se permite sólo el error numérico de muestreo documentado en la validación.
+No son valores de diseño FS ni carga de ejemplo automática en la UI.
+
 ## Integración guiada v0.20
 
 No nuevas ecuaciones ni tolerancias de ingeniería. El flujo usa las formulaciones

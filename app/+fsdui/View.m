@@ -11,6 +11,7 @@ classdef View < handle
         ResultCurveAxes
         Packaging
         Actuation
+        GlobalStatic
     end
     properties (Access=private)
         PollTimer
@@ -33,7 +34,7 @@ classdef View < handle
         function obj=View(fig)
             obj.Figure=fig; obj.Controller=fsdui.Controller();
             screen=get(groot,'ScreenSize');
-            fig.Name='FS Suspension Designer | v0.20.0';
+            fig.Name='FS Suspension Designer | v0.21.0';
             fig.Position=[40 40 min(1280,screen(3)-80) min(820,screen(4)-100)];
             theme(fig,'light'); % Explicit local theme; never change the user's MATLAB preference.
             fig.Color=[.96 .97 .98]; fig.CloseRequestFcn=@(~,~)obj.close();
@@ -56,6 +57,7 @@ classdef View < handle
                     case "BUMP", allowed="Analysis";
                     case {"PACKAGING_DEFINITION","PACKAGING_DEMO"}, allowed="Packaging";
                     case {"ACTUATION_CONFIG","ACTUATION_RUN","ACTUATION_ADOPT"}, allowed="Actuation";
+                    case "GLOBAL_CONFIG", allowed="Global static";
                     case {"NEW","LOAD","DEMO"}, allowed=obj.DraftPages;
                 end
                 actuationAction=startsWith(action,'ACTUATION_') || ...
@@ -89,6 +91,7 @@ classdef View < handle
             end
             c=obj.Controller; obj.UI.Status.Text=char(c.Status);
             obj.Actuation.updateStatus();
+            obj.GlobalStatic.updateStatus();
             obj.UI.Cancel.Enable=matlab.lang.OnOffSwitchState(c.Busy);
             if c.Busy, return; end
             if strlength(obj.PendingCommit)>0 && startsWith(c.Status,obj.PendingCommit+" complete")
@@ -103,7 +106,8 @@ classdef View < handle
                     case "BUMP", obj.DraftPages=setdiff(obj.DraftPages,"Analysis");
                     case {"PACKAGING_DEFINITION","PACKAGING_DEMO"}
                         obj.DraftPages=setdiff(obj.DraftPages,"Packaging"); obj.Packaging.committed();
-                    case {"NEW","LOAD","DEMO"}, obj.DraftPages=strings(0,1); obj.Actuation.resetDrafts();
+                    case "GLOBAL_CONFIG", obj.DraftPages=setdiff(obj.DraftPages,"Global static"); obj.GlobalStatic.committed();
+                    case {"NEW","LOAD","DEMO"}, obj.DraftPages=strings(0,1); obj.Actuation.resetDrafts(); obj.GlobalStatic.resetDrafts();
                 end
                 end
                 obj.PendingCommit="";
@@ -143,6 +147,7 @@ classdef View < handle
             end
             obj.Packaging.refresh();
             obj.Actuation.refresh();
+            obj.GlobalStatic.refresh();
         end
         function close(obj)
             if obj.Closing || isempty(obj.Controller), return; end
@@ -169,6 +174,7 @@ classdef View < handle
             if isfield(obj.UI,'Sample') && isgraphics(obj.UI.Sample), obj.UI.Sample.UserData=[]; end
             if ~isempty(obj.Packaging) && isvalid(obj.Packaging), obj.Packaging.release(); end
             if ~isempty(obj.Actuation) && isvalid(obj.Actuation), obj.Actuation.release(); end
+            if ~isempty(obj.GlobalStatic) && isvalid(obj.GlobalStatic), obj.GlobalStatic.release(); end
             obj.DrawnProject=[]; obj.DrawnCompatibility={}; obj.Definition=[]; obj.SeedRows=[];
             obj.Controller=[]; obj.UI=struct(); obj.Tabs=[];
             obj.GeometryAxes=[]; obj.CurveAxes=[]; obj.ResultAxes=[]; obj.ResultCurveAxes=[];
@@ -190,13 +196,14 @@ classdef View < handle
             root=uigridlayout(obj.Figure,[4 1]); root.RowHeight={64,34,'1x',60}; root.Padding=[16 12 16 12];
             header=uigridlayout(root,[1 2]); header.ColumnWidth={'1x',350};
             uilabel(header,'Text','FS  /  SUSPENSION DESIGNER','FontSize',23,'FontWeight','bold','FontColor',[.08 .17 .25]);
-            uilabel(header,'Text','v0.20  •  ACTUATION & MECHANICS','HorizontalAlignment','right','FontColor',[.22 .34 .42]);
+            uilabel(header,'Text','v0.21  •  GLOBAL STATIC EQUILIBRIUM','HorizontalAlignment','right','FontColor',[.22 .34 .42]);
             bar=uigridlayout(root,[1 2]); bar.ColumnWidth={'1x',170}; bar.Padding=0;
             obj.UI.Status=uilabel(bar,'Text','Ready','FontWeight','bold');
             obj.UI.Cancel=uibutton(bar,'Text','Request cancellation','ButtonPushedFcn',@(~,~)obj.Controller.cancel());
             obj.Tabs=uitabgroup(root);
-            names=["Project","Vehicle","Geometry","Analysis","Targets","Synthesis","Results","Packaging","Actuation"];
+            names=["Project","Vehicle","Geometry","Analysis","Targets","Synthesis","Results","Packaging","Actuation","GlobalStatic"];
             for name=names, obj.UI.(name+"Tab")=uitab(obj.Tabs,'Title',name); end
+            obj.UI.GlobalStaticTab.Title='Global static';
             footer=uitextarea(root,'Editable','off','Value', ...
                 {'EXPERIMENTAL ENGINEERING SOFTWARE — not suitable for manufacturing a real suspension.'; ...
                 'SI internally • +X rearward / +Y rightward / +Z upward • illustrative inputs are ASSUMED, never recommended FS values.'});
@@ -206,6 +213,7 @@ classdef View < handle
             obj.targetsPage(); obj.synthesisPage(); obj.resultsPage();
             obj.Packaging=fsdui.PackagingView(obj.UI.PackagingTab,obj.Controller,@(action,args)obj.invoke(action,args),@()obj.draft());
             obj.Actuation=fsdui.ActuationView(obj.UI.ActuationTab,obj.Controller,@(action,args)obj.invoke(action,args),@()obj.draft());
+            obj.GlobalStatic=fsdui.GlobalStaticView(obj.UI.GlobalStaticTab,obj.Controller,@(action,args)obj.invoke(action,args),@()obj.draft());
         end
         function projectPage(obj)
             g=uigridlayout(obj.UI.ProjectTab,[6 1]); g.RowHeight={38,38,38,130,'1x',40};
@@ -693,6 +701,7 @@ classdef View < handle
             elseif obj.Tabs.SelectedTab==obj.UI.AnalysisTab && obj.AnalysisPlotPending, obj.drawAnalysis();
             elseif obj.Tabs.SelectedTab==obj.UI.ResultsTab && obj.ResultPlotPending, obj.drawResults();
             elseif obj.Tabs.SelectedTab==obj.UI.ActuationTab, obj.Actuation.refresh();
+            elseif obj.Tabs.SelectedTab==obj.UI.GlobalStaticTab, obj.GlobalStatic.refresh();
             end
         end
         function adopt(obj)

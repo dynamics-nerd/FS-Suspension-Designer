@@ -2,6 +2,30 @@ function assessment = validateScenarioPayload(p,payload,context)
 %VALIDATESCENARIOPAYLOAD Native algebraic evidence validators, never forward solves.
 engine=p.scenario.definition.engine; assessment=[];
 if nargin<3, context=validationContext(); end
+if engine=="GLOBAL_STATIC"
+    projectRequire(isstruct(payload) && isscalar(payload) && ...
+        isequal(sort(string(fieldnames(payload))),["equilibrium";"system"]),'Invalid global payload fields.');
+    sources=payload.system.sources;
+    projectRequire(iscell(sources) && numel(sources)==4,'Four complete sources required.');
+    for k=1:4
+        cp=p.corners{k}; s=sources{k}; m=s.mechanical; a=cp.resources.actuations{1};
+        projectRequire(s.pathKind=="ACTUATION_BUMP_3D" && isequaln(s.geometry,cp.resources.geometries{1}) && ...
+            isequaln(s.actuation,a) && isequaln(s.springDamper,cp.resources.mechanicals{1}), ...
+            'Global corner resource differs from declared input.');
+        projectRequire(m.source.kind=="ActuationSweep",'Global production evidence requires native actuation.');
+        sweep=m.source.sweep; aa=fsd.analysis.analyzeActuationSweep(a,sweep);
+        % Reuse the existing MECHANICAL validator, including original BUMP controls.
+        bump=s.bump;
+        v=struct('bump',bump,'sweep',sweep,'analysis',m,'actuationAnalysis',aa,'candidate',[]);
+        validateScenarioPayload(cp,v,context);
+    end
+    expected=globalScenarioSystem(p,sources);
+    projectRequire(isequaln(expected,payload.system),'Global system differs from declared configuration.');
+    e=payload.equilibrium;
+    projectRequire(isequaln(e.initialGuesses,p.plan.initialGuesses) && isequaln(e.solverOptions,p.options), ...
+        'Global initial guesses/options differ.');
+    fsd.analysis.validateGlobalStaticEquilibrium(e,expected); return;
+end
 if engine=="PACKAGING"
     fsd.packaging.validateResult(payload);
     projectRequire(isequaln(payload.definition,p.packagingDefinition) && isequaln(payload.geometry,p.packagingGeometry) && ...

@@ -1,5 +1,16 @@
 # Examples
 
+## v0.21 — guided four-corner equilibrium
+
+`globalStaticGuidedInputs` explicitly creates synthetic benchmark declarations;
+the GUI never loads them automatically. `guidedGlobalStaticExample(newMatFile)`
+runs configuration, two global solves separated by a declared road change,
+selective STALE/history and exact SAVE/LOAD. Returns stage timings and Windows
+memory observations. No default output path or overwritten prior evidence.
+Run setupProject; addpath('app','examples'); then call the example explicitly.
+See docs/guided-global-static.md and docs/v0.21-validation.md for physical oracle,
+approximation error and actual recorded results. These are not FS setup values.
+
 ## v0.20 — complete guided actuation/mechanics
 
 `setupProject; addpath('app','examples'); out=guidedActuationMechanicsExample;`

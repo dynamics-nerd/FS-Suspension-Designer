@@ -1,5 +1,17 @@
 # Application UI — Guided Design, Packaging, Actuation/Mechanics
 
+v0.21 adds the tenth **Global static** section (`GlobalStaticView`), with native
+tables for four tires, sampled paths, gravity/provenance, mass approximation,
+ground/reference points, seven-coordinate bounds/scales/seeds and solver controls.
+Vehicle/Geometry/Actuation remain the editors of the existing resources. Apply
+checks readiness; Run explicitly generates paths and calls the historical solver.
+Stored attempts/alternatives, contacts, forces, pose, limits, residues, energies
+and selected-result comparison show original revision and compatibility. NONE
+shows no pose. mm/deg/N, internal SI; no implicit illustrative inputs or solves.
+GLOBAL_CONFIG/GLOBAL_RUN use existing Controller, explicit worker/sync choice,
+RF-01/02/03, bounded snapshots, cancellation, owner ledger and MAT.
+[Detailed instructions](../docs/guided-global-static.md).
+
 v0.20 adds `+fsdui/ActuationView.m` and pure table/plan/evidence adapters. The ninth
 page exposes native actuation/coilover configuration, ACTUATION/MECHANICAL analysis,
 fixed-suspension synthesis and exact resource adoption. New values display mm, deg,

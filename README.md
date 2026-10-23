@@ -4,6 +4,19 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+**v0.21.0 implementada y validada localmente sobre v0.20.0 (`9685942`)**,
+pendiente de auditoría independiente.324/324 casos seleccionados PASS (27 nuevos,
+297 históricos), Analyzer0/674, DAG24 acíclico; inventario2014, no suite completa.
+Rama `feature/v0.21-global-static-equilibrium`, gestionada exclusivamente por el
+usuario. Preparación explícita de cuatro esquinas y sección **Global static**,
+adaptador GLOBAL_STATIC, solver estático reducido histórico, historial/STALE y MAT.
+[Recorrido y contrato](docs/guided-global-static.md) ·
+[Validación y limitaciones actuales](docs/v0.21-validation.md).
+Sin dinámica completa, neumáticos de prestaciones, ARB o v0.22. Los estados de
+convergencia, admisibilidad y estabilidad se muestran por separado.
+
+### Entrega anterior v0.20
+
 **v0.20.0 implementada y validada localmente — pendiente de auditoría independiente**,
 actuación y mecánica guiadas, sobre la release estable
 publicada v0.19.0 (`58ee34b`), rama activa `feature/v0.20-actuation-mechanics`.

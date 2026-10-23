@@ -1,5 +1,10 @@
 % FS Suspension Designer engineering core.
 %
+% v0.21 Guided Full-Vehicle Static Setup (historical physical kernels unchanged)
+%   fsd.project.prepareEngineeringScenario - GLOBAL_STATIC four-corner readiness.
+%   fsd.project.runEngineeringScenario     - Native global solver and exact ledger.
+%   fsd.analysis.globalStaticSolverSettings - Pure existing-control normalization.
+%
 % v0.20 Guided Actuation & Mechanics (historical physics unchanged)
 %   fsd.project.configureActuationResources - Atomic explicit actuation/coilover resources.
 %   fsd.project.adoptActuationCandidate     - Exact compatible resources; fixed suspension.

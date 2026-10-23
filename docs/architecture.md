@@ -1,5 +1,21 @@
 # Arquitectura
 
+## Extensión v0.21 — equilibrio global guiado
+
+GlobalStaticView → Controller → operationBody (GLOBAL_CONFIG/GLOBAL_RUN) →
+prepareGlobalScenario / executeScenarioCore / validateScenarioPayload → APIs
+nativas0.10. Cada esquina reutiliza preparación y ejecución MECHANICAL0.20.
+El proyecto reúne fuentes ACTUATION_BUMP_3D nuevas y ejecuta el solver global;
+no suma cuatro equilibrios locales ni crea otro solver. `globalStaticSolverSettings`
+expone únicamente el normalizador existente para readiness sin solve.
+
+El contexto consume las cuatro identidades físicas completas, frames y bindings,
+vehículo/case, neumáticos y planes/opciones explícitos. La UI convierte unidades
+y presenta evidencia almacenada. Compartir operationBody vincula declaraciones y
+respuesta a la operación inmutable del owner; no se confía en etiquetas del worker.
+Worker sin ledger de entrada, unión canónica y MAT existentes. No aristas nuevas
+entre módulos ni dependencia del núcleo hacia UI. [Contrato](guided-global-static.md).
+
 ## Extensión v0.20 — actuación/mecánica
 
 `ActuationView` es una subvista de `fsdui.View` con adaptadores puros de tablas,

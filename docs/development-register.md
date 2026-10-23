@@ -8,7 +8,8 @@ Development validation does not imply independent audit acceptance.
 | ID | Kind / status | Planned version / dependencies | Acceptance and references |
 |---|---|---|---|
 | FSD-020 | Feature / IMPLEMENTED, DEVELOPER VALIDATION PASS; independent audit pending | 0.20; native v0.7/v0.8/v0.15 and RF-03 | Guided configuration→analysis→synthesis→adoption→MAT;592 unique selected PASS (33 new/559 historical), [contract](guided-actuation-mechanics.md), [evidence](v0.20-validation.md); original §14 and FUNC-003/004 |
-| FSD-021 | Feature / PLANNED | 0.21; FSD-020 | Four-corner/global equilibrium workflow; [existing contract](global-static-equilibrium.md) |
+| FSD-021 | Feature / IMPLEMENTED; audit CHANGES REQUIRED for V21-F-01, correction validated by developer; independent re-audit pending | 0.21; FSD-020, native0.10, RF-01/02/03 |324 original developer-selected PASS (27 new/297 historical); audit358/358 PASS reported by user, one MEDIUM presentation finding; correction10/10 selected PASS; [integration contract](guided-global-static.md), [original evidence](v0.21-validation.md), [focused correction](v0.21-f01-validation.md) |
+| V21-F-01 | Incident / MEDIUM; FIXED, DEVELOPER VALIDATION PASS; independent re-audit pending | 0.21; pending native tires and completed refresh |10/10 unique selected PASS (4 new/6 related), Analyzer0/4, actual Desktop controls; empty tire rows without invented data, completed-render marker, retry, READY and exact MAT; [focused evidence](v0.21-f01-validation.md) |
 | FSD-022 | Feature / PLANNED | 0.22 | Geometry Only/Generic/Custom; original §7; force data optional; equations/assumed parameter sources OPEN DECISION at specification |
 | FSD-023 | Feature / PLANNED | 0.23; mechanics | ARB INTEGRATED/POST_DESIGN/DISABLED; ARB-001 in [decisions](decisions.md) |
 | FSD-024 | Feature / PLANNED | 0.24; FSD-021/022/023 | Reduced performance and comparative event models; original §6, advanced lap-time/thermal models deferred |
@@ -19,6 +20,12 @@ Development validation does not imply independent audit acceptance.
 | FSD-TILT | Feature / OPEN | Appropriate contact/static model | Preliminary and detailed tilt, separate inspection checklist; original §18; FUNC-006 |
 | FSD-INTEGRAL | Feature / OPEN | Applicable targets/builders/evaluators | Joint synthesis and multiobjective comparison, original §15/16; FUNC-005 |
 | FSD-ADAMS | Feature / DEFERRED | After engineering and final UI | Hardpoint export and validation plan before automated loop; original §20–22/27; FUNC-006 |
+| FSD-021-TRACE | Integrity / IMPLEMENTED, DEVELOPER VALIDATION PASS | 0.21; RF-03 | Four paths generated at rest, shared operation reconstruction, dependency matrix, real worker4/4 and exact MAT0.21/0.20/0.19; no independent acceptance implied |
+| FSD-021-UI01 | Incident / FIXED, UI TEST PASS | 0.21 | Native uitable rejects string inside mixed cell data; presentation converts text to char. Failed first run retained, second UI run3/3 PASS |
+| FSD-021-NUM01 | Limitation / DOCUMENTED | 0.21; native0.10 | Narrow numerical box excludes some perturbed setups; explicit wider paths/box resolves preload case. Larger CG offset still no feasible residual decrease even with refined grid. No root-nonexistence claim or tolerance change; diagnostic MAT/logs in v0.21-validation.md |
+| GSE-001 | Decision / ADOPTED | 0.21 | Generate production paths within explicit global run, no recursive parent ledgers; decisions.md |
+| GSE-002 | Decision / ADOPTED | 0.21 | Existing concept mass accounting; no duplicate editable vehicle model |
+| GSE-003 | Decision / ADOPTED | 0.21 | Public wrapper of existing solver settings for pure readiness |
 | BUG-001 | Incident / NEEDS REPRODUCTION | Relevant input workflow | Historical Availability/value mismatch has no exact payload; retain unknown/KNOWN distinction, field-specific feedback |
 | BUG-002 | Incident / IMPLEMENTED IN 0.20, dialog gestures not automated | 0.20 | Missing pool offers explicit Cancel/Start worker/Run synchronously; real process/sync paths verified; no silent fallback, [coverage limits](v0.20-validation.md) |
 | UX-001 | Improvement / DEFERRED | Contextual need | Illustrative-input discovery; no general visual redesign |

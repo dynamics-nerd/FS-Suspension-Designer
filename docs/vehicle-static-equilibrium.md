@@ -1,5 +1,11 @@
 # Vehicle Parameters & Static Load Equilibrium — v0.9
 
+v0.21 adapts these vehicle/load-case contracts to the existing coupled model0.10
+through GLOBAL_STATIC. The local/static-load APIs below retain their original
+meaning; four local roots still do not substitute for coupled global equilibrium.
+See [guided-global-static.md](guided-global-static.md) for mass accounting,
+required data, explicit assumptions, native production paths and GUI use.
+
 ## Alcance y significado físico
 
 Dos problemas separados: distribución de reacciones verticales de cuatro

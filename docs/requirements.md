@@ -1,5 +1,31 @@
 # Requisitos
 
+## v0.21 — Global static setup
+
+- REQ-V21-FOUR: cuatro esquinas explícitas e independientes; construir RL/RR
+  con constructores existentes, sin generar ni reflejar datos silenciosamente.
+- REQ-V21-READY: identificar recursos, masas/CG, neumáticos y planes ausentes o
+  incompatibles sin solves durante preparación; no convertir ausencia en cero.
+- REQ-V21-GLOBAL: integrar el sistema/solver nativo0.10 con pose común, trayectorias
+  nuevas y completas en reposo, neumáticos unilaterales y gravedad/energía históricas.
+- REQ-V21-EVIDENCE: conservar intentos, alternativas, selección y diagnósticos;
+  distinguir convergencia, admisibilidad y estabilidad evaluada. Sin selección,
+  ninguna pose nominal sustituta. Presentación mm/deg/N/Nm/J, SI interno.
+- REQ-V21-TRACE: vinculación semántica RF-01/02/03 de operación a contexto completo;
+  rechazo de configuración alternativa antes de mutar la sesión/historial.
+- REQ-V21-STALE: geometría, actuación, mecánica, tire, masa/CG y planes/opciones
+  relevantes invalidan sin borrar. Datos ajenos no producen STALE innecesario.
+  Comparación histórica muestra revisión/estado.
+- REQ-V21-UI: recorrido sin editar estructuras MATLAB, usando Vehicle/Geometry/
+  Actuation existentes y sección Global static; feedback y elección worker/sync.
+- REQ-V21-MAT: historial/referencias exactos al SAVE/LOAD y compatibilidad anterior.
+- REQ-V21-VERIFY: oráculos independientes, worker real, casos inválidos/contacto,
+  UI real, Analyzer/DAG/inventario, tiempo/memoria representativos, sin inventar PASS.
+
+Contrato: [guided-global-static.md](guided-global-static.md). Evidencia por caso:
+[v0.21-validation.md](v0.21-validation.md). No predicción dinámica ni ingeniería
+estructural/fabricación, ARB, neumáticos de prestaciones o v0.22 implícitos.
+
 ## v0.20 — actuación y mecánica operativas
 
 | ID | Requisito vigente | Verificación principal |

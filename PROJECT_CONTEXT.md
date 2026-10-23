@@ -1,5 +1,29 @@
 # Contexto del proyecto
 
+## Desarrollo v0.21 —23 octubre2026 (contexto vigente)
+
+Implementación y validación del desarrollador completas:324/324 identidades
+seleccionadas PASS (27 nuevas/297 históricas), Failed0/Incomplete0; inventario2014
+con1987 IDs anteriores conservados, Analyzer0/674, DAG24. No suite completa2014.
+MAT auténticos0.20(4 registros) y0.19(1) exactos; UI nueva3 +histórica3, worker real4.
+Entrega output/v021-validation/guided-global-static.mat y docs/v0.21-validation.md.
+Auditoría independiente pendiente; no implica aprobación de release/fabricación.
+
+Base publicada v0.20.0, commit9685942, rama activa gestionada por el usuario
+feature/v0.21-global-static-equilibrium. Repositorio principal, sin worktree.
+Gestión Git exclusiva del usuario: no modificar referencias, índice, commits,
+pushes, merges, tags ni releases. No iniciar0.22. Los apartados inferiores son
+históricos; sus prohibiciones de iniciar0.21 no cancelan la autorización actual.
+
+Alcance: preparar FL/FR/RL/RR explícitos e integrar GLOBAL_STATIC, reutilizando
+el núcleo reducido0.10. SI y convenciones intactas. El adaptador genera los
+cuatro paths de producción en reposo durante la ejecución solicitada; readiness,
+recepción, compatibilidad y visualización no ejecutan nuevos solves.
+Contrato: docs/guided-global-static.md; estado de pruebas: docs/v0.21-validation.md.
+Mismas protecciones RF-01/02/03 y almacenamiento MAT0.19. Sin nueva física de
+neumáticos de prestaciones, ARB, dinámica, Tilt o Adams. Auditoría independiente
+reservada para otra conversación; validar localmente no equivale a aprobar release.
+
 ## Entrega local v0.20 —21 octubre2026
 
 Implementación y validación del desarrollador completas:592/592 identidades únicas

@@ -4,19 +4,19 @@
 
 Completar capacidades de ingeniería y su uso verificable con la interfaz v0.19,
 después rediseño visual definitivo y finalmente Adams. Plan provisional aprobado
-por el usuario; sólo v0.20 tiene alcance de implementación autorizado. Las secciones
+por el usuario; v0.21 tiene alcance de implementación autorizado desde23 octubre2026. Las secciones
 inferiores registran entregas históricas y sus exclusiones de entonces.
 
 | Versión | Entrega prevista / dependencias | Criterio para definir su alcance |
 |---|---|---|
 | v0.20 | Actuación/mecánica existentes operativas; base estable v0.19.0 y RF-01/02/03 | Configuración explícita → ACT/MECH → síntesis fija → comparación/adopción coherente → MAT; incrementos A/B/C/D, [contrato](guided-actuation-mechanics.md), [validación](v0.20-validation.md) |
-| v0.21 | Cuatro esquinas y equilibrio global; recursos/paths mecánicos de0.20, modelos reducidos0.9/0.10 | Preparación por corner, masas/CG/contactos/closure explícitos, readiness, solución global y diagnósticos; no asumir que el solver histórico ya ofrece el workflow integrado |
+| v0.21 | Cuatro esquinas/equilibrio global implementados y validados localmente; auditoría independiente pendiente |324 casos seleccionados PASS,27 nuevos; preparación explícita, modelo reducido0.10, UI/worker/MAT; [contrato](guided-global-static.md), [validación](v0.21-validation.md) |
 | v0.22 | Neumáticos Geometry Only / Generic / Custom; interfaces reemplazables | Geometría sin datos de fuerza permitida; Generic con supuestos documentados, Custom con datos/procedencia/dominio/validación; elegir ecuaciones/datos al especificar, sin inventar parámetros universales |
 | v0.23 | Anti-roll bar; mecánica/equilibrio y estrategia ARB-001 | INTEGRATED / POST_DESIGN / DISABLED, acoplamiento y signos/energía/balances verificables; decidir geometría/modelo antes de implementar |
 | v0.24 | Performance Solver reducido y comparadores iniciales de eventos Formula Student;0.21/22/23 | Modelos de fidelidad explícita para eventos acordados, datos de pista/vehículo, validación independiente y límites; no lap time avanzado ni certificación |
 | v0.25 | Generación fundamentada y selección de targets; modelos aplicables de prestaciones y catálogo de métricas | Origen/ecuaciones/sensibilidades/incertidumbre/tradeoffs explícitos, confirmación/adopción, feedback a síntesis y escenarios reproducibles |
 
-Los alcances0.21–0.25 se especificarán y aprobarán por separado. El registro central
+Los alcances0.22–0.25 se especificarán y aprobarán por separado. El registro central
 [development-register](development-register.md) conserva IDs, dependencias y estado.
 Direct Acting sigue pendiente (FSD-DIRECT), fuera de0.20 y sin rocker ficticio.
 También permanecen abiertos reglas por edición/competición, Tilt preliminar/detallado,

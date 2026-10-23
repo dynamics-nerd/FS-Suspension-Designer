@@ -1,5 +1,27 @@
 # Modelo de datos
 
+## Extensión v0.21
+
+EngineeringScenario existente admite engine GLOBAL_STATIC y scope VEHICLE. No se
+amplía el registry con modelos duplicados: geometrías/actuaciones/coilovers son
+recursos existentes; `inputs.tires` contiene cuatro VerticalTireModel nativos
+ordenados FL/FR/RL/RR. El concepto existente aporta masa operativa, convención de
+inclusión del piloto, dimensiones, CG XYZ y masas no suspendidas. Plan explícito:
+vehicleOptions, systemOptions, cornerPlans y initialGuesses; options usa el
+contrato numérico0.10. La aproximación de masa cero debe seleccionarse expresamente.
+
+PreparedEngineeringScenario global añade cuatro preparaciones MECHANICAL, los
+tires y vehículo/loadCase; su context registra todas las dependencias consumidas.
+Payload global cerrado: system y equilibrium. Cada source de system conserva el
+BumpSweep original adicional a los snapshots ActuationSweep/Mechanical para
+vincular la evidencia a su plan. No se embeben EngineeringResults padres ni ledger.
+El validator comprueba por esquina los recursos/paths y reconstruye el aggregate
+nativo; valida ecuaciones/selección sin generar forwards. Los tiempos no autentican
+la historia de ejecución. Resultado lógico0.16, modelos0.7/0.8/0.9/0.10 y MAT0.19
+conservados. Software consumidor0.21; no migración implícita al abrir anteriores.
+Historial inmutable y clasificación selectiva por context, no sólo por IDs.
+[Campos, contratos y límites](guided-global-static.md).
+
 ## Integración v0.20
 
 No nuevos esquemas físicos: se reutilizan ActuationGeometry0.7, SpringDamperModel0.8,

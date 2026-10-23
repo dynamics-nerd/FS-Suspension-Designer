@@ -50,7 +50,7 @@ classdef TestEngineeringProjectWorkflow < matlab.unittest.TestCase
                 case "ARCHITECTURE"
                     c=d.concept.definitionSI; c.architectures.frontSuspension="MACPHERSON";
                     d.concept=fsd.project.createVehicleConcept(c); expected="UNSUPPORTED";
-                case "GLOBAL_STATIC", s.engine="GLOBAL_STATIC"; expected="UNSUPPORTED";
+                case "GLOBAL_STATIC", s.engine="GLOBAL_STATIC"; expected="INVALID_INPUT"; % existing CORNER scope is invalid for global
             end
             d.scenarios={fsd.project.createEngineeringScenario(s)}; r=fsd.project.designReadiness(fsd.project.createEngineeringProject(d),'SCENARIO');
             t.verifyEqual(r.status,expected); t.verifyNotEmpty(r.diagnostics);
