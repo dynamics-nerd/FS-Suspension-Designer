@@ -1,5 +1,24 @@
 # Arquitectura
 
+## Extensión v0.20 — actuación/mecánica
+
+`ActuationView` es una subvista de `fsdui.View` con adaptadores puros de tablas,
+planes, especificaciones y evidencia; no realiza cálculos de ingeniería. Se conserva
+el shell App Designer y los flujos anteriores. Los tres comandos nuevos pasan por
+Controller → workerRequest/perform → operationBody → APIs públicas `fsd.project`.
+`configureActuationResources` construye modelos y revisa atómicamente; `ACTUATION_RUN`
+prepara/ejecuta el motor nativo; `adoptActuationCandidate` adopta el par exacto.
+SPECIFICATION/SYNTHESIS reutilizan la orquestación existente y la geometría fija0.15.
+
+La recepción reconstruye las declaraciones con el mismo operationBody y sustituye
+sólo registros ya validados en el punto de ejecución. Se mantiene RF-01/02/03, sin
+solves durante recepción/visualización/adopción. Las protecciones del owner, epochs,
+ledger y publicación MAT abarcan las acciones nuevas. La vista sólo muestra evidencia
+actual o histórica con su compatibilidad; STALE no se recalcula ni se oculta.
+Model/kinematics/analysis/synthesis siguen independientes de proyecto/UI; no nueva
+arista de módulos ni un segundo mecanismo de revisiones, storage o worker.
+[Contrato, datos, unidades y uso](guided-actuation-mechanics.md).
+
 ## Extensión v0.19 — Packaging
 
 `fsd.packaging` consume modelos y estados nativos inmutables; no ejecuta

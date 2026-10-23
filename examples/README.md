@@ -1,5 +1,22 @@
 # Examples
 
+## v0.20 — complete guided actuation/mechanics
+
+`setupProject; addpath('app','examples'); out=guidedActuationMechanicsExample;`
+uses explicit ASSUMED synthetic inputs from actuationSynthesisSeed. It configures
+actuation/coilover, records BUMP/ACTUATION/MECHANICAL, declares a native MR target,
+searches three evaluations, compares seed/selected candidate and adopts the exact
+actuation/mechanics with unchanged suspension and complete ledger (four results).
+The target uses an independent native +5mm chassis-Y solve outside the search
+budget; it is software integration evidence, not a measured vehicle or FS advice.
+
+`out=guidedActuationMechanicsExample('new-project.mat');` additionally verifies
+exact MAT round trip; destination must be new. No fixed files or plots are written
+by default. Output includes elapsed time, Windows memory before/after and operation
+times/memory snapshots; these are not peak resident memory measurements or general
+performance guarantees. [Workflow/limits](../docs/guided-actuation-mechanics.md) ·
+[actual evidence](../docs/v0.20-validation.md).
+
 ## v0.19 — packaging explícito
 
 `setupProject; addpath('examples'); out=packagingFeasibilityExample(false);`

@@ -1,5 +1,16 @@
 # v0.18 — Guided Suspension Design Interface
 
+## v0.20 Actuation/Mechanical extension
+
+The ninth Actuation page adds explicit native configuration, ACTUATION/MECHANICAL,
+fixed-suspension synthesis, candidate comparison/adoption and complete MAT. The
+existing pages remain. [Step-by-step use and contracts](guided-actuation-mechanics.md)
+includes units, source notes, readiness, failure/STALE semantics and model limits.
+If Async is selected without a process worker, the operation offers Cancel,
+Start worker or Run synchronously explicitly. Drafts must be applied first.
+No whole-app visual redesign or engineering calculations in UI callbacks.
+See [actual v0.20 execution results](v0.20-validation.md).
+
 ## v0.19 Packaging extension
 
 The native R2026b app gains an eighth Packaging page. The App Designer shell is

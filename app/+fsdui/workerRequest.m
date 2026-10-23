@@ -9,7 +9,7 @@ if ismember(request.action,["SAVE","VALIDATE","COMPATIBILITY"])
 end
 request.ledgerPolicy="APPEND";
 p=request.project; records=p.definition.results; needed="";
-if request.action=="ADOPT", needed=string(request.arguments.resultId);
+if ismember(request.action,["ADOPT","ACTUATION_ADOPT"]), needed=string(request.arguments.resultId);
 elseif ismember(request.action,["PACKAGING_RUN","PACKAGING_COMPARE"]), needed=string(request.arguments.parentId);
 end
 keep=cellfun(@(r)string(r.id)==needed,records);

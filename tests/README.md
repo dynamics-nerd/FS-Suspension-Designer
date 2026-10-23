@@ -1,5 +1,38 @@
 # Testing strategy
 
+## v0.20 — guided actuation/mechanics
+
+The six original TestGuidedActuationConfiguration cases are retained. New focused
+classes: TestGuidedActuationAnalysis (native outputs/SI/semantic binding/no solves),
+TestGuidedActuationSynthesis (declaration/annotations/budget/adoption/STALE),
+TestGuidedActuationVariants (architecture/body declarations, tabulated units/sources,
+axis contradiction/provenance), TestGuidedActuationUI (real controls/curves/drafts and
+recovered plans), TestGuidedActuationPersistence (real ProcessPool, cancellation,
+epoch/semantic rejection, exact MAT and integrated four-record example).
+
+```matlab
+setupProject; addpath('app','examples','tests');
+r = runtests({'tests/TestGuidedActuationConfiguration.m', ...
+    'tests/TestGuidedActuationAnalysis.m','tests/TestGuidedActuationSynthesis.m', ...
+    'tests/TestGuidedActuationVariants.m','tests/TestGuidedActuationUI.m', ...
+    'tests/TestGuidedActuationPersistence.m'});
+assertSuccess(r);
+report = verifyV20; % Analyzer, module DAG, inventory only; not full test execution
+```
+
+Run one MATLAB process at a time for native UI/worker tests. PCT is required for
+the actual process test; no skipped worker check is reported as PASS. Historical
+physics tests retain independent implicit rocker/energy/curvature oracles. Their
+own tolerances are not replaced by GUI round-trip tolerances. Prior tests/examples
+that write fixed output names must run in an isolated source copy to preserve old
+evidence. New example takes an optional NEW destination and never overwrites it.
+
+`verifyV20Legacy(input,expected,destination)` requires a real project produced by
+unmodified0.19 in a separate MATLAB process and its exact expected value. It has no
+missing-fixture fallback PASS. Ordinary tests do not depend on ignored work files.
+All test identities, commands, successes, failed attempts, costs and unexecuted
+coverage are distinguished in [v0.20-validation](../docs/v0.20-validation.md).
+
 ## v0.19 Packaging
 
 TestPackagingGeometry uses independent Euclidean cases and optional Navigation

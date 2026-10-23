@@ -1,5 +1,27 @@
 # Requisitos
 
+## v0.20 — actuación y mecánica operativas
+
+| ID | Requisito vigente | Verificación principal |
+|---|---|---|
+| REQ-V20-CONFIG | Geometría registrada, PUSHROD/PULLROD, attachment UPRIGHT/UCA/LCA, eje/rocker explícitos y coilover opcional nativo; parámetros, límites, unidades y procedencia | TestGuidedActuationConfiguration (seis originales), TestGuidedActuationVariants |
+| REQ-V20-ANALYSIS | Ejecutar ACTUATION/MECHANICAL, mostrar compresión/longitud/theta/MR/fuerzas/Kw total con validez y diagnósticos; velocidad mecánica explícita | TestGuidedActuationAnalysis, TestGuidedActuationUI, oráculos históricos |
+| REQ-V20-SEARCH | Configurar especificación/plan/opciones y ejecutar síntesis histórica con suspensión fija; comparar candidatos guardados sin nuevos solves | TestGuidedActuationSynthesis, TestGuidedActuationUI |
+| REQ-V20-ADOPT | Adoptar recursos relacionados exactos, elegibilidad/compatibilidad verificadas, una revisión, geometría e histórico intactos y STALE selectivo | TestGuidedActuationSynthesis, TestGuidedActuationPersistence |
+| REQ-V20-RECEIPT | Vincular operación solicitada a respuesta real; reutilizar RF-01/02/03, preservar IDs/epochs y rechazar respuestas canónicas de otra operación atómicamente | Tests nuevos de configuración/análisis/síntesis/persistencia; regresiones RF |
+| REQ-V20-UI | Extensión mínima de v0.19, unidades de ingeniería, borradores explícitos, estados/readiness/error, worker o selección síncrona explícita; no inputs inventados | TestGuidedActuationUI y regresiones UI/worker |
+| REQ-V20-MAT | Persistir configuración/escenarios/procedencia/opciones/historial exactos; leer proyectos anteriores y permitirlos sin nuevos recursos | TestGuidedActuationPersistence, verifyV20Legacy, regresiones de proyecto/storage |
+| REQ-V20-QA | Tests relevantes por incremento, oráculos independientes, regresión histórica, APIs públicas, Analyzer/DAG y costes representativos reales; auditoría separada | verifyV20 y el informe de ejecución |
+| REQ-DOC-CONTINUITY | Cada versión debe actualizar contratos, arquitectura, datos, decisiones, requisitos, tests, validación y roadmap afectados; explicar ecuaciones/algoritmos/supuestos/alternativas/errores/límites y evidencia sin depender de chats | Documentación por versión y registro central estable |
+
+No Direct Acting en0.20 (requisito FSD-DIRECT conservado), nueva estructura/fatiga/
+pandeo/hidráulica avanzada/fabricación, cuatro esquinas integradas, ARB o Adams.
+La existencia de sus módulos/APIs históricos no implica flujo guiado completo.
+Registro central = estado/planificación; requirements = requisitos; decisions =
+razones; contratos = funcionamiento; informes = ejecuciones; originales = historia.
+[Contrato](guided-actuation-mechanics.md) · [registro](development-register.md) ·
+[evidencia real](v0.20-validation.md).
+
 ## v0.19 Packaging & Physical Feasibility
 
 - REQ-V19-SOLIDS: esfera/cápsula/AABB/OBB explícitas, transformaciones propias,

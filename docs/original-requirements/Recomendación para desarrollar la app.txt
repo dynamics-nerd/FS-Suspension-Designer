@@ -1,0 +1,982 @@
+Sí. Para **tu proyecto concreto** te recomendaría empezar con **MATLAB como lenguaje/núcleo de cálculo + MATLAB App Designer para la interfaz de la primera versión + GitHub desde el primer día**. No intentaría ahora mezclar MATLAB con React, C++, Python, Electron, etc. porque multiplicarías la complejidad antes de saber siquiera si el solver funciona.
+
+La arquitectura que ya definimos va precisamente en esa dirección: un núcleo modular donde `Geometry Solver`, `Rules Engine`, `Tire Model`, `Optimization`, `Adams Export`, etc. sean independientes, de manera que en el futuro puedas cambiar la interfaz sin reescribir el cálculo. fileciteturn0file0L947-L971
+
+## MATLAB vs Visual Studio Code
+
+Hay una confusión importante aquí: **Visual Studio Code no es una tecnología para crear interfaces gráficas**. Es principalmente un editor/IDE. Puedes programar Python, JavaScript, C++, etc. con VS Code, pero necesitarías elegir además una tecnología de interfaz: PySide/PyQt, React, Electron, Tauri, .NET, etc.
+
+Para tu V1, yo haría:
+
+```text id="subff7"
+MATLAB
+│
+├── Núcleo matemático
+│   ├── Geometría
+│   ├── Cinemática
+│   ├── Dinámica
+│   ├── Neumático
+│   ├── Rules
+│   ├── Packaging
+│   ├── Optimización
+│   └── Exportación Adams
+│
+└── MATLAB App Designer
+    ├── Ventanas
+    ├── Botones
+    ├── Tablas
+    ├── Sliders
+    ├── Gráficos
+    └── Visualización 3D
+```
+
+App Designer está pensado precisamente para construir aplicaciones interactivas en MATLAB. ([mathworks.com](https://www.mathworks.com/help/matlab/ref/appdesigner.html?utm_source=chatgpt.com))
+
+Y tiene una ventaja especialmente interesante **ahora mismo**: desde MATLAB R2026b las aplicaciones de App Designer pueden guardarse como `.m + .xml` en lugar de obligatoriamente como `.mlapp` binario. Eso permite que Git pueda mostrar qué líneas han cambiado, hacer merges, comparar versiones, etc. ([mathworks.com](https://www.mathworks.com/help/matlab/creating_guis/app-designer-file-formats.html?utm_source=chatgpt.com))
+
+Por tanto, si tienes R2026b, yo utilizaría **el formato plain-text de App Designer desde el principio**.
+
+---
+
+# Pero no empieces haciendo la interfaz
+
+Este sería probablemente el error número 1.
+
+Puedes pasar un mes haciendo algo que tenga este aspecto:
+
+```text id="sbrxjq"
+┌─────────────────────────────────────────────┐
+│ FS Suspension Designer                     │
+├──────────┬──────────────────────────────────┤
+│ Vehicle  │                                  │
+│ Tires    │           [modelo 3D]            │
+│ Geometry │                                  │
+│ Analysis │                                  │
+│ Rules    │                                  │
+└──────────┴──────────────────────────────────┘
+```
+
+...y todavía no tener un programa capaz de calcular correctamente el camber.
+
+Para una aplicación de ingeniería como esta, **la interfaz es una capa que llama al núcleo matemático**. No debe contener el núcleo matemático.
+
+Por ejemplo, NO:
+
+```matlab id="f7tjio"
+function CalculateButtonPushed(app,event)
+
+    % 300 líneas calculando la suspensión
+    ...
+end
+```
+
+Sino algo parecido conceptualmente a:
+
+```matlab id="18x8ir"
+function CalculateButtonPushed(app,event)
+
+    result = KinematicSolver.solve(app.Suspension, app.State);
+
+    app.updatePlots(result);
+
+end
+```
+
+Y `KinematicSolver` debería funcionar perfectamente **aunque App Designer ni siquiera exista**.
+
+Eso es esencial.
+
+---
+
+# El orden en el que yo desarrollaría TU proyecto
+
+Además, no desarrollaría la aplicación siguiendo el orden de pantallas que definimos en el documento.
+
+El usuario finalmente hará:
+
+```text id="9qogur"
+Vehicle Concept
+      ↓
+Targets
+      ↓
+Geometry
+      ↓
+Optimization
+      ↓
+Validation
+```
+
+Pero tú como desarrollador deberías hacerlo prácticamente al revés.
+
+## FASE 0 — Preparar el proyecto
+
+Antes de programar cálculos, crea un repositorio **privado de GitHub**.
+
+Algo parecido a:
+
+```text id="s6o59e"
+FS-Suspension-Designer/
+│
+├── README.md
+│
+├── docs/
+│   ├── architecture.md
+│   ├── coordinate-system.md
+│   ├── equations.md
+│   └── roadmap.md
+│
+├── src/
+│   ├── geometry/
+│   ├── kinematics/
+│   ├── vehicle/
+│   ├── tire/
+│   ├── rules/
+│   ├── packaging/
+│   ├── optimization/
+│   ├── dynamics/
+│   └── export/
+│
+├── app/
+│
+├── tests/
+│
+├── examples/
+│
+├── data/
+│   └── rules/
+│
+└── output/
+```
+
+No es necesario que todas esas carpetas tengan código desde el principio.
+
+Estás creando el esqueleto.
+
+---
+
+# FASE 1 — Haz una suspensión diminuta
+
+Tu primer objetivo **no debería ser crear la V1**.
+
+Debería ser algo muchísimo más pequeño:
+
+> Introduzco los hardpoints de una suspensión double wishbone y MATLAB dibuja esa suspensión en 3D.
+
+Nada más.
+
+Por ejemplo:
+
+```text id="wso0a8"
+LCA Front
+LCA Rear
+UCA Front
+UCA Rear
+LBJ
+UBJ
+Wheel Centre
+Contact Patch
+```
+
+Defines tu sistema de coordenadas:
+
+```text id="t1j4qq"
+X = longitudinal
+Y = lateral
+Z = vertical
+```
+
+Esto ya estaba definido como requisito fundamental del proyecto. fileciteturn0file0L55-L81
+
+Y consigues:
+
+```text id="j2iyuc"
+       UCA
+   ●────────●
+    \      /
+     \    /
+      ● UBJ
+      │
+      │ upright
+      │
+      ● LBJ
+     /    \
+    /      \
+   ●────────●
+       LCA
+```
+
+Rotable en 3D.
+
+En ese momento ya tienes tu primera milestone:
+
+**v0.1 — Static suspension geometry**
+
+---
+
+# FASE 2 — Construir el primer solver
+
+Ahora haces que la rueda se mueva.
+
+Objetivo:
+
+```text id="x008kj"
+Wheel travel:
+-30 mm
+...
+0 mm
+...
++30 mm
+```
+
+Para cada posición resuelves las restricciones geométricas que habíamos definido:
+
+\[
+\|P_i-C_i\|=L_i
+\]
+
+y obtienes la nueva posición y orientación del upright. fileciteturn0file0L579-L610
+
+Primero calcula **una sola cosa**:
+
+```text id="0zozi7"
+Camber(z)
+```
+
+Y produces:
+
+```text id="ccyc5s"
+Camber
+  │
+-1│       /
+-2│     /
+-3│   /
+  └──────────── wheel travel
+   -30  0  +30
+```
+
+Nada de neumáticos.
+
+Nada de Skidpad.
+
+Nada de optimización.
+
+Nada de rules.
+
+Nada de IA.
+
+Si consigues:
+
+> hardpoints → wheel travel → camber correcto
+
+has construido el primer trozo verdaderamente importante del programa.
+
+---
+
+# FASE 3 — Tests. Desde aquí, obligatorios.
+
+Aquí hay una diferencia entre hacer un trabajo de clase y desarrollar software de ingeniería.
+
+Cada cálculo importante debe tener tests.
+
+MATLAB incluye un framework específico para unit testing, por lo que puedes probar funciones, clases y posteriormente incluso componentes de App Designer. ([mathworks.com](https://www.mathworks.com/help/matlab/matlab-unit-test-framework.html?utm_source=chatgpt.com))
+
+Por ejemplo:
+
+```text id="g6f934"
+tests/
+
+testDistanceConstraint.m
+testCamber.m
+testToe.m
+testKPI.m
+testRollCenter.m
+...
+```
+
+Imagina que sabes que para una geometría:
+
+```text id="r4nnfs"
+z = 0 mm
+camber = -1.500°
+```
+
+Tu test comprueba:
+
+```text id="ljewy4"
+expected = -1.500;
+actual = calculateCamber(...);
+
+verifyEqual(testCase,actual,expected,...
+            "AbsTol",1e-6)
+```
+
+¿Por qué es tan importante?
+
+Porque dentro de seis meses puedes modificar `RotationMatrix.m` para implementar steering.
+
+Sin querer rompes camber.
+
+GitHub/Matlab ejecuta los tests:
+
+```text id="fnfqdj"
+✓ distance
+✓ KPI
+✓ toe
+✗ camber
+
+Expected: -1.500
+Actual:   -1.437
+```
+
+Y sabes inmediatamente que has roto algo.
+
+Eso es mucho más importante para esta aplicación que tener una interfaz bonita.
+
+Y coincide con una de las decisiones más importantes que ya habíamos establecido:
+
+> **solver correcto primero; optimización después.** fileciteturn0file0L1118-L1140
+
+---
+
+# FASE 4 — Completar la cinemática básica
+
+Cuando camber esté demostrado:
+
+```text id="mif9w3"
+Camber
+↓
+Toe
+↓
+Caster
+↓
+KPI
+↓
+Scrub radius
+↓
+Mechanical trail
+↓
+Instant center
+↓
+Roll center
+```
+
+Uno por uno.
+
+Y cada nuevo módulo:
+
+```text id="myd2fn"
+implementación
+      ↓
+caso conocido
+      ↓
+test
+      ↓
+comparación OptimumKinematics / Adams
+      ↓
+aceptado
+```
+
+No:
+
+```text id="i4jgsf"
+hacer 20 ecuaciones
+↓
+esperar que todo funcione
+```
+
+Tu propio documento ya establece la comparación parámetro por parámetro contra herramientas externas. fileciteturn0file0L1120-L1137
+
+---
+
+# FASE 5 — Ahora sí, una interfaz mínima
+
+Aquí abriría **MATLAB App Designer**.
+
+Pero la primera interfaz podría ser ridículamente sencilla:
+
+```text id="b384q1"
+┌─────────────────────────────────────────────┐
+│ Suspension Designer                        │
+├────────────────┬────────────────────────────┤
+│ HARDPOINTS     │                            │
+│                │                            │
+│ UCA Front XYZ  │       suspensión 3D        │
+│ UCA Rear XYZ   │                            │
+│ LCA Front XYZ  │                            │
+│ ...            │                            │
+│                │                            │
+│ [Calculate]    │                            │
+├────────────────┴────────────────────────────┤
+│ Camber vs wheel travel                     │
+│ ─────────────────────────────────────────  │
+└─────────────────────────────────────────────┘
+```
+
+Eso ya te dará mucha experiencia con:
+
+- inputs;
+- tablas;
+- callbacks;
+- sliders;
+- tabs;
+- gráficas;
+- `uiaxes`;
+- actualización del modelo 3D.
+
+Entonces tendrás una **app real**, aunque sea muy básica.
+
+---
+
+# FASE 6 — Steering y otros movimientos
+
+Después amplías tu solver:
+
+```text id="ber1oe"
+heave
+roll
+pitch
+steering
+```
+
+hasta llegar al estado general que definimos:
+
+\[
+q=[heave,\ roll,\ pitch,\ steering]
+\]
+
+y después combinaciones entre ellos. fileciteturn0file0L617-L639
+
+Otra milestone:
+
+**v0.3 — Full kinematic solver**
+
+---
+
+# FASE 7 — Pushrod / pullrod / rocker
+
+Ahora:
+
+```text id="62zsz3"
+pushrod
+rocker
+damper
+motion ratio
+wheel rate
+```
+
+y nuevamente:
+
+```text id="v0mjsi"
+solver
+↓
+tests
+↓
+interfaz
+```
+
+No al revés.
+
+---
+
+# FASE 8 — Packaging y Rules
+
+Después introduciría:
+
+```text id="sasia3"
+FIXED
+RANGE
+FREE
+```
+
+y los design volumes.
+
+Entonces puedes empezar a decir:
+
+```text id="txuham"
+UCA Front:
+X = 315–350 mm
+Y = FIXED
+Z = 280–320 mm
+```
+
+y definir obstáculos básicos.
+
+Después:
+
+```text id="0jr2y4"
+Rules Engine
+```
+
+por separado.
+
+Esto es importante porque las Rules no deberían estar mezcladas en el solver. Eso también era una condición de la arquitectura que definimos. fileciteturn0file0L77-L93
+
+---
+
+# FASE 9 — Aquí empieza realmente la optimización
+
+Solo ahora.
+
+Hasta este momento tienes:
+
+```text id="kpvirf"
+hardpoints
+       ↓
+solver
+       ↓
+kinematics
+       ↓
+results
+```
+
+Ahora puedes invertirlo:
+
+```text id="cltv0i"
+targets
+       ↓
+optimizer
+       ↓
+hardpoints
+       ↓
+solver
+       ↓
+results
+       ↓
+error
+       └─────────→ optimizer
+```
+
+Y empezar con:
+
+\[
+J=w_1E_{camber}+w_2E_{toe}+\ldots
+\]
+
+más penalizaciones de rules/packaging. fileciteturn0file0L703-L741
+
+Entonces ya puedes empezar a tener algo realmente diferencial respecto a OptimumKinematics.
+
+---
+
+# FASE 10 — Dinámica, neumático y generación automática de targets
+
+Esto lo dejaría **bastante tarde**.
+
+Primero:
+
+```text id="fj4djr"
+Geometry Only
+```
+
+Después:
+
+```text id="5ntpqx"
+Generic FS Tire
+```
+
+Y finalmente:
+
+```text id="oty1ce"
+Custom Tire
+```
+
+Tal como habíamos diseñado. fileciteturn0file0L223-L245
+
+Esto evita que tengas simultáneamente bugs en:
+
+```text id="kgbxhe"
+modelo de neumático
++
+transferencia de carga
++
+solver de suspensión
++
+optimizador
+```
+
+y no sepas de dónde viene el error.
+
+---
+
+# GitHub: sí, absolutamente
+
+Aunque seas tú solo.
+
+No lo pienses inicialmente como:
+
+> “GitHub sirve para que varias personas programen juntas”.
+
+Para ti va a ser sobre todo:
+
+> **la memoria completa de cómo evoluciona tu aplicación.**
+
+GitHub recomienda precisamente un flujo ligero basado en ramas, cambios, commits y pull requests. ([docs.github.com](https://docs.github.com/en/get-started/using-github/github-flow?utm_source=chatgpt.com))
+
+Para ti no pondría GitFlow ni cosas complicadas.
+
+Usaría solamente:
+
+```text id="u0w407"
+main
+```
+
+como versión que funciona.
+
+Para desarrollar algo:
+
+```text id="rj2rf3"
+feature/camber-calculation
+feature/roll-center
+feature/3d-viewer
+feature/rules-engine
+fix/toe-sign-error
+```
+
+Trabajas ahí.
+
+Cuando funciona:
+
+```text id="m2kvto"
+tests ✓
+```
+
+merge a:
+
+```text id="rlvij9"
+main
+```
+
+Y listo.
+
+---
+
+# También usaría GitHub Issues
+
+Esto te va a venir especialmente bien porque tu proyecto es gigantesco.
+
+Por ejemplo:
+
+```text id="kjr9gu"
+#12 Calculate camber from wheel orientation
+
+#13 Implement toe calculation
+
+#14 Calculate front-view instant center
+
+#15 Implement roll center
+
+#16 Add wheel-travel sweep
+
+#17 Plot camber vs wheel travel
+```
+
+Cada cosa pequeña y concreta.
+
+No crees una Issue:
+
+> “Hacer solver de suspensión”
+
+porque puedes estar tres meses con ella.
+
+Una buena tarea debería responder a:
+
+> **¿Cómo sé objetivamente que esto está terminado?**
+
+Por ejemplo:
+
+### Issue #12 — Camber calculation
+
+**Input**
+```text id="rtvlam"
+Wheel rotation matrix
+```
+
+**Output**
+```text id="o4vc8y"
+Camber [deg]
+```
+
+**Acceptance criteria**
+
+```text id="gya4zx"
+Static test geometry → -1.500 ± 0.001°
+Positive rotation test → expected result
+Negative rotation test → expected result
+```
+
+Esto empieza a convertir el proyecto en **ingeniería de software** en lugar de una carpeta con 70 scripts de MATLAB.
+
+---
+
+# Haz commits pequeños
+
+No hagas:
+
+```text id="h5b140"
+"cambios"
+```
+
+ni:
+
+```text id="mqbxpk"
+"cosas nuevas"
+```
+
+Haz:
+
+```text id="bssepz"
+Add camber calculation from wheel rotation matrix
+
+Add unit tests for camber calculation
+
+Fix sign convention for right wheel camber
+
+Add wheel travel sweep
+
+Add camber curve plotting
+```
+
+Si mañana rompes algo puedes volver exactamente al punto anterior.
+
+---
+
+# Versiones
+
+También empezaría a numerarlas desde muy pronto:
+
+```text id="kffd2n"
+v0.1.0
+Static double wishbone geometry
+
+v0.2.0
+Bump kinematics
+
+v0.3.0
+Complete kinematic parameters
+
+v0.4.0
+Steering
+
+v0.5.0
+Pushrod and rocker
+
+v0.6.0
+Basic App Designer interface
+
+v0.7.0
+Packaging
+
+v0.8.0
+Rules
+
+v0.9.0
+Geometry optimizer
+
+v1.0.0
+Complete first release
+```
+
+No significa que `v0.1` sea algo presentable.
+
+Es una forma de saber:
+
+> “en esta versión sé que estas funciones funcionaban”.
+
+---
+
+# ¿Y Visual Studio Code?
+
+Yo **lo instalaría**, pero no lo usaría para crear otra interfaz ahora.
+
+Podrías acabar teniendo:
+
+```text id="kguf9r"
+MATLAB
+→ programación científica
+
+MATLAB App Designer
+→ interfaz
+
+GitHub
+→ repositorio
+
+GitHub Desktop
+→ commits/branches visualmente
+
+VS Code
+→ README, JSON, CSV, documentación, Git,
+   scripts auxiliares...
+```
+
+Pero puedes hacer perfectamente los primeros meses prácticamente todo desde MATLAB.
+
+MATLAB además integra Git directamente en sus Projects. ([mathworks.com](https://www.mathworks.com/help/matlab/matlab_prog/use-source-control-with-projects.html?utm_source=chatgpt.com))
+
+Si nunca has utilizado Git, probablemente te resultará más cómodo:
+
+**GitHub Desktop + MATLAB**
+
+que intentar aprender simultáneamente comandos Git por terminal.
+
+---
+
+# ¿Y si dentro de dos años App Designer se queda pequeño?
+
+Aquí está la razón por la que insisto tanto en separar la interfaz.
+
+Imagina que tienes:
+
+```text id="8ic9cw"
+app/
+    SuspensionDesigner.m
+
+src/
+    GeometrySolver.m
+    KinematicSolver.m
+    TireModel.m
+    RulesEngine.m
+    Optimizer.m
+    ...
+```
+
+Y un día decides que quieres una interfaz espectacular hecha en:
+
+```text id="bct9cp"
+React
++
+Three.js
++
+Tauri
+```
+
+o:
+
+```text id="4naar5"
+Python
++
+PySide6
+```
+
+Puedes sustituir:
+
+```text id="hhe3yj"
+MATLAB App Designer
+```
+
+sin replantear **qué es un roll center, cómo se calcula el camber o cómo funciona el optimizador**.
+
+Esta fue precisamente la intención de la arquitectura modular original. fileciteturn0file0L949-L971
+
+Y si finalmente quieres distribuir la versión MATLAB a gente que no tenga MATLAB, existe la opción de generar una aplicación standalone mediante MATLAB Compiler; el usuario final necesita MATLAB Runtime, pero no una licencia de MATLAB. ([mathworks.com](https://www.mathworks.com/help/compiler/standalone-applications.html?utm_source=chatgpt.com))
+
+Así que tampoco necesitas resolver ahora mismo el problema de distribución.
+
+---
+
+# Mi stack para ti
+
+Si mañana empezaras el proyecto, escogería esto:
+
+| Elemento | Elección |
+|---|---|
+| Lenguaje principal | **MATLAB** |
+| Solver matemático | **MATLAB** |
+| Optimización | **MATLAB** |
+| Visualización 3D V1 | **MATLAB graphics** |
+| Interfaz V1 | **MATLAB App Designer** |
+| Editor | **MATLAB IDE** |
+| Editor auxiliar | VS Code |
+| Versionado | **Git** |
+| Repositorio | **GitHub privado** |
+| Git para principiante | **GitHub Desktop** |
+| Gestión de tareas | **GitHub Issues** |
+| Testing | **MATLAB Unit Testing Framework** |
+| Documentación | Markdown dentro de `/docs` |
+| Validación cinemática | OptimumKinematics |
+| Validación alta fidelidad | Adams Car |
+| CAD | El que utilice vuestro equipo |
+| Datos | MAT / JSON / CSV según corresponda |
+
+Y **no metería Python, JavaScript, C++, SQL, servidores, APIs ni una base de datos tradicional en este momento** salvo que aparezca una necesidad concreta.
+
+---
+
+## La hoja de ruta que seguiría
+
+Tu proyecto completo sigue siendo el que definimos:
+
+```text id="8b1zii"
+requirements
+        ↓
+targets
+        ↓
+geometry synthesis
+        ↓
+kinematic analysis
+        ↓
+optimization
+        ↓
+packaging
+        ↓
+rules
+        ↓
+Tilt Test
+        ↓
+candidate selection
+        ↓
+Adams validation
+```
+
+fileciteturn0file0L5-L15
+
+Pero **tu hoja de ruta como programador** debería ser:
+
+```text id="alvv9j"
+GitHub + estructura
+        ↓
+modelo de datos
+        ↓
+geometría estática
+        ↓
+solver de una rueda
+        ↓
+camber
+        ↓
+tests
+        ↓
+resto de cinemática
+        ↓
+validación
+        ↓
+visualizador 3D
+        ↓
+App Designer básica
+        ↓
+steering
+        ↓
+actuation
+        ↓
+4 ruedas
+        ↓
+packaging
+        ↓
+rules
+        ↓
+optimización de hardpoints
+        ↓
+targets
+        ↓
+modelo dinámico
+        ↓
+tire model
+        ↓
+Tilt Test
+        ↓
+Adams export
+        ↓
+V1
+```
+
+**Esa diferencia es fundamental.** La especificación de V1 describe dónde quieres llegar; no es el orden en que debes programarla.
+
+Y, dado que dices que nunca has desarrollado una app, incluso iría un paso más allá: **antes de escribir código del solver, definiría contigo la arquitectura real del repositorio**, las carpetas, qué clases/estructuras de datos necesitamos, cómo representar un `Vehicle`, un `Suspension`, un `Hardpoint`, un `State`, un `Result`, etc., y cuál sería exactamente el primer milestone `v0.1`. Eso evitaría empezar con scripts sueltos que luego haya que rehacer.

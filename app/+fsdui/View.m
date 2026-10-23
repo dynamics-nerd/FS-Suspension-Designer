@@ -10,6 +10,7 @@ classdef View < handle
         ResultAxes
         ResultCurveAxes
         Packaging
+        Actuation
     end
     properties (Access=private)
         PollTimer
@@ -25,13 +26,14 @@ classdef View < handle
         DrawnSearchScope = "FL"
         DraftPages = strings(0,1)
         PendingCommit = ""
+        PendingActuation = false
         Closing = false
     end
     methods
         function obj=View(fig)
             obj.Figure=fig; obj.Controller=fsdui.Controller();
             screen=get(groot,'ScreenSize');
-            fig.Name='FS Suspension Designer | v0.19.0';
+            fig.Name='FS Suspension Designer | v0.20.0';
             fig.Position=[40 40 min(1280,screen(3)-80) min(820,screen(4)-100)];
             theme(fig,'light'); % Explicit local theme; never change the user's MATLAB preference.
             fig.Color=[.96 .97 .98]; fig.CloseRequestFcn=@(~,~)obj.close();
@@ -53,17 +55,29 @@ classdef View < handle
                     case "SPECIFICATION", allowed=["Targets";"Synthesis";"Analysis"];
                     case "BUMP", allowed="Analysis";
                     case {"PACKAGING_DEFINITION","PACKAGING_DEMO"}, allowed="Packaging";
+                    case {"ACTUATION_CONFIG","ACTUATION_RUN","ACTUATION_ADOPT"}, allowed="Actuation";
                     case {"NEW","LOAD","DEMO"}, allowed=obj.DraftPages;
+                end
+                actuationAction=startsWith(action,'ACTUATION_') || ...
+                    (action=="SPECIFICATION" && ismember(string(args.definition.engine),["ACTUATION","MECHANICAL","ACTUATION_SYNTHESIS"])) || ...
+                    (ismember(action,["SYNTHESIS","READINESS"]) && startsWith(string(args.scenarioId),'UI_ACT_SEARCH_'));
+                if actuationAction
+                    allowed="Actuation"; obj.Actuation.prepareAction(action,args);
                 end
                 if ~isempty(setdiff(obj.DraftPages,allowed))
                     error('fsd:ui:UnappliedDraft','Apply drafts on %s before running this action; this prevents silent data loss.',strjoin(setdiff(obj.DraftPages,allowed),', '));
                 end
                 async=obj.UI.Async.Value;
-                if async && isempty(obj.Controller.Pool)
-                    error('fsd:ui:NoWorker','Start the process worker on Project first, or explicitly uncheck asynchronous execution.');
+                if async && (isempty(obj.Controller.Pool) || ~isvalid(obj.Controller.Pool))
+                    answer=uiconfirm(obj.Figure,'No process worker is available. Choose explicitly how to execute this operation.', ...
+                        'Execution mode','Options',{'Cancel','Start worker','Run synchronously'},'DefaultOption',1,'CancelOption',1);
+                    if string(answer)=="Cancel", return;
+                    elseif string(answer)=="Start worker", obj.Controller.enableWorker();
+                    else, async=false; obj.UI.Async.Value=false;
+                    end
                 end
                 assert(~obj.Controller.Busy,'fsd:ui:Busy','Wait for the current operation before starting another.');
-                obj.PendingCommit=action; obj.Controller.run(action,args,async);
+                obj.PendingCommit=action; obj.PendingActuation=actuationAction; obj.Controller.run(action,args,async);
             catch cause, obj.showError(cause);
             end
         end
@@ -74,9 +88,14 @@ classdef View < handle
                 return;
             end
             c=obj.Controller; obj.UI.Status.Text=char(c.Status);
+            obj.Actuation.updateStatus();
             obj.UI.Cancel.Enable=matlab.lang.OnOffSwitchState(c.Busy);
             if c.Busy, return; end
             if strlength(obj.PendingCommit)>0 && startsWith(c.Status,obj.PendingCommit+" complete")
+                if obj.PendingActuation
+                    obj.Actuation.committed();
+                    if ~obj.Actuation.hasDraft(), obj.DraftPages=setdiff(obj.DraftPages,"Actuation"); end
+                else
                 switch obj.PendingCommit
                     case "VEHICLE", obj.DraftPages=setdiff(obj.DraftPages,"Vehicle");
                     case "DECISIONS", obj.DraftPages=setdiff(obj.DraftPages,"Geometry");
@@ -84,7 +103,8 @@ classdef View < handle
                     case "BUMP", obj.DraftPages=setdiff(obj.DraftPages,"Analysis");
                     case {"PACKAGING_DEFINITION","PACKAGING_DEMO"}
                         obj.DraftPages=setdiff(obj.DraftPages,"Packaging"); obj.Packaging.committed();
-                    case {"NEW","LOAD","DEMO"}, obj.DraftPages=strings(0,1);
+                    case {"NEW","LOAD","DEMO"}, obj.DraftPages=strings(0,1); obj.Actuation.resetDrafts();
+                end
                 end
                 obj.PendingCommit="";
             end
@@ -122,6 +142,7 @@ classdef View < handle
                 obj.drawAnalysis(); obj.DrawnCompatibility=c.Compatibility;
             end
             obj.Packaging.refresh();
+            obj.Actuation.refresh();
         end
         function close(obj)
             if obj.Closing || isempty(obj.Controller), return; end
@@ -147,6 +168,7 @@ classdef View < handle
             obj.Controller.Changed=[]; obj.Controller.close();
             if isfield(obj.UI,'Sample') && isgraphics(obj.UI.Sample), obj.UI.Sample.UserData=[]; end
             if ~isempty(obj.Packaging) && isvalid(obj.Packaging), obj.Packaging.release(); end
+            if ~isempty(obj.Actuation) && isvalid(obj.Actuation), obj.Actuation.release(); end
             obj.DrawnProject=[]; obj.DrawnCompatibility={}; obj.Definition=[]; obj.SeedRows=[];
             obj.Controller=[]; obj.UI=struct(); obj.Tabs=[];
             obj.GeometryAxes=[]; obj.CurveAxes=[]; obj.ResultAxes=[]; obj.ResultCurveAxes=[];
@@ -168,12 +190,12 @@ classdef View < handle
             root=uigridlayout(obj.Figure,[4 1]); root.RowHeight={64,34,'1x',60}; root.Padding=[16 12 16 12];
             header=uigridlayout(root,[1 2]); header.ColumnWidth={'1x',350};
             uilabel(header,'Text','FS  /  SUSPENSION DESIGNER','FontSize',23,'FontWeight','bold','FontColor',[.08 .17 .25]);
-            uilabel(header,'Text','v0.19  •  PACKAGING & PHYSICAL FEASIBILITY','HorizontalAlignment','right','FontColor',[.22 .34 .42]);
+            uilabel(header,'Text','v0.20  •  ACTUATION & MECHANICS','HorizontalAlignment','right','FontColor',[.22 .34 .42]);
             bar=uigridlayout(root,[1 2]); bar.ColumnWidth={'1x',170}; bar.Padding=0;
             obj.UI.Status=uilabel(bar,'Text','Ready','FontWeight','bold');
             obj.UI.Cancel=uibutton(bar,'Text','Request cancellation','ButtonPushedFcn',@(~,~)obj.Controller.cancel());
             obj.Tabs=uitabgroup(root);
-            names=["Project","Vehicle","Geometry","Analysis","Targets","Synthesis","Results","Packaging"];
+            names=["Project","Vehicle","Geometry","Analysis","Targets","Synthesis","Results","Packaging","Actuation"];
             for name=names, obj.UI.(name+"Tab")=uitab(obj.Tabs,'Title',name); end
             footer=uitextarea(root,'Editable','off','Value', ...
                 {'EXPERIMENTAL ENGINEERING SOFTWARE — not suitable for manufacturing a real suspension.'; ...
@@ -183,6 +205,7 @@ classdef View < handle
             obj.projectPage(); obj.vehiclePage(); obj.geometryPage(); obj.analysisPage();
             obj.targetsPage(); obj.synthesisPage(); obj.resultsPage();
             obj.Packaging=fsdui.PackagingView(obj.UI.PackagingTab,obj.Controller,@(action,args)obj.invoke(action,args),@()obj.draft());
+            obj.Actuation=fsdui.ActuationView(obj.UI.ActuationTab,obj.Controller,@(action,args)obj.invoke(action,args),@()obj.draft());
         end
         function projectPage(obj)
             g=uigridlayout(obj.UI.ProjectTab,[6 1]); g.RowHeight={38,38,38,130,'1x',40};
@@ -669,6 +692,7 @@ classdef View < handle
             if obj.Tabs.SelectedTab==obj.UI.GeometryTab && obj.GeometryPlotPending, obj.drawGeometry();
             elseif obj.Tabs.SelectedTab==obj.UI.AnalysisTab && obj.AnalysisPlotPending, obj.drawAnalysis();
             elseif obj.Tabs.SelectedTab==obj.UI.ResultsTab && obj.ResultPlotPending, obj.drawResults();
+            elseif obj.Tabs.SelectedTab==obj.UI.ActuationTab, obj.Actuation.refresh();
             end
         end
         function adopt(obj)

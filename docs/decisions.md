@@ -1,5 +1,48 @@
 # Registro de decisiones
 
+## Integración guiada v0.20 — decisiones nuevas
+
+- **GAM-001:** reutilizar fábricas, preparación, ejecución y validadores históricos
+  v0.7/v0.8/v0.15. Alternativa descartada: implementar ecuaciones o un solver en la
+  UI, que duplicaría convenciones y referencias verificadas. No nueva física.
+- **GAM-002:** configurar/adoptar actuación y coilover en una transacción de proyecto,
+  conservando exactamente la geometría y el ledger. Alternativa descartada: adoptar
+  sólo hardpoints visibles y reconstruir después un coilover aproximado, que puede
+  perder identidad, procedencia o límites. `[]` elimina mecánica explícitamente.
+- **GAM-003:** tres acciones nuevas con reconstrucción semántica compartida y recepción
+  RF-01/02/03. Reutilizar SPECIFICATION/SYNTHESIS en lugar de otro protocolo worker.
+  Se conserva sólo el padre de adopción en transporte; el owner mantiene el historial.
+  Validación canónica por sí sola no demuestra correspondencia con lo solicitado.
+- **GAM-004:** subvista nativa independiente, tablas y gráficas sobre evidencia guardada;
+  mm, grados, N y N/mm en fronteras, SI dentro. Alternativa descartada: rediseño global,
+  simulador gráfico o recomputación al seleccionar. La vista difiere gráficos ocultos
+  y limpia poses inválidas. Drafts deben aplicarse; no se guarda una copia UI del modelo.
+  En validación nativa, la primera página del grupo de pestañas interno se mostraba
+  vacía y sus gestos agotaban20s; se eligió el patrón existente de selector/paneles
+  superpuestos, que permite controlar explícitamente visibilidad. No se atribuye una
+  causa interna a MATLAB que no se haya demostrado. Capturas diagnostic del estado
+  inicial y ui-before-edit de la configuración corregida, además de las repeticiones
+  del informe; las tablas conservan sus gestos originales.
+- **GAM-005:** requerir velocidad y procedencia explícitas para el flujo mecánico guiado,
+  manteniendo intacto el default de reposo de las APIs históricas directas. No inferir
+  velocidad del grid ni imponer límites físicos estimados. No usar un rocker ficticio
+  para Direct Acting. Targets/normalización son declaración del usuario, no síntesis
+  fundamentada desde prestaciones (prevista v0.25).
+  Selectores físicos sin recurso previo permanecen UNSELECTED y se limpian al cambiar
+  de contexto; no usar la primera opción o la selección de otro corner como dato físico.
+- **GAM-006:** datos sin nuevo schema; ampliar software0.20 en los validadores que lo
+  necesitan. Mantener MAT0.19 y exactitud canónica, no migrar proyectos viejos al abrir.
+  Si falta worker, ofrecer Cancel/Start worker/Run synchronously explícitos. No fallback
+  silencioso ni nuevo backend. Costes medidos en casos representativos, sin límites
+  arbitrarios de historial, benchmarks extensivos u optimización marginal.
+
+Justificación histórica: se conservan las razones que ya constan en ACS/SD/ACT/MR y
+PKG. Cuando no conste el porqué original de una elección, **OPEN DECISION — reconstruir
+motivación histórica**; las razones nuevas anteriores sólo justifican esta integración.
+Direct Acting, modelos estructurales, gas/histéresis/fabricación y nuevas hipótesis
+quedan fuera de v0.20. No hay una decisión física abierta necesaria para este alcance.
+[Contrato y alternativas](guided-actuation-mechanics.md) · [validación](v0.20-validation.md).
+
 ## Packaging v0.19
 
 - PKG-020 (V19-RF-03): la autoridad de recepción es la operación pendiente del

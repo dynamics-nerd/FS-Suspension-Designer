@@ -1,4 +1,4 @@
 function value = version()
 %VERSION Return the current development milestone identifier.
-value = "0.19.0";
+value = "0.20.0";
 end

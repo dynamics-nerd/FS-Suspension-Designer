@@ -1,5 +1,33 @@
 # Roadmap
 
+## Prioridad vigente desde v0.20
+
+Completar capacidades de ingeniería y su uso verificable con la interfaz v0.19,
+después rediseño visual definitivo y finalmente Adams. Plan provisional aprobado
+por el usuario; sólo v0.20 tiene alcance de implementación autorizado. Las secciones
+inferiores registran entregas históricas y sus exclusiones de entonces.
+
+| Versión | Entrega prevista / dependencias | Criterio para definir su alcance |
+|---|---|---|
+| v0.20 | Actuación/mecánica existentes operativas; base estable v0.19.0 y RF-01/02/03 | Configuración explícita → ACT/MECH → síntesis fija → comparación/adopción coherente → MAT; incrementos A/B/C/D, [contrato](guided-actuation-mechanics.md), [validación](v0.20-validation.md) |
+| v0.21 | Cuatro esquinas y equilibrio global; recursos/paths mecánicos de0.20, modelos reducidos0.9/0.10 | Preparación por corner, masas/CG/contactos/closure explícitos, readiness, solución global y diagnósticos; no asumir que el solver histórico ya ofrece el workflow integrado |
+| v0.22 | Neumáticos Geometry Only / Generic / Custom; interfaces reemplazables | Geometría sin datos de fuerza permitida; Generic con supuestos documentados, Custom con datos/procedencia/dominio/validación; elegir ecuaciones/datos al especificar, sin inventar parámetros universales |
+| v0.23 | Anti-roll bar; mecánica/equilibrio y estrategia ARB-001 | INTEGRATED / POST_DESIGN / DISABLED, acoplamiento y signos/energía/balances verificables; decidir geometría/modelo antes de implementar |
+| v0.24 | Performance Solver reducido y comparadores iniciales de eventos Formula Student;0.21/22/23 | Modelos de fidelidad explícita para eventos acordados, datos de pista/vehículo, validación independiente y límites; no lap time avanzado ni certificación |
+| v0.25 | Generación fundamentada y selección de targets; modelos aplicables de prestaciones y catálogo de métricas | Origen/ecuaciones/sensibilidades/incertidumbre/tradeoffs explícitos, confirmación/adopción, feedback a síntesis y escenarios reproducibles |
+
+Los alcances0.21–0.25 se especificarán y aprobarán por separado. El registro central
+[development-register](development-register.md) conserva IDs, dependencias y estado.
+Direct Acting sigue pendiente (FSD-DIRECT), fuera de0.20 y sin rocker ficticio.
+También permanecen abiertos reglas por edición/competición, Tilt preliminar/detallado,
+pitch/anti geometry, síntesis integral/multiobjetivo/robustez y mejoras de packaging
+con actuación móvil. Su orden posterior requiere contratos físicos y datos propios;
+no quedan borrados ni se asignan versiones ficticiamente. UI final y Adams dependen
+de la ingeniería operativa. Gestión Git/publicación exclusivamente del usuario;
+validación del desarrollador y auditoría independiente separadas.
+Estado0.20: implementación y validación local completas (592 casos seleccionados
+PASS); pendiente de auditoría independiente. No se ha iniciado0.21 ni publicado0.20.
+
 ## v0.19 — Packaging & Physical Feasibility
 
 Base publicada v0.18.0, rama feature/v0.19-packaging-feasibility. Volúmenes
@@ -8,7 +36,8 @@ exenciones locales, recurso/proyecto/MAT, comparación y página Packaging.
 Aceptación verificable: casos analíticos independientes, fallos/datos ausentes
 sin falso CLEAR, staleness selectivo, recorrido real UI/MAT, scores históricos
 inalterados, regresiones y límites documentados. [Contrato](packaging-physical-feasibility.md)
-· [estado real de validación](v0.19-validation.md). No publicación ni v0.20 autorizadas.
+· [estado histórico de validación](v0.19-validation.md). La base estable para0.20
+es la release publicada v0.19.0; esto no reescribe los informes de desarrollo previos.
 
 ## v0.18 — Guided Suspension Design Interface
 
@@ -401,11 +430,12 @@ integration F-01 conservada, MAT/ataques, 471 históricos y nuevos tests,
 11 ejemplos, Analyzer0/DAG/performance/diff check. Revisión humana pendiente.
 [Contrato](design-requirements-target-evaluation.md) · [Evidencia](v0.11-validation.md).
 
-## Futuro conservado (no iniciado en esta tarea)
+## Futuro registrado al cerrar v0.11 (histórico)
 
 Generación razonada de targets desde vehículo; Performance Solver reducido;
 síntesis inversa; optimización de hardpoints/multiobjetivo/Pareto; packaging 3D;
 Formula Student Rules Engine; anti-dive, anti-lift/anti-rise, anti-squat; ARB
 `antiRollBarStrategy = INTEGRATED | POST_DESIGN | DISABLED`; Tilt Test;
 comparación robusta bajo incertidumbre; Adams export y validation plan.
-Cada capacidad requiere contratos físicos y validación propios. No v0.12.
+Cada capacidad requería contratos físicos y validación propios. El estado vigente
+es el plan superior y el registro central; síntesis y packaging ya tienen entregas.

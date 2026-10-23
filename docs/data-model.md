@@ -1,5 +1,22 @@
 # Modelo de datos
 
+## Integración v0.20
+
+No nuevos esquemas físicos: se reutilizan ActuationGeometry0.7, SpringDamperModel0.8,
+síntesis0.15 y proyecto/escenario/resultado0.16. Software0.20.0 admitido junto a las
+versiones previas en resultados y PackagingSourceReference; storage0.19 intacto.
+Los recursos del corner se registran/adoptan como par coherente. Metadata conserva
+`parameterProvenance.<ID>.sourceKind/sourceNote`; otras claves existentes se preservan.
+No se convierten fuentes/labels en identidad física ni se borra el ledger al revisar.
+
+Escenarios UI_ACTUATION/MECHANICAL/ACT_SEARCH por corner guardan plan SI completo,
+specification/targetOrigins y opciones nativas. Una fila sin editar conserva el
+objeto exacto; anotar un target no pierde incertidumbres/tolerancia numérica ocultas.
+Resultados originales y candidatos mantienen sus propios snapshots; la adopción
+copia los recursos exactos y cambia sólo la configuración actual. MAT recupera todo
+el proyecto lógico. Drafts/cámara/selección de la vista son estado temporal, no un
+segundo modelo persistido. [Campos, firmas y fronteras](guided-actuation-mechanics.md).
+
 ## Packaging v0.19
 
 Structs canónicos de valores (schema0.19), sin handles en el núcleo:

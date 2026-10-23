@@ -15,7 +15,7 @@ classdef TestGuidedDesignUI < matlab.uitest.TestCase
     end
     methods (Test)
         function nativeClassAndNavigation(t)
-            t.verifyClass(t.App,'FSSuspensionDesigner'); t.verifyNumElements(t.View.Tabs.Children,8);
+            t.verifyClass(t.App,'FSSuspensionDesigner'); t.verifyNumElements(t.View.Tabs.Children,9);
             t.choose(t.View.UI.VehicleTab); t.verifyEqual(t.View.Tabs.SelectedTab,t.View.UI.VehicleTab);
             t.choose(t.View.UI.GeometryTab); t.verifyEqual(t.View.Tabs.SelectedTab,t.View.UI.GeometryTab);
         end

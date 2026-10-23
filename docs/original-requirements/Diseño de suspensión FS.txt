@@ -1,0 +1,100 @@
+La **v0.16.0 queda cerrada y publicada**. A partir de ahora, `main` y el tag `v0.16.0` son la nueva base estable de FS-Suspension-Designer.
+
+Antes de iniciar v0.17, conviene revisar si el desarrollo sigue acercándonos al objetivo original de la aplicación.
+
+## Situación del proyecto
+
+He contrastado las funcionalidades desarrolladas hasta v0.16 con el documento original del proyecto.
+
+| Área | Situación |
+|---|---|
+| Geometría y cinemática de suspensión | Desarrollada |
+| Dirección y Ackermann | Desarrollada |
+| Pushrod/pullrod, rocker y wheel rate | Desarrollada |
+| Requisitos HARD/SOFT | Desarrollada |
+| Síntesis inversa desde geometrías seed | Desarrollada |
+| Proyectos, escenarios y readiness | Desarrollada |
+| Generación de geometrías iniciales sin seed | Pendiente |
+| Generación de targets justificados por prestaciones | Pendiente |
+| Modelo de neumáticos y dinámica vehicular | Pendiente |
+| Packaging tridimensional | Pendiente |
+| Rules Engine y Tilt Test integrados | Pendiente o integración por completar |
+| Interfaz gráfica completa | Pendiente |
+| Exportación y validación en Adams Car | Pendiente |
+
+El problema principal que queda es la transición entre **tener información básica del monoplaza** y **obtener una geometría de suspensión**, sin necesitar que el ingeniero haya definido previamente todos los hardpoints y targets.
+
+<box border radius="lg" padding={3} gap={2}>
+  <row align="center" gap={2}>
+    <icon name="check-circle" color="success"/>
+    **Flujo que ya podemos construir**
+  </row>
+  <text size="sm">Geometría seed + targets definidos → síntesis → análisis → comparación y resultados trazables.</text>
+  <divider color="subtle"/>
+  <row align="center" gap={2}>
+    <icon name="circle-dashed" color="secondary"/>
+    **Flujo que todavía queremos conseguir**
+  </row>
+  <text size="sm">Datos básicos del vehículo → objetivos de comportamiento justificados → geometría inicial → síntesis → validación.</text>
+</box>
+
+## Mi recomendación para el siguiente paso
+
+**No abriría todavía la rama v0.17.** Haría primero una revisión funcional, sin modificar código, para decidir cuál de las piezas pendientes aporta más valor y en qué orden debemos desarrollarlas.
+
+Para esa revisión utilizaría **Work con GPT-6 Sol — Medium**, que debería ser suficiente para comparar documentación, inspeccionar los módulos y elaborar una hoja de ruta. No necesitamos High ni repetir las auditorías numéricas ya superadas.
+
+<WritingBlock id="80316" variant="document"># Work — Revisión funcional y planificación posterior a v0.16.0
+
+Proyecto: `C:\Users\vaque\Documents\Apps FSAE\FS-Suspension-Designer`
+
+Base estable: `main`, release `v0.16.0`.
+
+## Objetivo
+
+Realizar una revisión integral, estrictamente de solo lectura, del estado funcional de FS-Suspension-Designer.
+
+Contrastar la implementación real con la visión original: una aplicación que acompañe el diseño de suspensiones Formula Student desde los parámetros iniciales del vehículo hasta una geometría optimizada, evaluada y preparada para validación de mayor fidelidad.
+
+## Trabajo solicitado
+
+1. Leer `AGENTS.md`, README, arquitectura, roadmap, decisiones, modelos de datos, contratos y documentos de validación v0.1–v0.16.
+
+2. Consultar, si están disponibles, `Nucleo-Funcionalidades-Refinado.txt` y `Recomendación para desarrollar la app.txt`. Si no están disponibles, indicarlo expresamente.
+
+3. Inspeccionar las APIs públicas y ejemplos representativos. Distinguir las funcionalidades implementadas, parcialmente implementadas, documentadas pero no implementadas y completamente ausentes. No considerar una función desarrollada por aparecer únicamente en el roadmap.
+
+4. Reconstruir el recorrido de un ingeniero que empieza sin hardpoints y solo dispone de masa, batalla, vías, neumáticos y algunas restricciones de packaging. Identificar dónde se detiene el flujo y qué módulos necesita para continuar.
+
+5. Evaluar específicamente las carencias de generación de targets, geometrías seed, modelos de dinámica y neumáticos, integración de reglas, packaging, optimización coordinada, visualización 3D, App Designer y exportación Adams.
+
+6. Identificar qué capacidades existentes pueden reutilizarse directamente y cuáles exigen nuevos modelos físicos. Evitar proponer funciones que produzcan precisión o prestaciones ficticias.
+
+7. Proponer tres alternativas concretas para v0.17, indicando valor para el usuario, dependencias, esfuerzo técnico, riesgos y criterios verificables de aceptación.
+
+8. Recomendar una hoja de ruta de v0.17 a v0.20, priorizando un producto útil y coherente, no simplemente añadir módulos aislados.
+
+9. Definir cuál debería ser el primer flujo funcional completo que pueda probar una persona sin conocer las APIs de MATLAB.
+
+10. Identificar qué partes del núcleo actual deberían estabilizarse antes de desarrollar la interfaz gráfica.
+
+## Entrega
+
+Producir un informe con:
+
+- Matriz de funcionalidades y estado real.
+- Principales diferencias respecto a la visión original.
+- Recorrido de usuario actual frente al objetivo.
+- Dependencias y bloqueos técnicos.
+- Tres alternativas de v0.17.
+- Hoja de ruta recomendada.
+- Funcionalidad mínima demostrable en cada versión.
+- Riesgos y decisiones abiertas.
+
+No realizar cambios de código, pruebas destructivas, commits, merges, tags ni releases. No crear todavía la rama v0.17.
+
+No iniciar automáticamente ninguna implementación.</WritingBlock>
+
+La cuestión que quiero resolver con esta revisión es **cuándo conviene empezar App Designer y qué capacidad de ingeniería necesitamos completar antes para que la interfaz tenga un flujo realmente útil**.
+
+Una vez resuelto eso, podremos definir v0.17 con un alcance más preciso y evitar desarrollar funcionalidades que después tengamos que reorganizar.

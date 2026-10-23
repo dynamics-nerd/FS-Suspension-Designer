@@ -4,6 +4,34 @@ Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student co
 
 ## Estado actual
 
+**v0.20.0 implementada y validada localmente — pendiente de auditoría independiente**,
+actuación y mecánica guiadas, sobre la release estable
+publicada v0.19.0 (`58ee34b`), rama activa `feature/v0.20-actuation-mechanics`.
+Configuración PUSHROD/PULLROD, UPRIGHT/UCA/LCA y coilover nativo, análisis ACTUATION/
+MECHANICAL, curvas y diagnósticos, síntesis de actuación con suspensión fija,
+comparación/adopción coherente y MAT completo. Extensión mínima de la interfaz0.19;
+SI interno, mm/grados en las nuevas vistas. No nuevos modelos estructurales.
+Validación seleccionada:592/592 PASS (33 nuevos +559 históricos), Analyzer0/662;
+inventario1987, no suite completa repetida. Núcleo físico histórico intacto.
+
+```matlab
+app = launchFSSuspensionDesigner;
+% Ejemplo completo con datos ASSUMED, sin archivos de salida por defecto:
+setupProject; addpath('app','examples');
+out = guidedActuationMechanicsExample;
+% Opcional: guidedActuationMechanicsExample('ruta-nueva.mat'); % no sobrescribe
+```
+
+[Uso, APIs, ecuaciones y límites](docs/guided-actuation-mechanics.md) ·
+[validación real v0.20](docs/v0.20-validation.md) ·
+[registro central](docs/development-register.md) · [roadmap](docs/roadmap.md).
+La integración conserva RF-01/RF-02/RF-03 y los límites históricos de latencia/
+memoria; no promete interfaz continuamente fluida ni historiales arbitrarios.
+Direct Acting permanece pendiente. No fabricación/certificación. Auditoría en
+otra conversación y gestión de ramas/commits/publicación exclusivamente del usuario.
+
+## Registro histórico v0.19 (no sustituye el estado superior)
+
 Seguimiento actual: [RF-03 — correspondencia operación/resultado](docs/v0.19-rf03-operation-contract.md).
 Implementación local y validación focalizada completas:286/286 casos únicos PASS,
 48 nuevos; Analyzer0/643. Inventario1954, sin repetir la suite completa. Sin

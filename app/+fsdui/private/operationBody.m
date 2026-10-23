@@ -20,6 +20,21 @@ switch request.action
         project=fsdui.upsertScenario(project,buildScenario(definition));
     case "READINESS"
         value=fsd.project.designReadiness(project,a.scenarioId);
+    case "ACTUATION_CONFIG"
+        [project,value]=fsd.project.configureActuationResources(project,a.cornerId, ...
+            a.definition,a.lengthUnit,a.mechanicalDefinition,a.units);
+    case "ACTUATION_RUN"
+        assert(ismember(string(a.engine),["ACTUATION","MECHANICAL"]), ...
+            'fsd:ui:InvalidOperation','Select ACTUATION or MECHANICAL explicitly.');
+        scenario=fsd.project.createEngineeringScenario(struct('id',"UI_"+a.engine+"_"+a.cornerId, ...
+            'engine',string(a.engine),'scope',fsd.model.designScope('CORNER',a.cornerId),'plan',a.plan));
+        project=fsdui.upsertScenario(project,scenario);
+        [value,project]=runScenario(project,scenario.definition.id,a.resultId);
+    case "ACTUATION_ADOPT"
+        records=project.definition.results;
+        found=cellfun(@(r)string(r.id)==string(a.resultId),records);
+        assert(nnz(found)==1,'fsd:ui:MissingResult','Select one stored synthesis result.');
+        project=fsd.project.adoptActuationCandidate(project,records{found},a.index);
     case "BUILD"
         result=runScenario(project,"UI_BUILD_"+a.scope,a.resultId);
         if result.nativePayload.seed.nominalStatus=="VALID"

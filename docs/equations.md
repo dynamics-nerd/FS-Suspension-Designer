@@ -1,5 +1,15 @@
 # Convenciones y formulación matemática
 
+## Integración guiada v0.20
+
+No nuevas ecuaciones ni tolerancias de ingeniería. El flujo usa las formulaciones
+v0.7/v0.8/v0.15 descritas aquí, en [actuación](actuation-geometry-synthesis.md) y
+[mecánica](spring-damper-wheel-rate.md). Convierte m→mm, rad→deg, N/m→N/mm y
+N·s/m→N/(mm/s) sólo al presentar/introducir datos; dirección/MR adimensionales.
+Velocidad prescrita explícita en el flujo guiado, no simulación dinámica. No se
+confunde resistencia de rueda con fuerza estructural ni carga de neumático.
+[Algoritmos, supuestos, límites y pruebas](guided-actuation-mechanics.md).
+
 ## Construcción geométrica v0.17 (sin cambiar física histórica)
 
 C=[0,s*frontTrack/2,0] o [wheelbase,s*rearTrack/2,0], s=-1 left/+1 right.

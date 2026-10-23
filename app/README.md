@@ -1,4 +1,14 @@
-# Application UI — Guided Design + v0.19 Packaging
+# Application UI — Guided Design, Packaging, Actuation/Mechanics
+
+v0.20 adds `+fsdui/ActuationView.m` and pure table/plan/evidence adapters. The ninth
+page exposes native actuation/coilover configuration, ACTUATION/MECHANICAL analysis,
+fixed-suspension synthesis and exact resource adoption. New values display mm, deg,
+N and N/mm; canonical values stay SI. Native configuration and adoption are public project
+APIs, never calculations in callbacks. New operations use the same RF-01/02/03
+receipt validation, epochs and complete owner ledger. Without a process worker,
+Async offers an explicit worker/synchronous choice; no automatic fallback.
+See [the v0.20 contract and use](../docs/guided-actuation-mechanics.md) and
+[actual validation](../docs/v0.20-validation.md). No global visual redesign.
 
 Launch from the repository: `app = launchFSSuspensionDesigner;`.
 Edit with `appdesigner('app/FSSuspensionDesigner.m')` in MATLAB R2026b.

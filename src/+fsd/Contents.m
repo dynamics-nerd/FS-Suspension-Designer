@@ -1,5 +1,9 @@
 % FS Suspension Designer engineering core.
 %
+% v0.20 Guided Actuation & Mechanics (historical physics unchanged)
+%   fsd.project.configureActuationResources - Atomic explicit actuation/coilover resources.
+%   fsd.project.adoptActuationCandidate     - Exact compatible resources; fixed suspension.
+%
 % v0.19 Packaging & Physical Feasibility
 %   fsd.packaging.createVolume          - Explicit SI solid/free-region declaration.
 %   fsd.packaging.createDefinition      - Required pairs, margins, local exemptions, regions.

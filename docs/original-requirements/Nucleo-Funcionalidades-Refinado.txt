@@ -1,0 +1,1372 @@
+# Aplicación para el diseño, optimización y validación de suspensiones de Formula Student
+
+## 1. Idea general del proyecto
+
+El proyecto consiste en desarrollar una aplicación especializada en el diseño de suspensiones para vehículos de Formula Student. El objetivo no es crear simplemente una calculadora de geometría ni un programa en el que el usuario tenga que introducir una suspensión completamente definida para posteriormente estudiar su comportamiento. La intención es desarrollar un **asistente de ingeniería capaz de acompañar al equipo desde las primeras decisiones conceptuales del vehículo hasta la obtención de una geometría de suspensión lista para fabricar y validar mediante software de mayor fidelidad como Adams Car**.
+
+La diferencia es importante. Programas como OptimumKinematics están especialmente orientados al análisis de una geometría de suspensión ya definida y permiten modificar hardpoints, ejecutar movimientos de heave, roll, pitch o steering, estudiar cientos de parámetros cinemáticos y realizar optimizaciones multiobjetivo sobre los puntos de anclaje. La aplicación propuesta tomaría muchas de estas capacidades como referencia, pero intentaría empezar una fase antes del proceso de diseño.
+
+El usuario no tendría que saber inicialmente qué camber gain quiere, dónde debe situar el roll center o cuáles deberían ser exactamente las coordenadas de los trapecios. Podría comenzar con información mucho más básica del coche, por ejemplo una masa objetivo de 275 kg, una determinada batalla, unas vías aproximadas, las dimensiones básicas del neumático y algunas restricciones de packaging. A partir de esta información, la aplicación ayudaría primero a determinar **qué características debería tener la suspensión** y, posteriormente, buscaría una geometría capaz de conseguirlas.
+
+Por tanto, el flujo global del programa sería:
+
+**requisitos del vehículo → generación de targets → síntesis de la suspensión → análisis cinemático → optimización → packaging → normativa → Tilt Test → selección de soluciones → exportación y validación en Adams Car.**
+
+La primera versión debe ser suficientemente completa para recorrer todo este proceso, pero sin intentar convertirse en un software multibody equivalente a Adams. La aplicación realizaría internamente aquellos cálculos que deben ejecutarse miles de veces durante el proceso de diseño y optimización, mientras que las simulaciones de mayor fidelidad quedarían delegadas a Adams Car.
+
+---
+
+# 2. Filosofía de funcionamiento
+
+Uno de los principios fundamentales de la aplicación sería que **no todos los parámetros deben conocerse desde el principio**.
+
+Cada parámetro del proyecto tendría un tipo asociado.
+
+**KNOWN o FIXED** representaría algo conocido y que no debe modificarse, como el diámetro de la llanta o un hardpoint impuesto por el chasis.
+
+**RANGE** representaría un parámetro que todavía no está decidido pero del que se conoce un intervalo admisible, por ejemplo una vía delantera entre 1.200 y 1.250 mm.
+
+**FREE** sería una variable que el optimizador puede modificar dentro de unas restricciones geométricas.
+
+**TARGET** indicaría una característica que se desea conseguir, como una determinada curva de camber frente a wheel travel.
+
+**DERIVED** sería una magnitud que calcula automáticamente el programa, como scrub radius, caster trail o roll center.
+
+**ASSUMED** representaría un parámetro que el programa necesita para determinadas simulaciones pero que el usuario todavía no conoce con precisión. En ese caso se utilizaría un valor genérico, estimado o un intervalo claramente identificado como supuesto.
+
+Finalmente, **RULE** representaría una restricción impuesta por la normativa.
+
+Esta clasificación permite que la aplicación pueda trabajar incluso cuando el vehículo todavía está en una fase conceptual.
+
+Además, los datos que el programa tenga que asumir nunca deberían ocultarse. Si, por ejemplo, todavía no se conoce la altura exacta del centro de gravedad, el programa podría trabajar con:
+
+\[
+h_{CG}=280-340\ mm
+\]
+
+en lugar de obligar al usuario a inventarse un valor de 310 mm.
+
+La solución buscada podría entonces optimizarse para funcionar correctamente dentro de todo ese intervalo.
+
+Esto permite introducir otro concepto importante: **robustez del diseño**. No interesa únicamente encontrar una suspensión perfecta para un conjunto concreto de valores, sino una geometría que continúe comportándose correctamente aunque el CG, la masa final o la distribución de pesos cambien ligeramente durante el desarrollo del monoplaza.
+
+---
+
+# 3. Creación del proyecto y normativa
+
+Al crear un proyecto, la aplicación pediría primero información básica:
+
+nombre del vehículo, categoría, versión de reglas utilizada, sistema de unidades y sistema de coordenadas.
+
+Internamente debería emplearse siempre un sistema de coordenadas único, por ejemplo:
+
+\[
+X = \text{longitudinal hacia delante}
+\]
+
+\[
+Y = \text{lateral}
+\]
+
+\[
+Z = \text{vertical}
+\]
+
+aunque posteriormente sea posible exportar los datos utilizando la convención requerida por otro programa.
+
+La normativa debe tratarse mediante un **Rules Engine independiente del solver de suspensión**.
+
+Esto es importante porque las Formula Student Rules cambian. Las reglas no deberían estar dispersas en el código en forma de condiciones aisladas. Deberían almacenarse en una base de datos versionada.
+
+Cada regla tendría asociada su referencia, versión, expresión matemática, parámetros necesarios y resultado.
+
+El programa podría mostrar:
+
+**PASS**, cuando se cumple.
+
+**FAIL**, cuando se incumple.
+
+**WARNING**, cuando se está demasiado cerca del límite.
+
+**NOT EVALUABLE**, cuando todavía faltan datos.
+
+El objetivo de la primera versión no sería verificar absolutamente todo el reglamento del vehículo, sino las reglas que afectan directamente a **suspensión, dirección, dimensiones y estabilidad**.
+
+---
+
+# 4. Vehicle Concept: empezar con muy pocos datos
+
+Después se introducirían los primeros datos del monoplaza.
+
+En una fase muy temprana podrían ser simplemente:
+
+masa objetivo del vehículo, masa del piloto, wheelbase aproximado, front track, rear track, dimensiones básicas del neumático, diámetro de rueda y arquitectura general.
+
+La aplicación debe diferenciar siempre entre:
+
+\[
+m_{vehicle}
+\]
+
+y
+
+\[
+m_{total}=m_{vehicle}+m_{driver}
+\]
+
+porque muchos cálculos dinámicos necesitan la masa total en condiciones de funcionamiento.
+
+Según avance el proyecto se podrían introducir datos adicionales: distribución de pesos, CG longitudinal, altura del CG, masa no suspendida, potencia, curvas de par, transmisión, aerodinámica, spring rates previstos, etc.
+
+El programa mostraría qué información está siendo utilizada realmente y qué parámetros están todavía estimados.
+
+La idea no es que con tres números el programa pretenda conocer mágicamente cuál es la suspensión perfecta. Lo que debe hacer es trabajar progresivamente.
+
+Con poca información ofrecerá rangos amplios.
+
+A medida que se introduzcan datos más precisos, esos rangos se irán estrechando.
+
+---
+
+# 5. Generación de targets de suspensión
+
+Este sería uno de los elementos que más diferenciaría la aplicación de un programa convencional de cinemática.
+
+Antes de generar hardpoints, el software debe preguntarse:
+
+**¿qué comportamiento debería tener la suspensión?**
+
+El usuario podría seleccionar qué quiere priorizar:
+
+Skidpad, Acceleration, Autocross, Endurance o un compromiso global.
+
+La aplicación trabajaría entonces con variables conceptuales de suspensión, no todavía con posiciones de hardpoints.
+
+Entre ellas podrían encontrarse el camber gain delantero y trasero, roll center height y migration, bump steer, Ackermann, anti-dive, anti-squat, roll stiffness distribution, motion ratio, wheel rates, suspension travel o steering characteristics.
+
+El programa generaría miles de combinaciones posibles de estos parámetros y las evaluaría mediante un **modelo reducido de dinámica vehicular**.
+
+No sería un modelo multibody como Adams. Sería deliberadamente mucho más rápido.
+
+Su finalidad no sería afirmar que el coche realizará una vuelta en exactamente un tiempo determinado, sino determinar:
+
+> qué dirección de diseño mejora el comportamiento del vehículo y qué compromisos existen entre unas pruebas y otras.
+
+Además, el nivel de precisión de esta generación de targets dependerá de la cantidad y calidad de datos disponibles. La aplicación debe poder funcionar aunque el equipo no disponga de un modelo experimental del neumático.
+
+---
+
+# 6. Modelo rápido de dinámica vehicular
+
+Para poder generar targets con fundamento físico, la V1 necesitaría un modelo de dinámica de vehículo sencillo pero suficientemente representativo.
+
+## Acceleration
+
+Para Acceleration se puede utilizar un modelo longitudinal basado en:
+
+\[
+m\dot v=F_x-F_{drag}-F_{rr}
+\]
+
+considerando la potencia disponible, relación de transmisión, adherencia del neumático y transferencia longitudinal de carga.
+
+Una aproximación básica de esta última es:
+
+\[
+\Delta F_z=\frac{m a_x h_{CG}}{L}
+\]
+
+De esta forma puede estudiarse cómo cambios en la geometría trasera, anti-squat, reparto de masas o neumático afectan a la capacidad de transmitir potencia al suelo.
+
+## Skidpad
+
+Para Skidpad se utilizaría un modelo quasi-static de curva mantenida.
+
+Se buscaría el equilibrio:
+
+\[
+\sum F_y=m\frac{v^2}{R}
+\]
+
+junto con el equilibrio de momentos alrededor del eje vertical.
+
+La carga vertical sobre cada neumático dependería de la transferencia lateral, altura del CG, vías, posición de los roll centers y reparto de rigidez al balanceo.
+
+Además, cada neumático tendría un camber diferente debido al roll del chasis y a la propia cinemática de la suspensión.
+
+Cuando existe un modelo de fuerzas del neumático, esta información permite estimar cómo afectan dichas variaciones de camber y carga vertical al grip disponible.
+
+Si no existe dicho modelo, la aplicación todavía puede optimizar criterios geométricos, por ejemplo mantener el neumático exterior próximo a una orientación favorable respecto al suelo y controlar las variaciones de toe y roll center, pero no debería presentar esos resultados como una optimización absoluta de grip.
+
+## Autocross
+
+Autocross introduce un problema más complejo porque predominan los cambios continuos de dirección.
+
+La V1 no necesitaría realizar una simulación multibody completa. Puede utilizar un modelo de lap-time simplificado basado en curvatura, aceleración lateral disponible, capacidad de aceleración y frenada y respuesta del vehículo.
+
+Además de grip máximo, aquí adquirirían mayor importancia el steering response, Ackermann, roll gradient, bump steer y características transitorias.
+
+Cuando no se disponga de un modelo de neumático suficientemente detallado, estas simulaciones tendrían principalmente valor comparativo entre configuraciones.
+
+## Endurance
+
+Para Endurance podría utilizarse inicialmente el mismo modelo de vehículo pero modificando el objetivo de optimización.
+
+En lugar de buscar únicamente el máximo rendimiento instantáneo se penalizarían configuraciones excesivamente críticas o sensibles.
+
+La primera versión no intentaría modelar detalladamente temperatura y degradación del neumático durante la prueba. Esto pertenecería a una versión posterior.
+
+Por tanto, las predicciones de estas simulaciones deben interpretarse fundamentalmente como una **herramienta para comparar diseños**, especialmente cuando los datos de neumático son limitados.
+
+---
+
+# 7. Tratamiento del neumático y distintos niveles de fidelidad
+
+El modelo de neumático **no sería un requisito obligatorio para utilizar la aplicación**.
+
+Esta es una decisión importante porque muchos equipos de Formula Student pueden conocer qué neumático van a utilizar, pero no disponer de datos completos de fuerzas, ensayos TTC o un modelo Pacejka correctamente ajustado.
+
+La aplicación debe poder adaptarse a esta situación.
+
+Es necesario diferenciar entre dos tipos de información:
+
+**datos geométricos del neumático**, necesarios para construir físicamente la suspensión;
+
+y
+
+**datos dinámicos del neumático**, necesarios para estimar el grip y el rendimiento del vehículo.
+
+Los datos geométricos incluirían principalmente diámetro o radio exterior, anchura, diámetro de llanta y posición del contact patch.
+
+Estos sí son necesarios para definir correctamente la geometría del vehículo, calcular scrub radius, packaging, steering axis y otras magnitudes.
+
+Sin embargo, no es obligatorio disponer de un modelo de fuerzas completo.
+
+La aplicación trabajaría con tres niveles de información de neumático.
+
+## Nivel 1: Geometry Only
+
+En este modo únicamente se introducen las dimensiones físicas del conjunto rueda-neumático.
+
+Por ejemplo:
+
+radio o diámetro exterior;
+
+anchura;
+
+diámetro de llanta;
+
+posición nominal del contact patch.
+
+Con esta información la aplicación puede realizar prácticamente toda la parte geométrica y cinemática:
+
+hardpoints;
+
+camber;
+
+camber gain;
+
+toe;
+
+bump steer;
+
+caster;
+
+KPI;
+
+scrub radius;
+
+mechanical trail;
+
+roll center;
+
+Ackermann;
+
+anti-dive;
+
+anti-squat;
+
+motion ratio;
+
+packaging;
+
+Tilt Test;
+
+y cumplimiento reglamentario.
+
+También puede realizar optimización cinemática.
+
+En este modo, la generación de targets se basaría principalmente en criterios geométricos y en reglas generales de diseño.
+
+Por ejemplo, podría buscar mantener controlada la migración del roll center, reducir bump steer, conseguir una determinada evolución del camber o limitar scrub radius.
+
+Lo que no podría afirmar con rigor es que una determinada suspensión produce mayor grip o un tiempo de Skidpad inferior.
+
+La aplicación debería indicarlo claramente.
+
+Por ejemplo:
+
+**Tire force data unavailable. Performance targets are geometry-based and should not be interpreted as fully vehicle-performance optimized.**
+
+---
+
+## Nivel 2: Generic Formula Student Tire Model
+
+Este sería probablemente el modo por defecto para muchos equipos.
+
+Si no existen datos experimentales del neumático, la aplicación utilizaría un modelo simplificado parametrizado.
+
+El usuario podría introducir algunos parámetros básicos si los conoce:
+
+coeficiente de fricción aproximado;
+
+sensibilidad a carga;
+
+camber sensitivity;
+
+cornering stiffness;
+
+longitudinal stiffness;
+
+o valores aproximados equivalentes.
+
+Los parámetros desconocidos podrían tomar valores genéricos correspondientes a un neumático slick de Formula Student, siempre mostrándolos como **ASSUMED**.
+
+Por ejemplo, una aproximación simplificada podría expresar:
+
+\[
+F_{y,max}=\mu(F_z,\gamma)F_z
+\]
+
+donde el coeficiente efectivo de fricción varía con la carga vertical y el camber.
+
+Esto permite representar dos fenómenos fundamentales:
+
+**load sensitivity**, por la cual duplicar la carga vertical no produce exactamente el doble de fuerza lateral;
+
+y **camber sensitivity**, mediante la cual el neumático modifica su capacidad de generar fuerza lateral dependiendo de su inclinación.
+
+Con un modelo de este tipo se pueden realizar simulaciones comparativas útiles sin disponer de datos experimentales completos.
+
+La aplicación podría entonces estudiar preguntas como:
+
+> ¿Qué ocurre si aumento el camber gain?
+
+> ¿Qué reparto de roll stiffness parece más favorable?
+
+> ¿Qué suspensión mantiene mejor orientado el neumático exterior durante Skidpad?
+
+> ¿Cómo cambia la capacidad lateral cuando modifico los roll centers?
+
+Las conclusiones seguirían siendo aproximadas, pero tendrían un fundamento dinámico mayor que una optimización puramente geométrica.
+
+---
+
+## Nivel 3: Custom Tire Model
+
+Si el equipo dispone de información experimental, podría utilizarla directamente.
+
+La aplicación permitiría importar tablas o modelos que proporcionen relaciones como:
+
+\[
+F_y=f(\alpha,F_z,\gamma)
+\]
+
+y
+
+\[
+F_x=f(\kappa,F_z,\gamma)
+\]
+
+donde:
+
+\[
+\alpha=\text{slip angle}
+\]
+
+\[
+\kappa=\text{slip ratio}
+\]
+
+\[
+F_z=\text{carga vertical}
+\]
+
+\[
+\gamma=\text{camber}
+\]
+
+Posteriormente podrían incorporarse también efectos de presión, combined slip, temperatura o desgaste.
+
+Este modo permitiría una generación de targets mucho más específica para el neumático realmente utilizado por el equipo.
+
+La arquitectura del programa debe diseñarse desde el principio para que el modelo de neumático sea **intercambiable**.
+
+El Vehicle Dynamics Solver no debería depender directamente de una ecuación concreta. Debería solicitar al módulo de neumático algo del tipo:
+
+\[
+[F_x,F_y,M_z]=TireModel(state)
+\]
+
+De esta forma el modelo simplificado de la V1 puede sustituirse posteriormente por uno mucho más avanzado sin modificar el resto del programa.
+
+---
+
+## 7.1. Qué se puede hacer sin modelo dinámico de neumático
+
+La ausencia de un modelo dinámico no impediría desarrollar una suspensión real.
+
+| Función | ¿Necesita modelo dinámico de neumático? |
+|---|---:|
+| Hardpoints | No |
+| Camber | No |
+| Camber gain | No |
+| Toe | No |
+| Bump steer | No |
+| Caster | No |
+| KPI | No |
+| Scrub radius | No |
+| Mechanical trail | No |
+| Roll center | No |
+| Roll center migration | No |
+| Ackermann | No |
+| Anti-dive | No |
+| Anti-squat | No |
+| Motion ratio | No |
+| Wheel rate | No |
+| Packaging | No |
+| Tilt Test | No |
+| Rules compliance | No |
+| Optimización cinemática | No |
+| Transferencia de carga | No |
+| Generación de targets geométricos | No |
+| Comparación de grip entre suspensiones | Sí |
+| Optimización directa de Skidpad | Recomendable |
+| Optimización directa de Autocross | Recomendable |
+| Predicción de lap time | Sí |
+| Modelo térmico de Endurance | Sí |
+
+Por tanto, el neumático **no debe convertirse en una barrera de entrada a la aplicación**.
+
+El programa simplemente reducirá o aumentará la fidelidad de las conclusiones según la información disponible.
+
+Esto sigue la filosofía general del proyecto:
+
+**usar todo lo que se conoce, identificar claramente todo lo que se supone y no inventar precisión donde no existe.**
+
+---
+
+# 8. Obtención de los targets
+
+Una vez creado el modelo rápido, la aplicación puede realizar un proceso de optimización.
+
+Dependiendo del nivel de datos de neumático disponible, los targets obtenidos tendrán diferentes niveles de profundidad.
+
+Con **Geometry Only**, la aplicación optimizaría principalmente características geométricas y cinemáticas.
+
+Con **Generic Tire Model**, podría relacionar esas características con tendencias de rendimiento.
+
+Con **Custom Tire Model**, podría optimizar específicamente para las características reales del neumático seleccionado.
+
+El programa podría ejecutar miles de combinaciones distintas de:
+
+camber gain, front/rear roll center, roll stiffness distribution, Ackermann, anti-squat, anti-dive, wheel rates y toe characteristics.
+
+Cada combinación produciría unas métricas de rendimiento o calidad para Skidpad, Acceleration, Autocross y Endurance.
+
+No debería buscarse una única solución mediante una suma arbitraria de todo.
+
+El problema es claramente **multiobjetivo**.
+
+Una configuración puede mejorar Skidpad y empeorar la respuesta en Autocross. Otra puede tener más grip pero resultar más sensible a variaciones del CG.
+
+Por ello la aplicación mostraría una **frontera de Pareto**.
+
+El usuario podría encontrar, por ejemplo:
+
+**Design A — máxima prestación lateral**
+
+**Design B — máximo Autocross**
+
+**Design C — mejor compromiso global**
+
+**Design D — diseño más robusto**
+
+El algoritmo de la V1 podría implementarse utilizando técnicas de optimización evolutiva multiobjetivo.
+
+El resultado de esta fase todavía no serían hardpoints.
+
+Serían **target curves y target ranges**.
+
+Por ejemplo:
+
+\[
+Camber(z)
+\]
+
+\[
+Toe(z)
+\]
+
+\[
+RC(z)
+\]
+
+\[
+MotionRatio(z)
+\]
+
+\[
+Ackermann(\delta)
+\]
+
+Esto separa correctamente dos problemas de ingeniería diferentes:
+
+**qué suspensión queremos**
+
+y
+
+**qué geometría produce esa suspensión**.
+
+---
+
+# 9. Selección de arquitectura de suspensión
+
+Una vez establecidos los targets, comienza el diseño físico.
+
+Para mantener controlado el alcance, la primera versión estaría centrada en la arquitectura más habitual en Formula Student:
+
+**double wishbone independiente en las cuatro ruedas.**
+
+En el eje delantero se incorporaría dirección mediante rack-and-pinion.
+
+Para la actuación de muelle-amortiguador se permitirían:
+
+direct acting, pushrod y pullrod.
+
+El usuario seleccionaría la arquitectura y la aplicación generaría los hardpoints correspondientes.
+
+En versiones posteriores podrían añadirse multilink, MacPherson u otras topologías, pero no son necesarias para demostrar el concepto inicial.
+
+---
+
+# 10. Packaging y regiones disponibles
+
+La posición de los hardpoints no puede optimizarse en todo el espacio.
+
+Por ejemplo, un pickup point del upper control arm puede necesitar situarse dentro de una determinada zona del chasis, mientras que la rótula exterior estará limitada por la llanta, upright y freno.
+
+Por eso la aplicación debería permitir definir **design volumes**.
+
+Un hardpoint podría especificarse como:
+
+FIXED, si ya está decidido.
+
+RANGE, si puede moverse entre determinados límites.
+
+FREE INSIDE VOLUME, si el optimizador puede colocarlo dentro de una región tridimensional.
+
+Esto permite incorporar el packaging directamente dentro del proceso de optimización y evita generar suspensiones cinemáticamente perfectas pero físicamente imposibles.
+
+También se definirían zonas prohibidas correspondientes al chasis, rueda, llanta, motor, acumulador, transmisión, steering rack, etc.
+
+La primera versión no necesita disponer de un CAD completo del vehículo. Los componentes pueden aproximarse mediante volúmenes sencillos, planos, cilindros y cajas.
+
+Posteriormente sí podría incorporarse la importación directa de geometría CAD.
+
+---
+
+# 11. Solver cinemático 3D
+
+Este sería el núcleo matemático de la aplicación.
+
+Cada suspensión se representaría mediante sus hardpoints y elementos rígidos.
+
+En una double wishbone tendríamos, entre otros, los dos puntos interiores del upper control arm, los dos del lower control arm, las rótulas exteriores, tie rod, wheel center y puntos relacionados con pushrod/pullrod y rocker.
+
+Cuando se impone un determinado wheel travel, las longitudes de los brazos deben permanecer constantes.
+
+Por tanto, el problema puede formularse mediante restricciones del tipo:
+
+\[
+\|P_i-C_i\|=L_i
+\]
+
+donde \(P_i\) representa un punto móvil del upright, \(C_i\) su correspondiente punto de referencia y \(L_i\) la longitud fija del elemento.
+
+El solver determinaría iterativamente la posición y orientación del upright que satisface simultáneamente todas estas restricciones.
+
+Puede resolverse utilizando métodos numéricos de resolución de sistemas no lineales o nonlinear least squares.
+
+Una vez determinada la matriz de orientación de la rueda, el programa puede extraer:
+
+camber, toe y steer.
+
+Repitiendo el cálculo para muchas posiciones se obtienen curvas completas.
+
+Por ejemplo:
+
+\[
+z=-30,-29,\ldots,0,\ldots,+29,+30\ mm
+\]
+
+generaría toda la curva de camber frente a wheel travel.
+
+---
+
+# 12. Movimientos que debe simular la V1
+
+La suspensión debe poder analizarse mediante cuatro movimientos fundamentales:
+
+**heave**, desplazando las ruedas del mismo eje en la misma dirección;
+
+**roll**, haciendo trabajar las ruedas de cada lado en sentidos opuestos;
+
+**pitch**, combinando el movimiento de los ejes delantero y trasero;
+
+y **steering**, desplazando el rack o imponiendo steering wheel angle.
+
+También deben poder combinarse.
+
+Esto es importante porque una geometría que funciona correctamente con el coche estático puede producir resultados completamente diferentes cuando simultáneamente existe roll, steering y bump.
+
+Por tanto, el solver debería aceptar estados generales:
+
+\[
+q=[heave,\ roll,\ pitch,\ steering]
+\]
+
+permitiendo construir posteriormente mapas multidimensionales.
+
+---
+
+# 13. Parámetros cinemáticos calculados
+
+A partir de cada posición, la aplicación calcularía las principales características de suspensión.
+
+Entre ellas estarían:
+
+camber, camber gain, toe, bump steer, caster, caster trail, kingpin inclination, scrub radius, mechanical trail, front-view instant center, side-view instant center, front-view swing arm, side-view swing arm, roll center, roll center migration, pitch characteristics, Ackermann, steering ratio, anti-dive, anti-squat y otros parámetros equivalentes.
+
+La aplicación debería almacenar tanto el valor instantáneo como su derivada.
+
+No solamente interesa conocer:
+
+\[
+Camber=-2.1^\circ
+\]
+
+sino también:
+
+\[
+\frac{dCamber}{dz}
+\]
+
+porque es precisamente esta derivada la que describe el camber gain.
+
+El cálculo de instant centers y roll centers puede realizarse geométricamente mediante la intersección de las líneas proyectadas de los brazos en los planos correspondientes.
+
+El scrub radius y mechanical trail se obtienen prolongando el steering axis hasta el plano del suelo y comparando su intersección con el contact patch.
+
+El Ackermann se obtiene comparando los ángulos reales de ambas ruedas durante steering con los ángulos geométricamente ideales.
+
+---
+
+# 14. Sistema de actuación: pushrod, pullrod y rocker
+
+La V1 también debería estudiar el sistema de actuación de la suspensión.
+
+A partir de las posiciones de pushrod o pullrod, rocker y damper, el solver calcularía cuánto se comprime el muelle ante un determinado desplazamiento de rueda.
+
+El motion ratio puede expresarse como:
+
+\[
+MR=\frac{dx_{spring}}{dz_{wheel}}
+\]
+
+y, en primera aproximación:
+
+\[
+K_{wheel}=K_{spring}MR^2
+\]
+
+aunque el programa utilizaría el motion ratio instantáneo, ya que normalmente cambia durante el recorrido.
+
+Esto permite analizar suspensiones progresivas o regresivas y optimizar también la posición de los puntos del rocker.
+
+La V1 no necesita simular detalladamente el comportamiento hidráulico del amortiguador. Se estudiarían principalmente geometría, spring rate, wheel rate y motion ratio.
+
+El análisis detallado del damper quedaría reservado para posteriores ampliaciones.
+
+---
+
+# 15. Síntesis inversa de la geometría
+
+Llegados a este punto aparece otra de las funciones fundamentales de la aplicación.
+
+Un programa convencional permite introducir hardpoints y calcula qué curva de camber producen.
+
+La aplicación debe poder realizar también el proceso inverso:
+
+> “Quiero esta curva de camber, esta curva de toe, este roll center y este Ackermann. Encuentra una geometría que se aproxime a ellos.”
+
+Los parámetros desconocidos serían las coordenadas de los hardpoints:
+
+\[
+X=[x_1,y_1,z_1,x_2,y_2,z_2,\ldots]
+\]
+
+Para cada candidato el solver ejecutaría todos los movimientos y calcularía las características resultantes.
+
+Después se evaluaría una función de error similar a:
+
+\[
+J=
+w_1E_{camber}
++w_2E_{toe}
++w_3E_{RC}
++w_4E_{Ackermann}
++w_5E_{MR}
++\ldots
+\]
+
+donde cada error estaría normalizado para que unas magnitudes no dominen artificialmente sobre otras.
+
+A continuación se añadirían penalizaciones:
+
+\[
+J_{total}=J+P_{rules}+P_{packaging}+P_{collision}
+\]
+
+Una suspensión que atraviesa el chasis podría tener una cinemática magnífica, pero recibiría una penalización tan elevada que quedaría automáticamente descartada.
+
+---
+
+# 16. Optimización multiobjetivo de hardpoints
+
+Al igual que sucede con los targets, no existe necesariamente una única geometría perfecta.
+
+Por eso el solver devolvería varios diseños Pareto-optimal.
+
+Uno podría conseguir un camber gain casi ideal pero peor bump steer.
+
+Otro podría ser ligeramente peor cinemáticamente pero mucho más fácil de fabricar.
+
+Otro podría mantener sus características mucho mejor durante todo el recorrido.
+
+La interfaz permitiría comparar estas soluciones mediante gráficos superpuestos y visualización 3D.
+
+Esto es importante porque la decisión final debe seguir perteneciendo al ingeniero.
+
+El programa no debe ocultar el proceso detrás de un botón de **“Generate Perfect Suspension”**.
+
+Debe explicar por qué una solución es mejor en unas métricas y peor en otras.
+
+---
+
+# 17. Visualización 3D
+
+Todos los diseños deberían poder visualizarse en un entorno tridimensional.
+
+La visualización mostraría brazos, upright, neumático, steering rack, pushrod/pullrod, rocker, spring-damper y volúmenes de packaging.
+
+El usuario debería poder ejecutar manualmente bump, rebound, roll y steering mediante sliders.
+
+Por ejemplo:
+
+\[
+Wheel\ Travel=-30\ldots+30\ mm
+\]
+
+y observar en tiempo real cómo cambia la suspensión.
+
+También sería muy útil representar visualmente instant centers, roll centers, steering axis, scrub radius, contact patches y trayectorias de los puntos.
+
+La visualización no sería solamente estética; ayudaría enormemente a detectar geometrías absurdas que matemáticamente podrían pasar desapercibidas.
+
+---
+
+# 18. Tilt Test
+
+La simulación del Tilt Test tendría sentido dentro del módulo de **Rules / Scrutineering**.
+
+La aplicación tendría dos niveles.
+
+## Preliminary Tilt Test
+
+Se podría utilizar incluso antes de diseñar la suspensión.
+
+Con un CG aproximadamente centrado lateralmente, una primera condición geométrica de vuelco es:
+
+\[
+\tan(\theta_{tip})\approx\frac{t/2}{h_{CG}}
+\]
+
+Esto permite comprobar rápidamente si la combinación de track y CG es razonable.
+
+No sustituye al Tilt Test real, pero es muy útil durante el diseño conceptual.
+
+## Detailed Tilt Test
+
+Una vez diseñada la suspensión se utilizaría un modelo quasi-static más completo.
+
+La gravedad se rotaría progresivamente respecto al vehículo y se calcularía la carga normal sobre cada rueda:
+
+\[
+F_{z,FL},F_{z,FR},F_{z,RL},F_{z,RR}
+\]
+
+El reparto de transferencia de carga entre ambos ejes dependería de la distribución de masas, vías, CG, roll centers y reparto de roll stiffness.
+
+La aplicación incrementaría automáticamente el ángulo hasta que:
+
+\[
+F_{z,i}=0
+\]
+
+para alguna rueda.
+
+Ese punto sería el **wheel lift angle**.
+
+El resultado podría mostrarse como:
+
+**Tilt requirement: 60°**
+
+**First wheel lift: 64.3°**
+
+**Margin: +4.3°**
+
+**PASS**
+
+o, por el contrario:
+
+**First wheel lift: 57.1°**
+
+**FAIL**
+
+La parte correspondiente a posibles fugas de fluidos no tiene sentido simularla mediante CFD o modelos de fluidos. Se trataría mediante un checklist de inspección.
+
+---
+
+# 19. Comparación de diseños
+
+Durante todo el proceso la aplicación permitiría guardar diferentes configuraciones.
+
+Por ejemplo:
+
+**Suspension_034**
+
+**Suspension_051**
+
+**Suspension_076**
+
+El usuario podría comparar sus curvas de camber, toe, RC, Ackermann, motion ratio y resultados dinámicos.
+
+También se podrían comparar sus puntuaciones de optimización, cumplimiento de reglas y márgenes de packaging.
+
+Esto permitiría mantener un historial del desarrollo y justificar posteriormente las decisiones tomadas durante el Engineering Design Event.
+
+---
+
+# 20. Integración con Adams Car
+
+La disponibilidad de una licencia de Adams Car modifica de forma importante el alcance lógico del proyecto.
+
+No tendría sentido dedicar una enorme cantidad de desarrollo a replicar un solver multibody que ya existe.
+
+Por tanto, la división debería ser:
+
+**Aplicación propia:** decidir qué suspensión queremos y encontrar geometrías candidatas.
+
+**Adams Car:** validar con mayor fidelidad qué comportamiento tiene realmente la suspensión elegida.
+
+Esta separación simplifica enormemente el proyecto y, al mismo tiempo, lo hace más profesional.
+
+---
+
+# 21. Exportación a Adams Car en la V1
+
+La primera integración no necesita controlar automáticamente Adams.
+
+El nivel básico sería exportar un archivo con todos los hardpoints.
+
+Por ejemplo:
+
+`Suspension_076_Hardpoints.csv`
+
+que contendría nombre, X, Y y Z de cada punto.
+
+También se almacenaría información sobre el sistema de coordenadas, unidades y arquitectura.
+
+Si el equipo dispone de un template de Adams fijo, se puede crear además una tabla de equivalencias entre los nombres utilizados por la aplicación y los utilizados por Adams.
+
+Por ejemplo:
+
+`FL_LCA_Front → hpl_lca_front`
+
+`FL_LCA_Rear → hpl_lca_rear`
+
+`FL_UCA_Front → hpl_uca_front`
+
+etc.
+
+De esta manera podría generarse posteriormente un archivo de comandos que modificase automáticamente el template.
+
+---
+
+# 22. Adams Validation Plan
+
+Además de exportar los hardpoints, la aplicación debería generar algo especialmente interesante: un **plan de validación**.
+
+La aplicación sabe qué características ha intentado conseguir durante la optimización.
+
+Por tanto, sabe también qué debería comprobarse posteriormente.
+
+El informe podría indicar que para `Suspension_076` se recomienda ejecutar en Adams:
+
+Vertical Motion de -30 a +30 mm.
+
+Opposite Wheel Travel o Roll.
+
+Steering sweep completo.
+
+Bump + steering combinado.
+
+Swept Steer full vehicle.
+
+Las salidas que deberían compararse serían las correspondientes a camber, toe, roll center, roll camber, roll steer, Ackermann, wheel rate, anti-dive, anti-squat y demás objetivos empleados durante el diseño.
+
+Por tanto, la V1 no necesita ejecutar Adams automáticamente.
+
+Necesita entregar al ingeniero:
+
+**la geometría que debe introducir y las simulaciones que debe realizar para comprobarla.**
+
+---
+
+# 23. Arquitectura informática de la aplicación
+
+El programa debería construirse de forma modular.
+
+El núcleo matemático podría desarrollarse inicialmente en MATLAB, ya que proporciona herramientas muy adecuadas para álgebra matricial, resolución de sistemas no lineales, optimización y visualización.
+
+La interfaz podría realizarse con MATLAB App Designer durante el desarrollo inicial.
+
+Internamente existirían módulos independientes para:
+
+Project, Ruleset, Vehicle Concept, Tire Model, Performance Model, Suspension Architecture, Packaging, Geometry Solver, Kinematic Analysis, Actuation, Optimization, Tilt Test, Adams Export y Reports.
+
+Esta modularidad es fundamental.
+
+El Kinematic Solver no debería saber nada sobre las reglas.
+
+El Rules Engine no debería saber cómo funciona Adams.
+
+El Adams Exporter no debería realizar cálculos cinemáticos.
+
+El Tire Model debería poder sustituirse sin modificar el Performance Solver.
+
+Cada módulo recibe información estructurada y devuelve resultados.
+
+Esto permitiría sustituir posteriormente MATLAB App Designer por otra interfaz sin tener que reescribir el núcleo del programa.
+
+---
+
+# 24. Flujo completo de utilización de la primera versión
+
+Un caso real podría comenzar de la siguiente forma.
+
+El equipo crea el proyecto `FS2028`.
+
+Introduce:
+
+masa objetivo del coche: 275 kg;
+
+piloto: 75 kg;
+
+wheelbase aproximado: 1.550-1.600 mm;
+
+front track: 1.200-1.250 mm;
+
+rear track: 1.180-1.230 mm;
+
+dimensiones del neumático previsto;
+
+y algunos datos preliminares del CG.
+
+A continuación selecciona el nivel de información disponible del neumático:
+
+**Geometry Only**
+
+**Generic Formula Student Tire Model**
+
+o
+
+**Custom Tire Model**.
+
+Si no dispone de datos experimentales, puede continuar sin problema utilizando únicamente la geometría o un modelo genérico.
+
+La aplicación comprueba inmediatamente las restricciones reglamentarias disponibles.
+
+A continuación, el usuario indica que quiere priorizar principalmente Autocross y Skidpad pero sin perjudicar demasiado Acceleration.
+
+El Performance Solver genera muchas configuraciones virtuales de suspensión y evalúa su comportamiento con el nivel de fidelidad permitido por los datos disponibles.
+
+El resultado no son hardpoints, sino una serie de targets.
+
+Después el usuario selecciona double wishbone, pushrod y rack-and-pinion.
+
+Define las regiones donde pueden colocarse los pickup points sobre el chasis y las restricciones del upright.
+
+El Geometry Optimizer comienza entonces a generar posiciones de hardpoints.
+
+Para cada candidato:
+
+construye la suspensión;
+
+realiza los sweeps de heave, roll, pitch y steering;
+
+calcula todos los parámetros cinemáticos;
+
+compara las curvas con los targets;
+
+comprueba packaging;
+
+comprueba reglas;
+
+calcula Tilt Test;
+
+y asigna unas métricas de calidad.
+
+Después de miles de evaluaciones aparece una frontera de Pareto.
+
+El equipo selecciona tres soluciones.
+
+Las compara visualmente y escoge una.
+
+La aplicación genera entonces:
+
+las coordenadas completas de los hardpoints;
+
+los gráficos cinemáticos;
+
+las características de actuación;
+
+el análisis reglamentario;
+
+el resultado del Tilt Test;
+
+las hipótesis utilizadas;
+
+el nivel de fidelidad del modelo de neumático;
+
+y el Adams Validation Plan.
+
+Finalmente los hardpoints se introducen en Adams Car y se realizan las simulaciones de alta fidelidad.
+
+Ese sería el ciclo completo de trabajo de la **versión 1**.
+
+---
+
+# 25. Qué debe contener realmente la V1
+
+Por tanto, la primera versión funcional debería llegar hasta el punto de poder diseñar una suspensión real.
+
+| Área | V1 |
+|---|---|
+| Proyecto y gestión de unidades | Sí |
+| Ruleset versionado | Sí |
+| Vehicle Concept desde pocos datos | Sí |
+| Variables FIXED/RANGE/FREE/TARGET/DERIVED/ASSUMED/RULE | Sí |
+| Modelo dinámico reducido | Sí |
+| Funcionamiento sin modelo dinámico de neumático | Sí |
+| Modelo genérico de neumático | Sí |
+| Importación de modelo avanzado de neumático | Básica/opcional |
+| Generación de targets geométricos | Sí |
+| Generación de targets dinámicos aproximados | Sí |
+| Optimización multiobjetivo | Sí |
+| Double wishbone | Sí |
+| Dirección rack-and-pinion | Sí |
+| Direct / pushrod / pullrod | Sí |
+| Solver cinemático 3D | Sí |
+| Heave / roll / pitch / steering | Sí |
+| Camber / toe / caster / KPI | Sí |
+| Instant centers / roll center | Sí |
+| Scrub / trail | Sí |
+| Ackermann | Sí |
+| Anti-dive / anti-squat | Sí |
+| Motion ratio / wheel rate | Sí |
+| Packaging básico 3D | Sí |
+| Tilt Test | Sí |
+| Visualización 3D | Sí |
+| Pareto y comparación de diseños | Sí |
+| Exportación de hardpoints | Sí |
+| Adams Validation Plan | Sí |
+| Simulación multibody completa | No |
+| Compliance detallado | No |
+| Chasis flexible | No |
+| Damper hidráulico avanzado | No |
+| Neumático térmico avanzado | No |
+| Degradación del neumático | No |
+| FEA estructural | No |
+| Automatización completa Adams | No |
+
+Esta delimitación es importante porque sigue siendo una aplicación ambiciosa, pero técnicamente realizable.
+
+---
+
+# 26. Validación de la V1
+
+Antes de añadir nuevas funciones sería imprescindible demostrar que el núcleo funciona correctamente.
+
+Se construirían varias geometrías conocidas y se ejecutarían posiciones concretas de bump, roll y steering.
+
+Los resultados obtenidos por la aplicación deberían compararse con herramientas externas.
+
+OptimumKinematics puede servir como referencia para la parte puramente cinemática y Adams Car como benchmark de mayor fidelidad.
+
+La validación debería realizarse parámetro por parámetro:
+
+camber, toe, caster, KPI, scrub radius, roll center, Ackermann, motion ratio, etc.
+
+Además deberían existir unit tests para cálculos geométricos individuales.
+
+El modelo de neumático genérico también debería validarse como modelo de tendencia, no como modelo predictivo absoluto.
+
+No tendría sentido desarrollar algoritmos de optimización avanzados si un error en el cálculo del roll center o en el modelo de neumático provoca que el optimizador esté buscando soluciones incorrectas.
+
+Por tanto, el orden de desarrollo debe ser:
+
+**solver correcto primero; optimización después.**
+
+---
+
+# 27. Evolución posterior: V2 y versiones siguientes
+
+Una vez que este flujo completo funcione y haya sido validado, la aplicación podría evolucionar considerablemente.
+
+La ampliación más inmediata sería cerrar el ciclo con Adams Car.
+
+En lugar de:
+
+**App → export → Adams → análisis manual**
+
+se llegaría a:
+
+**App → Adams → simulación → resultados → App.**
+
+La aplicación podría modificar automáticamente los hardpoints del modelo de Adams, ejecutar las simulaciones necesarias e importar los resultados.
+
+Entonces sería posible mostrar:
+
+\[
+Target=-0.70^\circ/25mm
+\]
+
+\[
+App=-0.69^\circ/25mm
+\]
+
+\[
+Adams=-0.67^\circ/25mm
+\]
+
+y utilizar esta diferencia para mejorar los modelos internos.
+
+---
+
+# 28. Modelos de neumático más avanzados
+
+Otra ampliación importante sería incorporar modelos de neumático mucho más completos.
+
+Se podrían utilizar datos TTC, tablas experimentales o modelos parametrizados avanzados.
+
+La fuerza lateral podría depender de:
+
+\[
+F_y=f(\alpha,F_z,\gamma,P,T,\kappa,\ldots)
+\]
+
+incorporando progresivamente:
+
+load sensitivity;
+
+camber sensitivity;
+
+combined slip;
+
+presión;
+
+temperatura;
+
+desgaste;
+
+relaxation length;
+
+y otras características.
+
+Esto permitiría que la generación de targets dependiera mucho más directamente del neumático utilizado por el equipo.
+
+También permitiría estudiar si realmente merece la pena ganar determinadas décimas de grado de camber bajo roll o si el neumático apenas obtiene beneficio de ellas.
+
+---
+
+# 29. Lap-time simulation avanzada
+
+El modelo reducido de V1 estaría pensado principalmente para orientar el diseño.
+
+Una versión posterior podría incluir un lap-time simulator completo.
+
+El usuario podría importar una pista o construirla mediante segmentos.
+
+El programa calcularía velocidad, aceleración longitudinal y lateral y tiempo de vuelta.
+
+Entonces el objetivo de optimización podría convertirse directamente en:
+
+\[
+\min(t_{Autocross})
+\]
+
+o
+
+\[
+\min(t_{Endurance})
+\]
+
+en lugar de utilizar únicamente proxies dinámicos.
+
+Esto permitiría relacionar directamente cada modificación de suspensión con rendimiento en pista.
+
+---
+
+# 30. Compliance y elastocinemática
+
+La V1 asumiría esencialmente componentes rígidos.
+
+En la realidad existen deformaciones en:
+
+rótulas, rodamientos, brazos, upright, chasis y steering system.
+
+Una versión avanzada podría incorporar matrices de rigidez.
+
+La posición efectiva de la rueda pasaría a depender tanto de la cinemática como de las fuerzas.
+
+Esto permitiría calcular compliance steer, compliance camber y otras características K&C.
+
+Para análisis todavía más avanzados podría utilizarse directamente Adams Car.
+
+---
+
+# 31. Chasis flexible y FEA
+
+La aplicación también podría generar automáticamente los load cases de los brazos de suspensión.
+
+Conociendo las fuerzas del neumático en el contact patch y la geometría de los links se pueden determinar las fuerzas axiales y reacciones en los pickup points.
+
+Estas cargas podrían exportarse posteriormente hacia software FEA para dimensionar wishbones, rockers, uprights y soportes.
+
+No sería necesario convertir la propia aplicación en un solver de elementos finitos.
+
+La filosofía continuaría siendo la misma:
+
+**la aplicación decide y prepara; un software especializado valida en profundidad.**
+
+---
+
+# 32. Tolerancias y robustez
+
+Una evolución especialmente interesante sería introducir tolerancias de fabricación.
+
+Un pickup point diseñado como:
+
+\[
+X=325.00\ mm
+\]
+
+en realidad podría fabricarse con:
+
+\[
+X=325.00\pm0.50\ mm
+\]
+
+La aplicación podría realizar simulaciones Monte Carlo desplazando aleatoriamente todos los hardpoints dentro de sus tolerancias.
+
+Así podría determinarse qué suspensiones son especialmente sensibles a pequeños errores de fabricación.
+
+Entre dos soluciones con prestaciones similares podría recomendarse aquella que mantuviera mejor sus características pese a las tolerancias.
+
+---
+
+# 33. Correlación con telemetría
+
+Una etapa posterior permitiría cerrar también el ciclo con el vehículo físico.
+
+La aplicación podría importar datos de telemetría:
+
+steering angle, suspension travel, lateral acceleration, longitudinal acceleration, yaw rate, wheel speeds y otros canales.
+
+La cadena completa sería entonces:
+
+**modelo teórico → Adams → vehículo físico → telemetría.**
+
+Esto permitiría determinar hasta qué punto el vehículo real reproduce lo previsto durante el diseño.
+
+---
+
+# 34. Otras arquitecturas de suspensión
+
+Una vez estabilizado el solver double wishbone podrían añadirse otras arquitecturas.
+
+La clave sería construir un solver general basado en joints y constraints en lugar de escribir todo el código específicamente para un double wishbone.
+
+De esa forma podrían incorporarse progresivamente otras suspensiones sin rehacer el programa completo.
+
+No obstante, para una aplicación inicialmente especializada en Formula Student, conseguir un soporte excelente de double wishbone tiene mucho más valor que soportar diez arquitecturas de forma mediocre.
+
+---
+
+# 35. Objetivo final del proyecto
+
+El resultado final no debe entenderse como un sustituto de OptimumKinematics ni como un sustituto de Adams Car.
+
+La aplicación ocuparía un espacio diferente.
+
+OptimumKinematics responde muy bien a preguntas del tipo:
+
+> “Tengo esta suspensión. ¿Qué características cinemáticas tiene y cómo puedo optimizar sus hardpoints?”
+
+Adams Car puede responder:
+
+> “Tengo este vehículo y estos subsistemas. ¿Cómo se comportan mediante un modelo multibody detallado?”
+
+La aplicación propuesta intentaría responder a una pregunta anterior:
+
+> **“Estoy diseñando un Formula Student. Con los requisitos de mi vehículo y el rendimiento que quiero conseguir, ¿qué suspensión debería diseñar?”**
+
+Y a partir de ahí continuaría:
+
+> **“¿Qué targets debería buscar?”**
+
+> **“¿Qué hardpoints consiguen esos targets?”**
+
+> **“¿Cumple el packaging y las reglas?”**
+
+> **“¿Pasaría el Tilt Test?”**
+
+> **“¿Qué compromisos existen entre las diferentes soluciones?”**
+
+> **“¿Cómo cambia la precisión de las conclusiones según los datos de neumático disponibles?”**
+
+> **“¿Qué geometrías merece la pena validar en Adams?”**
+
+Ese sería realmente el elemento diferencial del proyecto.
+
+La primera versión no necesitaría simular absolutamente todos los fenómenos de un vehículo real ni exigir al usuario disponer de datos de neumático avanzados.
+
+Necesitaría construir correctamente el proceso de ingeniería que conecta:
+
+**requisitos → nivel de información disponible → prestaciones → targets → geometría → validación.**
+
+La aplicación debería ser útil tanto para un equipo que apenas conoce masa, wheelbase, track y dimensiones de rueda como para otro que dispone de modelos de neumático completos y una licencia de Adams Car.
+
+Si ese flujo funciona, el proyecto ya tendría valor por sí mismo y proporcionaría además una base modular sobre la que posteriormente añadir dinámica de vehículo más avanzada, neumáticos experimentales, compliance, tolerancias, telemetría, FEA e integración automática con Adams Car.

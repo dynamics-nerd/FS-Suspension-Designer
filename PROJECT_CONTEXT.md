@@ -1,5 +1,38 @@
 # Contexto del proyecto
 
+## Entrega local v0.20 —21 octubre2026
+
+Implementación y validación del desarrollador completas:592/592 identidades únicas
+seleccionadas PASS,33 nuevas +559 históricas, Failed0/Incomplete0. Analyzer0/662,
+DAG24 acíclico;1954 IDs históricos conservados, inventario1987, no suite monolítica.
+MAT auténtico0.19 exacto, proceso real/síntesis/adopción/MAT, UI y STALE verificados.
+Código físico372 archivos sin cambios. Informe docs/v0.20-validation.md;
+ejemplo revisable output/v020-validation/guided-actuation-mechanics.mat. Auditoría
+independiente pendiente, ninguna aprobación de publicación o fabricación.
+
+Base estable publicada v0.19.0 `58ee34baa942ee43e9e8748ab9fe50a5819b4329`.
+Rama gestionada por el usuario `feature/v0.20-actuation-mechanics`; trabajo en el
+repositorio principal, sin worktree separado. No modificar referencias Git,
+commits, pushes, merges, tags ni releases. No v0.21. Se conservan cambios anteriores
+y los seis tests de configuración. El usuario autoriza completar0.20 por incrementos
+A/B/C/D y reserva auditoría independiente para otra conversación.
+
+Alcance: operación guiada de los modelos0.7/0.8/0.15, actuación y coilover explícitos,
+ACT/MECH, síntesis fija/comparación/adopción y MAT/worker. Sin nueva física ni rediseño
+visual general. Contrato en docs/guided-actuation-mechanics.md, resultados reales en
+docs/v0.20-validation.md. No confundir implementación con aprobación independiente.
+Documentación continua obligatoria: contratos, arquitectura, datos, decisiones,
+requisitos, tests, validación y roadmap afectados deben permitir una memoria técnica
+sin depender del chat. No reconstruir como hechos motivaciones históricas desconocidas.
+
+Roadmap provisional:0.21 cuatro esquinas/equilibrio,0.22 neumáticos,0.23 ARB,
+0.24 performance/eventos reducidos,0.25 targets fundamentados; resto abierto.
+Ingeniería antes de UI definitiva y Adams. Direct Acting pendiente, fuera de0.20.
+docs/development-register.md centraliza estado/IDs/dependencias, separado de los
+contratos y las evidencias. docs/original-requirements fue aportado por el usuario
+y permanece sin editar. Los apartados siguientes son historia, no prohibiciones
+nuevas que cancelen el alcance0.20 aprobado.
+
 ## Seguimiento RF-03 —21 octubre2026
 
 Recepción vinculada a la operación inmutable del propietario, además de validar
