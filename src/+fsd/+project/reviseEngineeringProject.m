@@ -7,6 +7,12 @@ projectRequire(isstruct(patch) && isscalar(patch) && all(ismember(string(fieldna
 d=project.definition;
 for name=string(fieldnames(patch))', d.(name)=patch.(name); end
 candidate=projectCore(d,context); projectRequire(candidate.id==project.id,'Project ID is immutable.');
+if isfield(project.definition.resources,'tires')
+    for old=project.definition.resources.tires'
+        t=old{1}; retained=fsd.project.findTire(candidate,t.definition.id,t.definition.revision);
+        projectRequire(isequaln(retained,t),'Registered tire revisions are immutable; append a new revision.');
+    end
+end
 if isequaln(candidate,project), revised=project; return; end
 d.revision=d.revision+1; revised=projectCore(d,context);
 end

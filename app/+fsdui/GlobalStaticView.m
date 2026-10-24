@@ -50,7 +50,15 @@ classdef GlobalStaticView < handle
             match=cellfun(@(s)s.definition.id==string(obj.UI.Scenario.Value),ss);
             if ~obj.Dirty
                 obj.Scenario=[]; if any(match), obj.Scenario=ss{match}; end
-                rows=fsdui.globalStaticConfiguration('ROWS',obj.Scenario); obj.setRows(rows);
+                shown=obj.Scenario; obj.UI.Source.Value='SCENARIO_TIRES';
+                if ~isempty(shown)&&isfield(shown.definition.inputs,'tireSource')
+                    obj.UI.Source.Value='LIBRARY_ASSIGNMENTS';
+                    prepared=fsd.project.prepareEngineeringScenario(p,shown.definition.id);
+                    shown.definition.inputs=struct('tires',{prepared.tires});
+                    if numel(prepared.tires)~=4, shown.definition.inputs.tires=cell(4,1); end
+                end
+                rows=fsdui.globalStaticConfiguration('ROWS',shown); obj.setRows(rows);
+                obj.UI.tires.ColumnEditable=[false,repmat(strcmp(obj.UI.Source.Value,'SCENARIO_TIRES'),1,4)];
             end
             obj.Readiness=[];
             if any(match), obj.Readiness=fsd.project.designReadiness(p,ss{match}.definition.id); end
@@ -96,6 +104,10 @@ classdef GlobalStaticView < handle
         end
     end
     methods(Access=private)
+        function sourceChanged(obj)
+            obj.UI.tires.ColumnEditable=[false,repmat(strcmp(obj.UI.Source.Value,'SCENARIO_TIRES'),1,4)];
+            obj.edited();
+        end
         function pickScenario(obj)
             if obj.Dirty
                 value='NEW'; if ~isempty(obj.Scenario), value=char(obj.Scenario.definition.id); end
@@ -109,7 +121,9 @@ classdef GlobalStaticView < handle
             bar=uigridlayout(g,[1,3]); bar.ColumnWidth={200,200,'1x'}; bar.Padding=0;
             obj.UI.Apply=uibutton(bar,'Text','Apply and check readiness','ButtonPushedFcn',@(~,~)obj.apply());
             obj.UI.Run=uibutton(bar,'Text','Run global equilibrium','ButtonPushedFcn',@(~,~)obj.run());
-            uilabel(bar,'Text','Paths are generated explicitly in this run; static velocity is zero.');
+            obj.UI.Source=uidropdown(bar,'Items',{'SCENARIO_TIRES','LIBRARY_ASSIGNMENTS'}, ...
+                'Tooltip','Exclusive vertical source; configure library assignments on Tires.', ...
+                'ValueChangedFcn',@(~,~)obj.sourceChanged());
             uilabel(g,'Text','Registered corner resources (native identity validation occurs at readiness)');
             obj.UI.Resources=uitable(g,'ColumnName',{'Corner','Geometry','Actuation','Coilover'});
             uilabel(g,'Text','Vertical tires — linear unilateral law only');
@@ -168,6 +182,7 @@ classdef GlobalStaticView < handle
             for name=["controls","tires","paths","coordinates","guesses","options","contacts","heights"]
                 r.(name)=obj.UI.(name).Data;
             end
+            r.sourceMode=string(obj.UI.Source.Value);
         end
         function setRows(obj,r)
             for name=string(fieldnames(r))', obj.UI.(name).Data=r.(name); end

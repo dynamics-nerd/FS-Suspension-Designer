@@ -11,7 +11,11 @@ p=context.prepare(project,scenarioFind(project,id));
 if p.readiness.status~="READY"
     report.status="STALE"; report.diagnostics=[p.readiness.missing;p.readiness.diagnostics]; return;
 end
-if ~isequaln(p.context,result.prepared.context)
+currentContext=p.context; executedContext=result.prepared.context;
+if result.engine=="TIRE_CHARACTERIZATION" && p.scenario.definition.engine=="TIRE_CHARACTERIZATION"
+    currentContext=tireReuseContext(p); executedContext=tireReuseContext(result.prepared);
+end
+if ~isequaln(currentContext,executedContext)
     report.status="STALE"; report.diagnostics="Relevant model, concept dependency, target, plan, architecture or control changed."; return;
 end
 if ~dependencyReference && isequaln(result.projectIdentity,project.identity), report.status="CURRENT_EXECUTION";
@@ -22,4 +26,13 @@ else
         report.diagnostics="Verified dependency projection; not a new execution or the original complete project snapshot.";
     end
 end
+end
+function value=tireReuseContext(p)
+% Keep prepared.context byte-for-byte reconstructible for original v0.22 MAT.
+% Exact worker/result validation still uses the complete prepared snapshot.
+scenario=p.scenario.identity;
+scenario.definition.inputs=rmfield(scenario.definition.inputs,'tireRevision');
+scenario.definition.plan=struct();
+value=struct('scenario',scenario, ...
+    'consumed',fsd.tire.evaluationDependencies(p.tire,p.plan.states,p.plan.request));
 end

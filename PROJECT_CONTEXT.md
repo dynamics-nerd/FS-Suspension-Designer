@@ -1,5 +1,31 @@
 # Contexto del proyecto
 
+## Desarrollo v0.22 —24 octubre2026 (contexto vigente)
+
+Base estable publicada v0.21.0, commit362e92e539e6941bd9d582966a934c25fe60d937.
+Rama del usuario feature/v0.22-tire-models-foundation; gestión Git exclusiva del
+usuario. Alcance autorizado Tire Models Foundation, incrementos A–E; no v0.23.
+Contrato docs/tire-models-foundation.md; evidencia docs/v0.22-validation.md.
+Implementación y validación del desarrollador completas:161/161 seleccionados
+PASS (49 nuevos/112 históricos), Analyzer0/703, DAG26; inventario2067 con2018 IDs
+anteriores conservados. Auditoría independiente pendiente; no suite completa.
+Estado posterior: auditoría independiente CHANGES REQUIRED por V22-F-01/02/03,
+todos MEDIUM. Correcciones acotadas validadas por el desarrollador:112/112 PASS
+(19 nuevas/93 regresiones), Analyzer0/708, DAG26, inventario2086 sin perder IDs.
+Reauditoría independiente pendiente. El informe
+original se conserva y docs/v0.22-audit-corrections.md registra la reauditoría.
+Geometry Only/Generic/Custom con biblioteca, revisiones/asignaciones, Dugoff
+reducido estacionario explícito, carga/camber declarados y caracterización/UI.
+GLOBAL_STATIC conserva física/ruta histórica y añade proyección vertical de
+biblioteca; adherencia no invalida equilibrio que no la consume.
+Alternativa C aprobada: núcleo independiente y adaptadores MathWorks opcionales.
+Usuario instaló Extended Tire Features26.2.3; pruebas públicas sintéticas fuera
+del repositorio identificaron diferencias entre Dugoff MathWorks y variante
+nativa. No conversión silenciosa ni modelos de turismo como datos FS.
+Sin TTC/identificación/MF propios ni expansión de prestaciones/targets/ARB.
+Los apartados siguientes son históricos: sus estados de auditoría/publicación
+no describen la base actualmente publicada y no cancelan la autorización0.22.
+
 ## Desarrollo v0.21 —23 octubre2026 (contexto vigente)
 
 Implementación y validación del desarrollador completas:324/324 identidades

@@ -2,6 +2,10 @@ function assessment = validateScenarioPayload(p,payload,context)
 %VALIDATESCENARIOPAYLOAD Native algebraic evidence validators, never forward solves.
 engine=p.scenario.definition.engine; assessment=[];
 if nargin<3, context=validationContext(); end
+if engine=="TIRE_CHARACTERIZATION"
+    projectRequire(isequaln(payload,fsd.tire.evaluate(p.tire,p.plan.states,p.plan.request)), ...
+        'Tire response differs from the exact declared model, states, channels or policy.'); return;
+end
 if engine=="GLOBAL_STATIC"
     projectRequire(isstruct(payload) && isscalar(payload) && ...
         isequal(sort(string(fieldnames(payload))),["equilibrium";"system"]),'Invalid global payload fields.');

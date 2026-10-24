@@ -1,5 +1,13 @@
 # Convenciones y formulación matemática
 
+## v0.22 — neumáticos estacionarios
+
+DUGOFF_REDUCED_1 y sus leyes separadas de carga y camber se especifican en
+[tire-models-foundation](tire-models-foundation.md). Demanda compartida y límite
+circular, sin extrapolación oculta. El Dugoff proveedor es otra variante;
+coeficientes/entradas no se intercambian sin comprobar su equivalencia.
+La ley vertical histórica no cambia.
+
 ## v0.21 — integración, sin nueva ley física
 
 Se reutiliza íntegramente [global-static-equilibrium.md](global-static-equilibrium.md):

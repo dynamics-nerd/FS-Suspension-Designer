@@ -22,7 +22,7 @@ if string(mode)=="ROWS"
     rows.coordinates(:,2:4)=num2cell([d.options.bounds.*factors,d.options.coordinateScales.*factors]);
     rows.guesses=num2cell(d.plan.initialGuesses.*factors);
     for k=1:4
-        t=d.inputs.tires{k};
+        t=[]; if isfield(d.inputs,'tires'), t=d.inputs.tires{k}; end
         % A valid project may retain a pending native tire at any corner.
         % Keep its presentation fields blank; readiness owns the diagnosis.
         if ~isempty(t)
@@ -63,12 +63,15 @@ if ~isempty(r.heights)
     so.rideHeightPointIds=string(r.heights(:,1)); so.rideHeightPointsBody_m=matrix(r.heights(:,2:4))/1000;
 end
 tires=cell(4,1); plans=struct();
+library=isfield(r,'sourceMode')&&string(r.sourceMode)=="LIBRARY_ASSIGNMENTS";
 for k=1:4
     assert(string(r.tires{k,1})==ids(k) && string(r.paths{k,1})==ids(k),'fsd:ui:GlobalInput','Corner order changed.');
+    if ~library
     tires{k}=fsd.model.createVerticalTireModel(struct('cornerId',ids(k),'modelType',"LINEAR_VERTICAL_UNILATERAL", ...
         'stiffness',scalar(r.tires{k,2},ids(k)+" tire stiffness [N/mm]"), ...
         'unloadedRadius',scalar(r.tires{k,3},ids(k)+" unloaded radius [mm]"), ...
         'sourceKind',string(r.tires{k,4}),'sourceNote',string(r.tires{k,5})),struct('length',"mm",'stiffness',"N/mm"));
+    end
     plan=struct(); if ~isempty(previous), plan=d.plan.cornerPlans.(ids(k)); end
     plan.travel_m=fsdui.numberList(r.paths{k,2})/1000;
     assert(~isempty(plan.travel_m),'fsd:ui:GlobalInput','Explicit wheel travel samples required for each corner.');
@@ -87,7 +90,7 @@ for k=1:numel(optionNames)
     end
 end
 d.options=fsd.analysis.globalStaticSolverSettings(d.options);
-d.inputs.tires=tires;
+if library, d.inputs=struct('tireSource',"LIBRARY_ASSIGNMENTS"); else, d.inputs=struct('tires',{tires}); end
 d.plan=struct('vehicleOptions',vo,'systemOptions',so,'cornerPlans',plans,'initialGuesses',matrix(r.guesses)./factors);
 value=d;
 end

@@ -1,5 +1,24 @@
 # Roadmap
 
+## Estado vigente —24 octubre2026
+
+v0.21.0 publicada por el usuario. v0.22 Tire Models Foundation implementada,
+con validación del desarrollador completa y auditoría independiente pendiente:
+Geometry Only/Generic/Custom, biblioteca/revisiones/asignaciones, Dugoff reducido
+con carga/camber declarados, caracterización/curvas y proyección vertical selectiva,
+MAT/worker/UI. Incrementos A contratos, B evaluador, C proyecto, D interfaz,
+E validación completados;161/161 tests seleccionados PASS (49 nuevos/112 históricos).
+Alternativa C: .tir sólo adaptador opcional MathWorks, sin parser/
+MF/TTC propios. No v0.23. Los estados inferiores son históricos.
+[Contrato](tire-models-foundation.md), [validación](v0.22-validation.md).
+
+Actualización posterior: auditoría independiente CHANGES REQUIRED por tres
+MEDIUM V22-F-01/02/03. Corrección acotada de presentación canónica, STALE de
+caracterización y normalización numérica; no amplía v0.22 ni inicia v0.23.
+Correcciones validadas por desarrollo:112/112 seleccionados PASS; confirmación
+independiente pendiente, sin alterar el dictamen original.
+[Reauditoría focalizada](v0.22-audit-corrections.md).
+
 ## Prioridad vigente desde v0.20
 
 Completar capacidades de ingeniería y su uso verificable con la interfaz v0.19,
@@ -16,7 +35,8 @@ inferiores registran entregas históricas y sus exclusiones de entonces.
 | v0.24 | Performance Solver reducido y comparadores iniciales de eventos Formula Student;0.21/22/23 | Modelos de fidelidad explícita para eventos acordados, datos de pista/vehículo, validación independiente y límites; no lap time avanzado ni certificación |
 | v0.25 | Generación fundamentada y selección de targets; modelos aplicables de prestaciones y catálogo de métricas | Origen/ecuaciones/sensibilidades/incertidumbre/tradeoffs explícitos, confirmación/adopción, feedback a síntesis y escenarios reproducibles |
 
-Los alcances0.22–0.25 se especificarán y aprobarán por separado. El registro central
+El alcance0.22 está aprobado e implementado; los de0.23–0.25 se especificarán y
+aprobarán por separado. El registro central
 [development-register](development-register.md) conserva IDs, dependencias y estado.
 Direct Acting sigue pendiente (FSD-DIRECT), fuera de0.20 y sin rocker ficticio.
 También permanecen abiertos reglas por edición/competición, Tilt preliminar/detallado,

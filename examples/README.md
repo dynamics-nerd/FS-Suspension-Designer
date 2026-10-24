@@ -1,5 +1,14 @@
 # Examples
 
+## v0.22 — tire characterization
+
+tireCharacterizationInputs explicitly returns synthetic assumed declarations and
+states; the UI never loads them automatically. No example coefficient is a
+recommended FS value. Native characterization can run independently of vehicle
+geometry and of optional MathWorks tools. ImportMathWorksTir/evaluateMathWorks
+retain the provider model and ISO convention, not an automatic native conversion.
+[Contract](../docs/tire-models-foundation.md).
+
 ## v0.21 — guided four-corner equilibrium
 
 `globalStaticGuidedInputs` explicitly creates synthetic benchmark declarations;

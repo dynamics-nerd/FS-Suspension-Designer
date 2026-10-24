@@ -20,6 +20,19 @@ switch request.action
         project=fsdui.upsertScenario(project,buildScenario(definition));
     case "READINESS"
         value=fsd.project.designReadiness(project,a.scenarioId);
+    case "TIRE_CONFIG"
+        [project,value]=fsd.project.registerTire(project,a.definition);
+    case "TIRE_ASSIGN"
+        project=fsd.project.assignTires(project,a.assignments); value=project.definition.resources.tireAssignments;
+    case "TIRE_STUDY_CONFIG"
+        scenario=fsd.project.createEngineeringScenario(a.definition);
+        assert(scenario.definition.engine=="TIRE_CHARACTERIZATION",'fsd:ui:InvalidOperation','Tire study required.');
+        project=fsdui.upsertScenario(project,scenario); value=fsd.project.designReadiness(project,scenario.definition.id);
+    case "TIRE_RUN"
+        scenario=project.definition.scenarios;
+        found=cellfun(@(s)s.definition.id==string(a.scenarioId)&&s.definition.engine=="TIRE_CHARACTERIZATION",scenario);
+        assert(nnz(found)==1,'fsd:ui:InvalidOperation','Select an exact tire scenario.');
+        [value,project]=runScenario(project,a.scenarioId,a.resultId);
     case "GLOBAL_CONFIG"
         scenario=fsd.project.createEngineeringScenario(a.definition);
         assert(scenario.definition.engine=="GLOBAL_STATIC",'fsd:ui:InvalidOperation','GLOBAL_STATIC scenario required.');

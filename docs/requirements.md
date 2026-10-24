@@ -1,5 +1,31 @@
 # Requisitos
 
+## v0.22 — Tire Models Foundation
+
+- REQ-V22-PARTIAL: Geometry Only/Generic/Custom y parámetros desconocidos guardables;
+  sin coeficientes físicos automáticos, calidad distinta del nivel de información.
+- REQ-V22-PHYSICS: DUGOFF_REDUCED_1 exacto, signos/dominios explícitos, carga/camber
+  declarados, combined slip, oráculos independientes y datos sintéticos identificados.
+- REQ-V22-API: capacidades/readiness por operación y evaluación N muestras sin
+  producto cartesiano; NaN/estados distinguen desconocido/no soportado/fuera dominio.
+- REQ-V22-LIBRARY: revisiones inmutables y asignaciones compartidas a cuatro esquinas.
+- REQ-V22-GLOBAL: conservar ley vertical histórica; fuente exclusiva, dependencia
+  proyectada para que cambios de fuerza no invaliden equilibrio vertical.
+- REQ-V22-TRACE: historial/MAT/worker/RF01–03; exactitud de recurso, revisión,
+  canales, hipótesis, orden y dominio antes de recibir una respuesta.
+- REQ-V22-UI: flujo Tires con edición incompleta, escenarios, curvas/modelo claramente
+  identificados, comparación condicionada y persistencia; conservar V21-F-01.
+- REQ-V22-OPTIONAL: MathWorks sólo mediante APIs públicas y adaptador opcional,
+  modelo proveedor distinto del nativo, sin datos importados certificados por defecto.
+- REQ-V22-CANONICAL-UI: abrir request predeterminado, cualquier orden de canales
+  admitido y plan vacío sin mutar declaraciones; completar, ejecutar y recuperar MAT.
+- REQ-V22-REUSE: compatibilidad por parámetros/leyes/estados/canales consumidos,
+  separada de la identidad completa de ejecución y de la recepción RF-01/02/03.
+- REQ-V22-NUMERIC: normalizar enteros reales seguros y single a double en la
+  fábrica; validación, readiness, evaluación e identidades MAT coherentes.
+
+Contrato: [tire-models-foundation](tire-models-foundation.md).
+
 ## v0.21 — Global static setup
 
 - REQ-V21-FOUR: cuatro esquinas explícitas e independientes; construir RL/RR

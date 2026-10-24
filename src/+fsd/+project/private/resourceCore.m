@@ -3,6 +3,8 @@ function resources = resourceCore(input)
 resources=struct('geometries',{{}},'steerings',{{}},'actuations',{{}},'mechanicals',{{}});
 if isfield(input,'seedBindings'), resources.seedBindings={}; end
 if isfield(input,'packaging'), resources.packaging={}; end
+if isfield(input,'tires'), resources.tires={}; end
+if isfield(input,'tireAssignments'), resources.tireAssignments={}; end
 projectRequire(isstruct(input) && isscalar(input) && all(ismember(string(fieldnames(input)), ...
     string(fieldnames(resources)))),'Invalid resource registry.');
 for name=string(fieldnames(input))', resources.(name)=input.(name); end
@@ -18,6 +20,16 @@ for name=string(fieldnames(resources))'
             case "mechanicals", fsd.model.validateSpringDamperModel(r); ids(j)=r.cornerId;
             case "seedBindings", validateSeedBinding(r); ids(j)=r.scenarioId;
             case "packaging", fsd.packaging.validateDefinition(r); ids(j)=r.definitionSI.id;
+            case "tires"
+                fsd.tire.validate(r); ids(j)=r.definition.id+"/"+string(r.definition.revision);
+            case "tireAssignments"
+                projectRequire(isstruct(r)&&isscalar(r)&&isequal(sort(string(fieldnames(r))), ...
+                    ["cornerId";"tireId";"tireRevision"]),'Invalid tire assignment fields.');
+                projectRequire(isstring(r.cornerId)&&isscalar(r.cornerId)&&ismember(r.cornerId,["FL","FR","RL","RR"])&& ...
+                    isstring(r.tireId)&&isscalar(r.tireId)&&isnumeric(r.tireRevision)&&isscalar(r.tireRevision)&& ...
+                    isfinite(r.tireRevision)&&r.tireRevision>=1&&fix(r.tireRevision)==r.tireRevision,'Invalid tire assignment.');
+                projectRequire(isfield(input,'tires')&&any(cellfun(@(t)t.definition.id==r.tireId&& ...
+                    t.definition.revision==r.tireRevision,input.tires)),'Assigned tire revision does not exist.'); ids(j)=r.cornerId;
         end
     end
     projectRequire(numel(unique(ids))==numel(ids),'Duplicate resource IDs.');

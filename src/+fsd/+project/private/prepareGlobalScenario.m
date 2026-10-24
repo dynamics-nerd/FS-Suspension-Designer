@@ -17,8 +17,14 @@ try
     for name=names
         if ~isfield(d.plan,name), r.missing(end+1,1)="PLAN:"+name; end
     end
-    projectRequire(all(ismember(string(fieldnames(d.inputs)),"tires")),'Only native tires are global inputs.');
-    if ~isfield(d.inputs,'tires'), r.missing(end+1,1)="INPUT:TIRES_FL_FR_RL_RR"; end
+    library=isfield(d.inputs,'tireSource');
+    if library
+        projectRequire(isequal(string(fieldnames(d.inputs)),"tireSource")&& ...
+            isequal(d.inputs.tireSource,"LIBRARY_ASSIGNMENTS"),'Choose exactly one global tire source.');
+    else
+        projectRequire(all(ismember(string(fieldnames(d.inputs)),"tires")),'Only native tires are global inputs.');
+        if ~isfield(d.inputs,'tires'), r.missing(end+1,1)="INPUT:TIRES_FL_FR_RL_RR"; end
+    end
     if ~isempty(r.missing), r.status="MISSING_DATA"; p.readiness=r; return; end
     c=conceptPreparation(project.definition.concept,d.plan.vehicleOptions);
     r.missing=[r.missing;c.missing]; r.diagnostics=[r.diagnostics;c.diagnostics];
@@ -58,8 +64,24 @@ try
     q=d.plan.initialGuesses;
     projectRequire(isnumeric(q) && isreal(q) && size(q,1)==7 && ~isempty(q) && all(isfinite(q),'all') && ...
         all(q>=p.options.bounds(:,1) & q<=p.options.bounds(:,2),'all'),'Initial guesses must be finite 7-by-N within bounds.');
-    projectRequire(iscell(d.inputs.tires) && numel(d.inputs.tires)==4,'Four tires in FL/FR/RL/RR order required.');
-    p.tires=d.inputs.tires(:);
+    if library
+        p.tires=cell(4,1); p.verticalBindings=cell(4,1);
+        registry=project.definition.resources;
+        for k=1:4
+            assigned={};
+            if isfield(registry,'tireAssignments'), assigned=registry.tireAssignments(cellfun(@(a)a.cornerId==ids(k),registry.tireAssignments)); end
+            if isempty(assigned), r.missing(end+1,1)="TIRE:"+ids(k)+":ASSIGN_LIBRARY_REVISION"; continue; end
+            a=assigned{1}; tire=fsd.project.findTire(project,a.tireId,a.tireRevision);
+            if isempty(tire)||~fsd.tire.capabilities(tire).vertical
+                r.missing(end+1,1)="TIRE:"+ids(k)+":CONFIGURE_VERTICAL_TIRE"; continue;
+            end
+            p.tires{k}=fsd.tire.verticalModel(tire,ids(k));
+            p.verticalBindings{k}=struct('cornerId',ids(k),'tireId',a.tireId,'vertical',tire.verticalIdentity);
+        end
+    else
+        projectRequire(iscell(d.inputs.tires) && numel(d.inputs.tires)==4,'Four tires in FL/FR/RL/RR order required.');
+        p.tires=d.inputs.tires(:);
+    end
     contexts=cell(4,1); wc=nan(4,3);
     projectRequire(isstruct(d.plan.cornerPlans) && isscalar(d.plan.cornerPlans) && ...
         isequal(sort(string(fieldnames(d.plan.cornerPlans))),sort(ids(:))),'Four named corner plans required.');
@@ -96,6 +118,7 @@ try
     p.context=struct('engine',"GLOBAL_STATIC",'scenario',scenario.identity,'corners',{contexts}, ...
         'vehicle',p.vehicle.identity,'loadCase',p.loadCase.identity,'tires',{p.tires}, ...
         'systemOptions',so,'options',p.options,'initialGuesses',q);
+    if library, p.context.verticalBindings=p.verticalBindings; end
 catch cause
     if ~startsWith(string(cause.identifier),["fsd:project:","fsd:model:","fsd:analysis:InvalidGlobalStaticInput"]), rethrow(cause); end
     r.status="INVALID_INPUT"; r.diagnostics(end+1,1)=string(cause.identifier)+": "+string(cause.message);

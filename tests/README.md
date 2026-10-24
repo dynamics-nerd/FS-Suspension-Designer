@@ -1,5 +1,23 @@
 # Testing strategy
 
+## v0.22 focused validation
+
+Post-audit regressions: TestTireAuditUI exercises the three canonical Desktop
+reproducers through Apply/Run/MAT; TestTireAuditDependencies checks structural
+consumption and preserved provenance; TestTireAuditNumeric checks safe integer
+normalization, rejection, readiness/evaluation and MAT. TestTireWorker additionally
+rejects a reply from a physically reusable but unrequested tire revision.
+See [subsequent audit corrections](../docs/v0.22-audit-corrections.md).
+
+TestTirePhysics contains independent algebraic oracles; TestTireContracts covers
+partial data, domains and frames. TestTireProject covers revisions, vertical
+projection/STALE, MAT and canonical evidence. TestTireWorker uses a ProcessPool
+and independently valid mismatched requests. TestTireUI uses native cell edits
+and verifies draft ownership. TestTireMathWorksAdapter is optional: absence is
+reported as skipped/incomplete, never PASS; its fixtures are synthetic provider
+defaults, not FS measurements. No own TTC/MF fitting pipeline.
+verifyV22 checks Analyzer/DAG/inventory only. [Actual results](../docs/v0.22-validation.md).
+
 ## v0.21 — global static integration
 
 `TestGuidedGlobalStatic` tests native production paths, independent nominal

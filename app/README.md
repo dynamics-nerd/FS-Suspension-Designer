@@ -1,5 +1,15 @@
 # Application UI — Guided Design, Packaging, Actuation/Mechanics
 
+## Tires (v0.22)
+
+TiresView edits partial native resources and explicit laws, assigns immutable
+revisions, configures studies and plots stored evidence. Definition/assignment/
+study drafts are tracked separately and must be applied before Run/Save. Units
+mm/degrees are presentation-only; stiffness N/rad is explicitly labelled. Global
+static selects one vertical source, with library-derived tire cells readonly.
+Optional MathWorks import/contrast remains a public API utility, not an MF/TTC
+workflow in this view. [Contract](../docs/tire-models-foundation.md).
+
 v0.21 adds the tenth **Global static** section (`GlobalStaticView`), with native
 tables for four tires, sampled paths, gravity/provenance, mass approximation,
 ground/reference points, seven-coordinate bounds/scales/seeds and solver controls.

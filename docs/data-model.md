@@ -1,5 +1,29 @@
 # Modelo de datos
 
+## Extensión v0.22
+
+TireDefinition0.22 conserva definición SI, identidad y verticalIdentity. Geometría,
+vertical, familia/parámetros, leyes, dominios y procedencia se mantienen separados;
+[] significa desconocido. resources.tires y tireAssignments son opcionales y no
+se añaden a proyectos antiguos al leerlos. Revisiones registradas son inmutables;
+asignaciones cornerId/tireId/tireRevision pueden compartir el mismo recurso.
+Curvas viven en EngineeringResult, no en cada revisión.
+
+TIRE_CHARACTERIZATION conserva referencia exacta, estados/orden/request y
+TireResponse0.22. Proyecto/escenario/resultado lógicos0.16 y envelope MAT existente
+continúan; se amplían versiones consumidoras sin reescribir snapshots históricos.
+GLOBAL_STATIC tiene inputs.tires histórico o tireSource=LIBRARY_ASSIGNMENTS,
+exclusivos. El contexto nuevo incluye sólo ID y proyección vertical consumida.
+No handles, objetos proveedor ni radio efectivo inferido. [Contrato](tire-models-foundation.md).
+
+Correcciones V22-F-01/02/03: request vacío conserva su declaración persistida,
+con defaults sólo en evaluación/presentación; se mantiene el orden de canales.
+Un plan vacío sigue siendo declaración pendiente editable. La proyección de
+dependencias de caracterización es efímera: no sustituye prepared.context ni
+identidades históricas, y no cambia el esquema MAT. La fábrica convierte valores
+enteros seguros y single a double antes de construir identidades; validate exige
+esta representación canónica. Ningún valor físico desconocido se completa.
+
 ## Extensión v0.21
 
 EngineeringScenario existente admite engine GLOBAL_STATIC y scope VEHICLE. No se

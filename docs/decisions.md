@@ -1,5 +1,27 @@
 # Registro de decisiones
 
+## TIR-006/007/008 — correcciones de auditoría v0.22, 24 octubre 2026
+
+Decisiones posteriores a CHANGES REQUIRED, sin alterar el resultado original:
+
+- **TIR-006:** compartir normalizeRequest entre evaluación y presentación. La UI
+  representa la secuencia exacta de canales y muestra ausencias en blanco.
+  Descartado duplicar defaults en callbacks, ordenar/descartar canales o aplicar
+  silenciosamente un escenario durante LOAD. Evita divergencia del contrato público.
+- **TIR-007:** conservar prepared.context completo y derivar una proyección física
+  sólo al clasificar compatibilidad. Descartado reemplazar el contexto guardado:
+  rompería reconstrucción de MAT0.22 y podría confundir reutilización con recepción
+  de una operación distinta. La selección estructural sigue ramas/capacidades de
+  la familia y estados efectivos; no usa coincidencia de arrays como prueba.
+- **TIR-008:** normalizar numerics una vez en create, antes de identidades, y
+  exigir double canónico en validate. Enteros con roundtrip exacto dentro de
+  flintmax y single son admisibles; conversiones inseguras se rechazan. Descartado
+  convertir coeficientes en cada ecuación o aceptar recursos que fallen después
+  en funciones que exigen floating point. No cambian física ni tolerancias.
+
+Contratos y límites en [tire-models-foundation](tire-models-foundation.md);
+evidencia en [correcciones](v0.22-audit-corrections.md).
+
 ## GSE-001/002/003 — integración v0.21,23 octubre2026
 
 Decisiones nuevas del desarrollo autorizado, sin atribución retrospectiva:
@@ -564,3 +586,25 @@ de errores; un catch general ocultaría fallos de programación. No se cambian
 ecuaciones, unidades, modelos, esquema MAT ni normalización numérica existente.
 Contrato y pruebas: [flujo global](guided-global-static.md),
 [validación focalizada](v0.21-f01-validation.md).
+
+## Tire Models Foundation —24 octubre2026
+
+- **TIR-001:** alternativa C aprobada: familia nativa ligera y APIs públicas
+  MathWorks opcionales, sin dependencia obligatoria de VDYNTIRE. La prueba26.2.3
+  mostró distinto comportamiento Dugoff para el mismo kappa: mantener variantes
+  identificadas, sin sustituir ni convertir silenciosamente la física aprobada.
+- **TIR-002:** capacidad, rigideces y camber tienen leyes declaradas separadas.
+  No inferir exponentes ni hipótesis despreciables de campos vacíos. MARK/REJECT
+  no recortan ni extrapolan entradas. Camber thrust no implica capacidad óptima.
+- **TIR-003:** recurso compuesto y proyección vertical; registry/revisiones y
+  asignaciones existentes, no otro framework MAT/worker. Contexto global consume
+  ID y componente vertical, no la revisión de fuerza completa.
+- **TIR-004:** .tir mediante parser público proveedor, texto/parámetros/versiones
+  plain IMPORTED_UNVERIFIED. No conversión nativa ni completitud experimental
+  certificada. Adaptadores de importación/contraste no añaden identificación/TTC
+  ni otro motor MF al proyecto/UI.
+- **TIR-005:** estacionario Fx/Fy con dominios explícitos, sin Mz/radio efectivo/
+  transitorios. Calidad de evidencia declarada y referenciada, sin certificar
+  ensayos ausentes. Ecuaciones y límites: [contrato](tire-models-foundation.md).
+
+Estas decisiones nuevas no reconstruyen motivaciones históricas desconocidas.

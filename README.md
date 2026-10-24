@@ -1,8 +1,24 @@
 # FS Suspension Designer
 
+## v0.22 — Tire Models Foundation (development)
+
+Base estable publicada v0.21.0. Desarrollo autorizado de neumáticos Geometry Only/
+Generic/Custom, biblioteca/revisiones/asignaciones, caracterización estacionaria
+Fx/Fy y carga/camber declarados. El núcleo funciona sin Extended Tire Features;
+el adaptador opcional .tir/contraste conserva el modelo MathWorks separado.
+Vista Tires sin datos físicos automáticos; ejemplo sintético sólo por acción
+explícita, nunca parámetros recomendados FS. [Contrato](docs/tire-models-foundation.md),
+[validación real](docs/v0.22-validation.md). Gestión Git exclusiva del usuario.
+Implementación y validación del desarrollador completas: **161/161 tests
+seleccionados PASS** (49 nuevos y112 históricos). Auditoría independiente pendiente.
+Actualización posterior: la auditoría emitió CHANGES REQUIRED (tres MEDIUM).
+Las correcciones se documentan separadamente en
+[v0.22 audit corrections](docs/v0.22-audit-corrections.md):112/112 tests focalizados
+PASS (19 nuevos/93 regresiones), pendientes de reauditoría independiente.
+
 Aplicación MATLAB para desarrollar y validar suspensiones de Formula Student con un núcleo de ingeniería independiente de App Designer y de herramientas externas.
 
-## Estado actual
+## Entrega histórica v0.21 (estado documentado antes de su publicación)
 
 **v0.21.0 implementada y validada localmente sobre v0.20.0 (`9685942`)**,
 pendiente de auditoría independiente.324/324 casos seleccionados PASS (27 nuevos,

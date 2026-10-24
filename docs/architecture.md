@@ -1,5 +1,28 @@
 # Arquitectura
 
+## Extensión v0.22 — Tire Models Foundation
+
+TiresView → Controller → operationBody → project → tire. El nuevo paquete tire
+contiene declaraciones, capacidades/readiness y evaluación estacionaria nativa,
+independiente de proyecto/UI/MathWorks. Sólo consume model para adaptar la ley
+vertical existente. Proyecto amplía su registry opcional y sus escenarios,
+sin segundo ledger/worker/escritor MAT. GLOBAL_STATIC consume la proyección
+vertical y el ID de recurso asociado; excluye fuerza/revisión completa del
+contexto de compatibilidad. Physics0.10 no cambia.
+
+El adaptador público MathWorks es opcional y explícito: modelos proveedor
+identificados separadamente, texto TIR y datos simples persistibles. Nunca se
+llama desde el evaluador nativo ni se redistribuye código proveedor. Referencia:
+[contrato y ecuaciones](tire-models-foundation.md).
+
+Corrección de auditoría V22-F-02: la caracterización conserva su contexto completo
+de ejecución para MAT/reconstrucción/worker; compatibilityCore deriva aparte una
+proyección efímera mediante tire.evaluationDependencies. No se guarda ni acepta
+una proyección aportada por el worker. V22-F-01 comparte tire.normalizeRequest
+entre evaluador y presentación, sin estados físicos ficticios ni reescritura LOAD.
+V22-F-03 concentra la normalización numérica en tire.create; validate exige double
+canónico. [Contratos corregidos](tire-models-foundation.md#physical-reuse-versus-execution-identity-f-02).
+
 ## Extensión v0.21 — equilibrio global guiado
 
 GlobalStaticView → Controller → operationBody (GLOBAL_CONFIG/GLOBAL_RUN) →

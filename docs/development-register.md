@@ -5,12 +5,26 @@ execution evidence remain in their existing authoritative documents. Original
 documents under original-requirements are historical and remain unedited.
 Development validation does not imply independent audit acceptance.
 
+Current state24October2026: user published v0.21.0 at362e92e. Older audit/status
+entries retain their historical checkpoints. La auditoría independiente de v0.22
+emitió CHANGES REQUIRED por V22-F-01/02/03 (MEDIUM); las correcciones posteriores
+del desarrollador están validadas (112/112 seleccionados PASS), pendientes de
+confirmación independiente.
+
 | ID | Kind / status | Planned version / dependencies | Acceptance and references |
 |---|---|---|---|
 | FSD-020 | Feature / IMPLEMENTED, DEVELOPER VALIDATION PASS; independent audit pending | 0.20; native v0.7/v0.8/v0.15 and RF-03 | Guided configuration→analysis→synthesis→adoption→MAT;592 unique selected PASS (33 new/559 historical), [contract](guided-actuation-mechanics.md), [evidence](v0.20-validation.md); original §14 and FUNC-003/004 |
 | FSD-021 | Feature / IMPLEMENTED; audit CHANGES REQUIRED for V21-F-01, correction validated by developer; independent re-audit pending | 0.21; FSD-020, native0.10, RF-01/02/03 |324 original developer-selected PASS (27 new/297 historical); audit358/358 PASS reported by user, one MEDIUM presentation finding; correction10/10 selected PASS; [integration contract](guided-global-static.md), [original evidence](v0.21-validation.md), [focused correction](v0.21-f01-validation.md) |
 | V21-F-01 | Incident / MEDIUM; FIXED, DEVELOPER VALIDATION PASS; independent re-audit pending | 0.21; pending native tires and completed refresh |10/10 unique selected PASS (4 new/6 related), Analyzer0/4, actual Desktop controls; empty tire rows without invented data, completed-render marker, retry, READY and exact MAT; [focused evidence](v0.21-f01-validation.md) |
-| FSD-022 | Feature / PLANNED | 0.22 | Geometry Only/Generic/Custom; original §7; force data optional; equations/assumed parameter sources OPEN DECISION at specification |
+| FSD-022 | Feature / IMPLEMENTED; original audit CHANGES REQUIRED; corrections FIXED, DEVELOPER VALIDATION PASS; re-audit pending | 0.22; stable0.21 | Original161/161 retained; subsequent112/112 selected PASS (19 new/93 regressions), Analyzer0/708, DAG26; [contract](tire-models-foundation.md), [original evidence](v0.22-validation.md), [subsequent corrections](v0.22-audit-corrections.md) |
+| V22-F-01 | Incident / MEDIUM; FIXED, DEVELOPER VALIDATION PASS; re-audit pending | 0.22; TIR-006 | Three canonical Desktop reproducers, default/reordered requests and incomplete plans; no silent scenario rewrite, Apply/Run/exact MAT |
+| V22-F-02 | Incident / MEDIUM; FIXED, DEVELOPER VALIDATION PASS; re-audit pending | 0.22; TIR-007 | Structural consumption projection;8 focused cases and4 real-worker cases, complete historical identity, semantic rejection and vertical STALE retained |
+| V22-F-03 | Incident / MEDIUM; FIXED, DEVELOPER VALIDATION PASS; re-audit pending | 0.22; TIR-008 |7 numeric cases PASS; safe integer/single to double, unsafe/logical rejection, canonical validation and exact MAT |
+| TIR-001 | Decision / APPROVED | 0.22 | Native core and optional public MathWorks adapters; distinct variants, no compulsory add-on |
+| TIR-002 | Physical contract / IMPLEMENTED, initial15 tests PASS | 0.22 | Explicit load/camber laws; no physical defaults for unknown inputs |
+| TIR-003 | Integrity / IMPLEMENTED, DEVELOPER VALIDATION PASS | 0.22 | Immutable revisions/assignments, selective vertical context, real worker and exact MAT0.19/0.20/0.21/0.22; [evidence](v0.22-validation.md) |
+| TIR-004 | Optional adapter / IMPLEMENTED,9/9 provider tests PASS | 0.22 | TIR import/contrast IMPORTED_UNVERIFIED through public APIs; no native family conversion/TTC fitting; native Desktop also tested with provider absent from path |
+| TIR-005 | Limitation / DOCUMENTED | 0.22 | Stationary Fx/Fy, explicit domains, no Mz/effective radius/transients or experimental prediction |
 | FSD-023 | Feature / PLANNED | 0.23; mechanics | ARB INTEGRATED/POST_DESIGN/DISABLED; ARB-001 in [decisions](decisions.md) |
 | FSD-024 | Feature / PLANNED | 0.24; FSD-021/022/023 | Reduced performance and comparative event models; original §6, advanced lap-time/thermal models deferred |
 | FSD-025 | Feature / PLANNED | 0.25; applicable physical models | Derived targets with explicit fidelity/adoption and synthesis feedback; original §5/8; FUNC-001/002/005 |
