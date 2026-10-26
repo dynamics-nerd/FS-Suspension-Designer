@@ -5,6 +5,8 @@ if isfield(input,'seedBindings'), resources.seedBindings={}; end
 if isfield(input,'packaging'), resources.packaging={}; end
 if isfield(input,'tires'), resources.tires={}; end
 if isfield(input,'tireAssignments'), resources.tireAssignments={}; end
+if isfield(input,'antiRollBars'), resources.antiRollBars={}; end
+if isfield(input,'arbAssignments'), resources.arbAssignments={}; end
 projectRequire(isstruct(input) && isscalar(input) && all(ismember(string(fieldnames(input)), ...
     string(fieldnames(resources)))),'Invalid resource registry.');
 for name=string(fieldnames(input))', resources.(name)=input.(name); end
@@ -22,6 +24,17 @@ for name=string(fieldnames(resources))'
             case "packaging", fsd.packaging.validateDefinition(r); ids(j)=r.definitionSI.id;
             case "tires"
                 fsd.tire.validate(r); ids(j)=r.definition.id+"/"+string(r.definition.revision);
+            case "antiRollBars"
+                fsd.model.validateAntiRollBar(r); ids(j)=r.definition.id+"/"+string(r.definition.revision);
+            case "arbAssignments"
+                projectRequire(isstruct(r)&&isscalar(r)&&isequal(sort(string(fieldnames(r))), ...
+                    ["arbId";"arbRevision";"axleId"]),'Invalid ARB assignment fields.');
+                projectRequire(isstring(r.axleId)&&isscalar(r.axleId)&&ismember(r.axleId,["FRONT","REAR"])&& ...
+                    isstring(r.arbId)&&isscalar(r.arbId)&&isnumeric(r.arbRevision)&&isscalar(r.arbRevision)&& ...
+                    isfinite(r.arbRevision)&&r.arbRevision>=1&&fix(r.arbRevision)==r.arbRevision,'Invalid ARB assignment.');
+                projectRequire(isfield(input,'antiRollBars')&&any(cellfun(@(b)b.definition.id==r.arbId&& ...
+                    b.definition.revision==r.arbRevision&&b.definition.axleId==r.axleId,input.antiRollBars)), ...
+                    'Assigned ARB revision/axle does not exist.'); ids(j)=r.axleId;
             case "tireAssignments"
                 projectRequire(isstruct(r)&&isscalar(r)&&isequal(sort(string(fieldnames(r))), ...
                     ["cornerId";"tireId";"tireRevision"]),'Invalid tire assignment fields.');

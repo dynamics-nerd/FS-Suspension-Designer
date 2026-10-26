@@ -2,6 +2,9 @@ function [payload,assessment] = executeScenarioCore(p)
 %EXECUTESCENARIOCORE Only entry point permitted to call native forward/search APIs.
 engine=p.scenario.definition.engine; plan=p.plan; resources=p.resources;
 assessment=[];
+if ismember(engine,["ARB_KINEMATICS","ARB_MECHANICAL","ARB_SIZING"])
+    payload=executeArbScenario(p); return;
+end
 if engine=="TIRE_CHARACTERIZATION"
     payload=fsd.tire.evaluate(p.tire,plan.states,plan.request); return;
 end

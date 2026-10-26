@@ -1,7 +1,17 @@
-function system = createGlobalStaticSystem(vehicle, loadCase, sources, tires, options)
+function system = createGlobalStaticSystem(vehicle, loadCase, sources, tires, options, antiRollBars)
 %CREATEGLOBALSTATICSYSTEM Serializable inputs; downstream preparation validates paths.
 % Sources/tires are four cells in FL/FR/RL/RR order. All option lengths are SI.
 id = "fsd:model:InvalidGlobalStaticSystem";
+if nargin<6, antiRollBars={}; end
+if ~iscell(antiRollBars)||numel(antiRollBars)>2, error(id,'At most two explicit axle couplings required.'); end
+arbIds=strings(numel(antiRollBars),1);
+for k=1:numel(antiRollBars)
+    bar=antiRollBars{k}; fsd.model.validateAntiRollBar(bar);
+    if fsd.model.antiRollBarReadiness(bar,'MECHANICAL').status~="READY", error(id,'Active ARB declaration is not mechanically ready.'); end
+    arbIds(k)=bar.definition.axleId;
+end
+if numel(unique(arbIds))~=numel(arbIds), error(id,'One active ARB per axle.'); end
+[~,arbOrder]=sort(arbIds); antiRollBars=antiRollBars(arbOrder);
 fsd.model.validateVehicleParameters(vehicle);
 fsd.model.validateVehicleLoadCase(loadCase,vehicle);
 if ~iscell(sources) || numel(sources) ~= 4 || ~iscell(tires) || numel(tires) ~= 4 || ...
@@ -90,4 +100,16 @@ system = struct("schemaVersion","0.10.0","kind","GlobalStaticSystem", ...
 system.identity = struct("schemaVersion","1.0.0","kind","GlobalStaticSystemIdentity", ...
     "vehicle",vehicle.identity,"loadCase",loadCase.identity,"corners",{physical}, ...
     "options",rmfield(o,"rideHeightPointIds"),"rotationOrder",system.rotationOrder);
+if ~isempty(antiRollBars)
+    for k=1:numel(antiRollBars)
+        bar=antiRollBars{k}; indices=[1,2]; if bar.definition.axleId=="REAR", indices=[3,4]; end
+        if bar.definition.representation=="COAXIAL_TORSION"
+            for j=indices
+                if ~isequaln(bar.definition.referenceFrame,sources{j}.geometry.referenceFrame), error(id,'ARB and source coordinate frames differ.'); end
+            end
+        end
+    end
+    system.schemaVersion="0.23.0"; system.antiRollBars=antiRollBars(:);
+    system.identity.antiRollBars=cellfun(@(b)b.identity,antiRollBars(:),'UniformOutput',false);
+end
 end

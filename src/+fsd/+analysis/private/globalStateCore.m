@@ -60,6 +60,20 @@ for i = 1:4
     gradientTime = gradientTime+toc(part);
     corners{i} = corner;
 end
+arbResponses={}; arbEnergy=0;
+if isfield(p,'antiRollBars')
+    arbResponses=cell(size(p.antiRollBars));
+    for k=1:numel(p.antiRollBars)
+        arb=p.antiRollBars{k}; indices=[4,5]; if arb.bar.definition.axleId=="REAR", indices=[6,7]; end
+        response=arbResponseCore(arb,q(indices)); arbResponses{k}=response;
+        if ~response.available, feasible=false; smooth=false; continue; end
+        arbEnergy=arbEnergy+response.energy_J;
+        gradient(indices)=gradient(indices)+response.resistance_N;
+        H(indices,indices)=H(indices,indices)+response.candidateTangent_N_per_m;
+        smooth=smooth&&response.bilateralCurvatureAvailable;
+    end
+    U=U+arbEnergy;
+end
 normal = nan(4,1);
 for i = 1:4
     if ~isempty(fieldnames(corners{i}.tire)), normal(i) = corners{i}.tire.normalForce_N; end
@@ -90,6 +104,11 @@ state = struct("schemaVersion","0.10.0","kind","GlobalStaticState", ...
     "comparisonV09",struct("reference",p.referenceLoadsV09, ...
     "predictedMinusReference_N",normal-p.referenceLoadsV09.cornerLoads_N, ...
     "referenceNotImposed",true));
+if isfield(p,'antiRollBars')
+    state.schemaVersion="0.23.0"; state.antiRollBars=arbResponses;
+    if ~feasible, arbEnergy=NaN; end
+    state.antiRollBarEnergy_J=arbEnergy;
+end
 timings = struct("stateEvaluationTime_s",toc(timer),"energyAssemblyTime_s",energyTime, ...
     "gradientAndHessianAssemblyTime_s",gradientTime);
 end

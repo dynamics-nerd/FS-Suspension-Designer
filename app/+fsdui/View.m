@@ -13,6 +13,7 @@ classdef View < handle
         Actuation
         GlobalStatic
         Tires
+        Arb
     end
     properties (Access=private)
         PollTimer
@@ -35,7 +36,7 @@ classdef View < handle
         function obj=View(fig)
             obj.Figure=fig; obj.Controller=fsdui.Controller();
             screen=get(groot,'ScreenSize');
-            fig.Name='FS Suspension Designer | v0.22.0';
+            fig.Name='FS Suspension Designer | v0.23.0';
             fig.Position=[40 40 min(1280,screen(3)-80) min(820,screen(4)-100)];
             theme(fig,'light'); % Explicit local theme; never change the user's MATLAB preference.
             fig.Color=[.96 .97 .98]; fig.CloseRequestFcn=@(~,~)obj.close();
@@ -61,6 +62,8 @@ classdef View < handle
                     case "GLOBAL_CONFIG", allowed="Global static";
                     case {"TIRE_CONFIG","TIRE_ASSIGN","TIRE_STUDY_CONFIG","TIRE_RUN"}
                         allowed="Tires"; obj.Tires.prepareAction(action);
+                    case {"ARB_CONFIG","ARB_ASSIGN","ARB_STUDY_CONFIG","ARB_RUN"}
+                        allowed="ARB"; obj.Arb.prepareAction(action);
                     case {"NEW","LOAD","DEMO"}, allowed=obj.DraftPages;
                 end
                 actuationAction=startsWith(action,'ACTUATION_') || ...
@@ -95,6 +98,7 @@ classdef View < handle
             c=obj.Controller; obj.UI.Status.Text=char(c.Status);
             obj.Actuation.updateStatus();
             obj.GlobalStatic.updateStatus();
+            obj.Arb.updateStatus();
             obj.UI.Cancel.Enable=matlab.lang.OnOffSwitchState(c.Busy);
             if c.Busy, return; end
             if strlength(obj.PendingCommit)>0 && startsWith(c.Status,obj.PendingCommit+" complete")
@@ -103,6 +107,9 @@ classdef View < handle
                     if ~obj.Actuation.hasDraft(), obj.DraftPages=setdiff(obj.DraftPages,"Actuation"); end
                 else
                 switch obj.PendingCommit
+                    case {"ARB_CONFIG","ARB_ASSIGN","ARB_STUDY_CONFIG"}
+                        obj.Arb.committed(obj.PendingCommit);
+                        if ~obj.Arb.hasDraft(), obj.DraftPages=setdiff(obj.DraftPages,"ARB"); end
                     case {"TIRE_CONFIG","TIRE_ASSIGN","TIRE_STUDY_CONFIG"}
                         obj.Tires.committed(obj.PendingCommit);
                         if ~obj.Tires.hasDraft(), obj.DraftPages=setdiff(obj.DraftPages,"Tires"); end
@@ -113,7 +120,7 @@ classdef View < handle
                     case {"PACKAGING_DEFINITION","PACKAGING_DEMO"}
                         obj.DraftPages=setdiff(obj.DraftPages,"Packaging"); obj.Packaging.committed();
                     case "GLOBAL_CONFIG", obj.DraftPages=setdiff(obj.DraftPages,"Global static"); obj.GlobalStatic.committed();
-                    case {"NEW","LOAD","DEMO"}, obj.DraftPages=strings(0,1); obj.Actuation.resetDrafts(); obj.GlobalStatic.resetDrafts(); obj.Tires.resetDrafts();
+                    case {"NEW","LOAD","DEMO"}, obj.DraftPages=strings(0,1); obj.Actuation.resetDrafts(); obj.GlobalStatic.resetDrafts(); obj.Tires.resetDrafts(); obj.Arb.resetDrafts();
                 end
                 end
                 obj.PendingCommit="";
@@ -155,6 +162,7 @@ classdef View < handle
             obj.Actuation.refresh();
             obj.GlobalStatic.refresh();
             obj.Tires.refresh();
+            obj.Arb.refresh();
         end
         function close(obj)
             if obj.Closing || isempty(obj.Controller), return; end
@@ -183,6 +191,7 @@ classdef View < handle
             if ~isempty(obj.Actuation) && isvalid(obj.Actuation), obj.Actuation.release(); end
             if ~isempty(obj.GlobalStatic) && isvalid(obj.GlobalStatic), obj.GlobalStatic.release(); end
             if ~isempty(obj.Tires) && isvalid(obj.Tires), obj.Tires.release(); end
+            if ~isempty(obj.Arb) && isvalid(obj.Arb), obj.Arb.release(); end
             obj.DrawnProject=[]; obj.DrawnCompatibility={}; obj.Definition=[]; obj.SeedRows=[];
             obj.Controller=[]; obj.UI=struct(); obj.Tabs=[];
             obj.GeometryAxes=[]; obj.CurveAxes=[]; obj.ResultAxes=[]; obj.ResultCurveAxes=[];
@@ -204,12 +213,12 @@ classdef View < handle
             root=uigridlayout(obj.Figure,[4 1]); root.RowHeight={64,34,'1x',60}; root.Padding=[16 12 16 12];
             header=uigridlayout(root,[1 2]); header.ColumnWidth={'1x',350};
             uilabel(header,'Text','FS  /  SUSPENSION DESIGNER','FontSize',23,'FontWeight','bold','FontColor',[.08 .17 .25]);
-            uilabel(header,'Text','v0.22  •  TIRE MODELS FOUNDATION','HorizontalAlignment','right','FontColor',[.22 .34 .42]);
+            uilabel(header,'Text','v0.23  •  ANTI-ROLL BAR & AXLE COUPLING','HorizontalAlignment','right','FontColor',[.22 .34 .42]);
             bar=uigridlayout(root,[1 2]); bar.ColumnWidth={'1x',170}; bar.Padding=0;
             obj.UI.Status=uilabel(bar,'Text','Ready','FontWeight','bold');
             obj.UI.Cancel=uibutton(bar,'Text','Request cancellation','ButtonPushedFcn',@(~,~)obj.Controller.cancel());
             obj.Tabs=uitabgroup(root);
-            names=["Project","Vehicle","Geometry","Analysis","Targets","Synthesis","Results","Packaging","Actuation","GlobalStatic","Tires"];
+            names=["Project","Vehicle","Geometry","Analysis","Targets","Synthesis","Results","Packaging","Actuation","GlobalStatic","Tires","ARB"];
             for name=names, obj.UI.(name+"Tab")=uitab(obj.Tabs,'Title',name); end
             obj.UI.GlobalStaticTab.Title='Global static';
             footer=uitextarea(root,'Editable','off','Value', ...
@@ -223,6 +232,7 @@ classdef View < handle
             obj.Actuation=fsdui.ActuationView(obj.UI.ActuationTab,obj.Controller,@(action,args)obj.invoke(action,args),@()obj.draft());
             obj.GlobalStatic=fsdui.GlobalStaticView(obj.UI.GlobalStaticTab,obj.Controller,@(action,args)obj.invoke(action,args),@()obj.draft());
             obj.Tires=fsdui.TiresView(obj.UI.TiresTab,obj.Controller,@(action,args)obj.invoke(action,args),@()obj.draft());
+            obj.Arb=fsdui.ArbView(obj.UI.ARBTab,obj.Controller,@(action,args)obj.invoke(action,args),@()obj.draft());
         end
         function projectPage(obj)
             g=uigridlayout(obj.UI.ProjectTab,[6 1]); g.RowHeight={38,38,38,130,'1x',40};
@@ -712,6 +722,7 @@ classdef View < handle
             elseif obj.Tabs.SelectedTab==obj.UI.ActuationTab, obj.Actuation.refresh();
             elseif obj.Tabs.SelectedTab==obj.UI.GlobalStaticTab, obj.GlobalStatic.refresh();
             elseif obj.Tabs.SelectedTab==obj.UI.TiresTab, obj.Tires.refresh();
+            elseif obj.Tabs.SelectedTab==obj.UI.ARBTab, obj.Arb.refresh();
             end
         end
         function adopt(obj)

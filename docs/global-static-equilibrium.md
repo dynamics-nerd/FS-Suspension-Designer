@@ -1,5 +1,23 @@
 # v0.10 — Coupled Chassis Pose & Global Static Equilibrium
 
+## v0.23 optional axle coupling
+
+`createGlobalStaticSystem(...,options,antiRollBars)` accepts an optional cell of
+at most two ready resources with distinct FRONT/REAR axes. Absence/empty cell
+uses the historical representation below exactly. Active systems have physical
+schema0.23; the seven coordinates, rotation/contact laws and Newton remain.
+For indices I=(4,5) or (6,7), U+=Uarb(qI), R(I)+=dUarb/dqI and
+H(I,I)+=d²Uarb/dqI², including off-diagonal and geometric terms. No additional
+chassis-roll energy and no direct external-force insertion. Unilateral tires
+do not disconnect internal bars. Global line search additionally preserves ARB
+segments/branches and feasibility; stability requires bilateral curvature of
+every active path. A finite candidate Hessian alone does not certify stability.
+The world force/moment balances keep their original definitions.
+[Exact ARB equations, sampling and contracts](anti-roll-bar.md).
+
+The historical sections below describe the no-ARB model. Statements excluding
+ARB/UI refer to those original releases, not to the optional0.23 consumer.
+
 ## v0.21 consumer integration
 
 The historical physical model, algorithms and budgets below are unchanged.

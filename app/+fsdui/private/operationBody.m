@@ -20,6 +20,21 @@ switch request.action
         project=fsdui.upsertScenario(project,buildScenario(definition));
     case "READINESS"
         value=fsd.project.designReadiness(project,a.scenarioId);
+    case "ARB_CONFIG"
+        [project,value]=fsd.project.registerAntiRollBar(project,a.definition);
+    case "ARB_ASSIGN"
+        project=fsd.project.assignAntiRollBars(project,a.assignments); value=project.definition.resources.arbAssignments;
+    case "ARB_STUDY_CONFIG"
+        scenario=fsd.project.createEngineeringScenario(a.definition);
+        assert(ismember(scenario.definition.engine,["ARB_KINEMATICS","ARB_MECHANICAL","ARB_SIZING"]), ...
+            'fsd:ui:InvalidOperation','ARB scenario required.');
+        project=fsdui.upsertScenario(project,scenario); value=fsd.project.designReadiness(project,scenario.definition.id);
+    case "ARB_RUN"
+        scenarios=project.definition.scenarios;
+        found=cellfun(@(s)s.definition.id==string(a.scenarioId)&&ismember(s.definition.engine, ...
+            ["ARB_KINEMATICS","ARB_MECHANICAL","ARB_SIZING"]),scenarios);
+        assert(nnz(found)==1,'fsd:ui:InvalidOperation','Select an exact ARB scenario.');
+        [value,project]=runScenario(project,a.scenarioId,a.resultId);
     case "TIRE_CONFIG"
         [project,value]=fsd.project.registerTire(project,a.definition);
     case "TIRE_ASSIGN"

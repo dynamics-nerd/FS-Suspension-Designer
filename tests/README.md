@@ -1,5 +1,37 @@
 # Testing strategy
 
+## V23-F-02 — exact loaded ARB declarations
+
+TestArbPlanPreservation uses the audited example geometry, the auditor's single
+ROLL/heave/driver data, an explicit revision-12 fixture and real Desktop controls.
+It checks complete no-edit project equality, CURRENT_EXECUTION, exact restore of
+presentation, selective heave/roll/driver/wheel edits, motion, incomplete requests,
+unrepresented options/metadata, packaging cells and MAT. Equality here has no
+floating-point tolerance; converted edited values use the documented SI boundary.
+TestArbSizingUnits retains the V23-F-01 integer-target/units/provenance coverage.
+TestGlobalStaticPendingTires and TestTireAuditUI retain V21/V22 optional-field
+presentation regressions. Run UI classes in MATLAB Desktop, with setupProject
+and app/tests/examples on the path. Work runners and actual selected outcomes
+are indexed in [the focused report](../docs/v0.23-f02-validation.md); discovery
+of the full inventory does not mean the full test suite was executed.
+
+## v0.23 focused validation
+
+TestAntiRollBarEnergy covers partial contracts, independent equivalent energy,
+preload and section laws. Geometry adds analytic planar-circle oracles, independent
+energy derivatives, link virtual work, axis reversal/reflection, unequal arms,
+gaps/singularities/curvature availability and native driver mappings. Global
+adds optional axes, coupled gradient/Hessian, preload, unilateral contact and
+no-bar representation regression. Project covers immutable resources/selective
+dependencies, native ROLL/global and exact MAT. Packaging reuses independent
+segment–sphere cases. UI uses native Desktop controls. Worker uses a real local
+ProcessPool and canonical incompatible replies, including reusable other revisions.
+verifyV23 checks Analyzer, DAG and inventory; it does not run the suite. Final
+execution counts and omissions belong in the version validation report.
+The actual App Designer shell test brings its sample control into view with
+the public [scroll(container,component)](https://www.mathworks.com/help/matlab/ref/matlab.ui.container.tree.scroll.html)
+API before a native gesture; it also checks stored closure diagnostics.
+
 ## v0.22 focused validation
 
 Post-audit regressions: TestTireAuditUI exercises the three canonical Desktop

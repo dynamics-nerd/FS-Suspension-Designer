@@ -1,5 +1,16 @@
 # Examples
 
+## v0.23 — anti-roll bars
+
+antiRollBarInputs returns explicit ASSUMED software benchmarks for equivalent
+or coaxial resources. geometricAntiRollBarInputs creates a synthetic draft using
+existing selected native pickups, with independent ARB geometry assumptions;
+it does not fabricate suspension parents. None of these values is recommended
+Formula Student data. guidedAntiRollBarExample runs native geometric analysis,
+comparison, section sizing, packaging, global coupling, history and optional MAT.
+The example is explicit and never overwrites an existing file.
+[Contract and equations](../docs/anti-roll-bar.md).
+
 ## v0.22 — tire characterization
 
 tireCharacterizationInputs explicitly returns synthetic assumed declarations and

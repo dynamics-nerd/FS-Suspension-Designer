@@ -127,7 +127,7 @@ classdef TestGuidedDesignWorkflow < matlab.unittest.TestCase
             t.verifyEqual(s.camber_rad,independent.camber_rad,'AbsTol',1e-12);
         end
         function v018ResultsAndHistoricalSoftwareRemainValid(t)
-            t.verifyEqual(t.SearchResult.fsdVersion,"0.22.0");
+            t.verifyEqual(t.SearchResult.fsdVersion,"0.23.0");
             t.verifyTrue(fsd.project.validateEngineeringResult(t.SearchResult));
             old=t.SearchResult; old.fsdVersion="0.17.0";
             t.verifyTrue(fsd.project.validateEngineeringResult(old));

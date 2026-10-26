@@ -1,5 +1,52 @@
 # Requisitos
 
+## v0.23 — Anti-Roll Bar & Axle Coupling
+
+- REQ-V23-PLAN-PRESERVATION (V23-F-02): Apply sin edición conserva exactamente
+  la declaración canónica ARB, clases, dimensiones, celdas, campos ausentes,
+  metadatos y opciones no representados. No crea revisión ni invalida resultados
+  vigentes. Una edición convierte sólo su campo desde unidades visuales y mantiene
+  la invalidación existente de los consumidores afectados; sin tolerancias de
+  equivalencia ni cambios en hashes/worker. Revertir al texto cargado preserva
+  el valor original. MAT conserva la declaración antes y después.
+
+- REQ-V23-SIZING-UNITS (V23-F-01): valid integer/single/double sizing targets
+  display in Nm/deg after double promotion, with sufficient round-trip precision.
+  Apply without edits preserves the loaded canonical plan/target/provenance;
+  intentional numeric/provenance edits remain effective. Partial plans remain
+  editable/persistible. Do not reject valid integers to avoid presentation errors.
+
+- REQ-V23-RESOURCE: representaciones equivalente/coaxial separadas, revisión,
+  eje/puertos/ajustes, referencias libres, dominios y procedencia; parcial guardable.
+- REQ-V23-ENERGY: una energía acoplada, signos de trabajo virtual, fuerzas/gradiente,
+  Hessiano cruzado y rigidez geométrica; sin esfuerzo físico inventado en equivalente.
+- REQ-V23-CLOSURE: ROCKER/UPRIGHT MUST y UCA/LCA si reutilizables; pickup ARB
+  independiente del amortiguador, continuidad/rama/residuo/condicionamiento/límites.
+- REQ-V23-REFERENCE: UNKNOWN, ZERO_AT_INSTALLATION y DECLARED_FREE distintos;
+  instalación descargada no significa universalmente ángulo libre cero.
+- REQ-V23-SECTION: rigidez conocida y GJ/L excluyentes; maciza/tubular, inverso
+  determinado con target del usuario, sin optimización ni validación resistente.
+- REQ-V23-MOTION: muestras pareadas/BUMP y ROLL nativo; ningún producto cartesiano,
+  extrapolación, clipping ni supuesto de roll–steer–bump general.
+- REQ-V23-GLOBAL: acoplamiento energético de0/1/2 ejes en siete coordenadas;
+  mantener Newton/contacto/selección y regresión sin barra; no fuerzas internas
+  duplicadas en balances externos, rueda sin contacto aún conectada a la barra.
+- REQ-V23-STABILITY: candidato de curvatura separado de tangente bilateral
+  disponible; no certificar estabilidad en extremos/discontinuidades/singularidades.
+- REQ-V23-PACKAGING: radios/soportes/obstáculos explícitos y checks seleccionados;
+  INCOMPLETE/colisión/clearance muestreado diferentes; no certificado continuo.
+- REQ-V23-TRACE: historial inmutable, consumo STALE selectivo frente a identidad
+  exacta de ejecución; revisión físicamente reutilizable no puede recibir otro run.
+- REQ-V23-UI: crear/editar parcial, readiness, estudiar/comparar/dimensionar,
+  packaging, asignación por eje, GLOBAL_STATIC con/sin ARB e historial/MAT desde Desktop.
+- REQ-V23-STORAGE: RF01–03/epochs/cancelación/worker y MAT auténtico0.19–0.22,
+  sin migración física ni reinterpretación de evidencia histórica.
+- REQ-V23-VALIDATION: oráculos independientes, regresiones relacionadas,
+  Analyzer/DAG/inventario, tiempo/RAM y persistencia representativos. Evidencia
+  de desarrollo distinta de auditoría independiente y de validación experimental.
+- REQ-V23-DOC: ecuaciones, convenciones, métodos, alternativas, supuestos,
+  límites, casos y evidencia reproducibles. ARB-001 INTEGRATED permanece abierto.
+
 ## v0.22 — Tire Models Foundation
 
 - REQ-V22-PARTIAL: Geometry Only/Generic/Custom y parámetros desconocidos guardables;

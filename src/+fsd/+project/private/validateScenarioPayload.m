@@ -2,6 +2,16 @@ function assessment = validateScenarioPayload(p,payload,context)
 %VALIDATESCENARIOPAYLOAD Native algebraic evidence validators, never forward solves.
 engine=p.scenario.definition.engine; assessment=[];
 if nargin<3, context=validationContext(); end
+if engine=="ARB_SIZING"
+    projectRequire(isequaln(payload,assembleArbPayload(p,{},[])),'Sizing result differs from its resource and declared target.'); return;
+end
+if ismember(engine,["ARB_KINEMATICS","ARB_MECHANICAL"])
+    projectRequire(isstruct(payload)&&isscalar(payload)&&isequal(sort(string(fieldnames(payload))), ...
+        ["motion";"packaging";"sources";"study"]),'Invalid ARB payload fields.');
+    expected=assembleArbPayload(p,payload.sources,payload.motion);
+    projectRequire(isequaln(workflowComparable(payload),workflowComparable(expected)),'ARB evidence differs from its exact operation/parents.');
+    return;
+end
 if engine=="TIRE_CHARACTERIZATION"
     projectRequire(isequaln(payload,fsd.tire.evaluate(p.tire,p.plan.states,p.plan.request)), ...
         'Tire response differs from the exact declared model, states, channels or policy.'); return;

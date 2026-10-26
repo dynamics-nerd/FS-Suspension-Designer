@@ -15,6 +15,9 @@ currentContext=p.context; executedContext=result.prepared.context;
 if result.engine=="TIRE_CHARACTERIZATION" && p.scenario.definition.engine=="TIRE_CHARACTERIZATION"
     currentContext=tireReuseContext(p); executedContext=tireReuseContext(result.prepared);
 end
+if ismember(result.engine,["ARB_KINEMATICS","ARB_MECHANICAL","ARB_SIZING"])&&p.scenario.definition.engine==result.engine
+    currentContext=arbReuseContext(p); executedContext=arbReuseContext(result.prepared);
+end
 if ~isequaln(currentContext,executedContext)
     report.status="STALE"; report.diagnostics="Relevant model, concept dependency, target, plan, architecture or control changed."; return;
 end
@@ -24,6 +27,32 @@ else
     report.diagnostics="Dependencies unchanged; evidence still belongs to its original execution revision, not a new run.";
     if dependencyReference
         report.diagnostics="Verified dependency projection; not a new execution or the original complete project snapshot.";
+    end
+end
+end
+function value=arbReuseContext(p)
+scenario=p.scenario.identity; scenario.definition.inputs=rmfield(scenario.definition.inputs,'arbRevision');
+scenario.definition.plan=p.plan; scenario.definition.options=p.options;
+operation="MECHANICAL"; if p.scenario.definition.engine=="ARB_KINEMATICS", operation="GEOMETRY"; end
+if p.scenario.definition.engine=="ARB_SIZING", operation="SIZING"; end
+resources=struct('geometries',{{}},'actuations',{{}});
+for k=1:numel(p.resources.geometries)
+    g=p.resources.geometries{k}; resources.geometries{k,1}=struct('geometry',fsd.model.geometryIdentity(g),'frame',g.referenceFrame);
+end
+for k=1:numel(p.resources.actuations)
+    a=p.resources.actuations{k}.identity;
+    resources.actuations{k,1}=rmfield(a,{'rockerDamperPointStatic_m','damperChassisPoint_m'});
+end
+value=struct('scenario',scenario,'bar',fsd.model.antiRollBarDependencies(p.bar,operation), ...
+    'resources',resources,'driverOptions',p.driverOptions);
+if isfield(p.plan,'packaging')
+    components=p.plan.packaging.definition.components; consumesSupports=false;
+    for k=1:numel(components)
+        c=components{k}; consumesSupports=consumesSupports||any(ismember([c.firstPoint,c.secondPoint],["ARB_SUPPORT_LEFT","ARB_SUPPORT_RIGHT"]));
+    end
+    if consumesSupports
+        value.packagingSupports=p.bar.definition.parameters.supports_m;
+        if isfield(p.bar.definition.provenance,'supports_m'), value.packagingSupportSource=p.bar.definition.provenance.supports_m; end
     end
 end
 end

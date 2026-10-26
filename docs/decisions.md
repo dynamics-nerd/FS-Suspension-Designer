@@ -1,5 +1,77 @@
 # Registro de decisiones
 
+## ARB-010 — V23-F-02: preservación por campo de la declaración cargada
+
+26 octubre 2026. Extender el snapshot transitorio de V23-F-01 a la definición
+completa del escenario y su representación visual. Comparar exactamente los
+controles con su representación cargada y fusionar únicamente campos editados.
+No reconstruir desde texto campos no editados: 17 dígitos no garantizan conservar
+una ida/vuelta de unidades, la clase single, la forma de vectores o la ausencia
+de un campo. Packaging conserva además los datos de volumen que la UI no muestra.
+Se descartan tolerancias de equivalencia física, normalizaciones globales,
+supresión de revisiones y modificaciones de compatibilidad: ocultarían cambios
+o afectarían contratos correctos. Se evita un framework genérico de formularios;
+la solución permanece dentro de ArbView. Los validadores, revisiones y STALE
+existentes deciden el efecto de las declaraciones resultantes.
+No cambia el modelo matemático ni el esquema persistente. El cambio explícito
+de motor mantiene la ruta de creación de plan/opciones del nuevo motor.
+[Contrato y evidencia](v0.23-f02-validation.md). Esta es una decisión de la
+corrección actual, no una justificación retrospectiva de la implementación previa.
+
+## ARB-009 — V23-F-01: frontera numérica de presentación
+
+Convertir datos numéricos a double antes de la aritmética de unidades, no después
+del redondeo entero. Mantener %.17g y conservar el plan/celdas cargados que no se
+editen evita reescribir tipo, valor SI o campos ausentes de una declaración parcial.
+Una edición numérica real se interpreta como double; no se reconvierte al entero
+original. Una edición sólo de procedencia conserva el número original.
+Se descartan rechazar enteros válidos y normalizar ahora el modelo/proyecto/MAT:
+el defecto está en la UI y esas alternativas alterarían contratos no afectados.
+Estado transitorio por estudio, sin esquema persistente nuevo ni caché de cálculo.
+No cambia la física ni se reconstruye retrospectivamente ninguna motivación.
+[Evidencia focalizada](v0.23-f01-validation.md).
+
+## ARB-002…008 — implementación autorizada v0.23,25 octubre2026
+
+Estas decisiones pertenecen al desarrollo0.23, no reconstruyen motivaciones
+históricas desconocidas. El estudio y las precisiones del usuario aprueban la
+física general; los siguientes contratos concretan su implementación:
+
+- **ARB-002:** separar recurso equivalente lineal de geometría coaxial. Ambos
+  comparten energía/trabajo virtual, no capacidades ficticias. Descartadas dos
+  rigideces de rueda independientes y una conversión automática de roll stiffness
+  a toda la ley de fuerzas: pierden acoplamiento o necesitan hipótesis ausentes.
+- **ARB-003:** coordenadas de ambos brazos sobre el mismo eje orientado, referencia
+  libre UNKNOWN/ZERO_AT_INSTALLATION/DECLARED_FREE. La instalación descargada
+  define psiFree=alphaR_install−alphaL_install. Descartado inferir cero por ausencia.
+- **ARB-004:** compartir aritmética histórica círculo/esfera y transformación de
+  puntos materiales; conservar ramas/ángulo continuo. PCHIP interpola pickup XYZ;
+  el cierre analítico se resuelve sobre ese mismo camino y sus derivadas implícitas
+  dan energía/gradiente/Hessiano coherentes. Descartados solver duplicado e
+  interpolación independiente de ángulo/fuerza/rigidez por errores de cierre/trabajo.
+- **ARB-005:** ley conocida en puertos con alcance explícito, o GJ/L circular
+  excluyente. Dimensionamiento inverso escalar desde target del usuario. No inferir
+  material, longitud activa, deformación de brazos o un óptimo de vehículo.
+- **ARB-006:** incrustar Uarb/gradiente/Hessiano en los pares de coordenadas de
+  rueda del GLOBAL_STATIC existente. Mantener Newton, balances externos y contacto
+  unilateral; guard adicional de segmentos/ramas. Descartado un resorte directo
+  adicional de roll o anular ARB en rueda sin contacto: cambiarían la energía física.
+- **ARB-007:** separar recepción exacta de ejecución de la proyección física de
+  reutilización, como exige V22-F-02. Rigidez desconocida no bloquea cinemática;
+  material almacenado no invalida ley conocida independiente. No usar igualdad
+  de curvas como prueba de equivalencia. Soportes sin posición/radio no bloquean
+  cierre/fuerzas, pero no certifican packaging. No modificar snapshots MAT antiguos.
+- **ARB-008:** packaging acotado mediante primitivas existentes y dimensiones
+  explícitas. UI nueva sólo para declaraciones, magnitudes, comparación, sizing y
+  asociación global. Conservar candidato local de curvatura separado de tangente
+  bilateral; no presentar rigidez/estabilidad certificadas en extremos o knots
+  no resueltos. No fabricar radios de apoyos desde una línea geométrica.
+
+**ARB-001 permanece abierto en su significado histórico:** INTEGRATED requiere
+optimización conjunta futura; POST_DESIGN/DISABLED son estrategias de producto,
+no nuevos algoritmos ya completados por sumar energías en el equilibrio estático.
+Contratos, ecuaciones, alternativas y límites: [anti-roll-bar](anti-roll-bar.md).
+
 ## TIR-006/007/008 — correcciones de auditoría v0.22, 24 octubre 2026
 
 Decisiones posteriores a CHANGES REQUIRED, sin alterar el resultado original:

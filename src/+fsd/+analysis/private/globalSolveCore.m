@@ -26,6 +26,9 @@ for k = 0:o.maxIterations
             trial = globalStateCore(p,candidate); count = count+1;
             sameSegments = isequal(cellfun(@(c) c.pathSegmentIndex,trial.corners), ...
                 cellfun(@(c) c.pathSegmentIndex,state.corners));
+            if isfield(state,'antiRollBars')
+                sameSegments=sameSegments&&isequal(arbSegments(trial),arbSegments(state));
+            end
             if trial.feasible && sameSegments && norm(trial.residual./budgets,inf) < normR
                 accepted = true; break;
             end
@@ -47,4 +50,7 @@ end
 diagnostics = struct("method","SCALED_DAMPED_NEWTON","termination",reason, ...
     "iterations",iterations,"residualEvaluations",count,"sourceRevalidationsDuringSolve",0, ...
     "scaledResidualHistory",history(1:iterations+1),"solveTime_s",toc(timer));
+end
+function values=arbSegments(state)
+values=cellfun(@(r)[r.segmentIds;r.branchSigns],state.antiRollBars,'UniformOutput',false);
 end

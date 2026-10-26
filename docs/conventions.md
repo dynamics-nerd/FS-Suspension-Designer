@@ -1,5 +1,16 @@
 # Convenciones
 
+## ARB v0.23
+
+Eje orientado común a ambos brazos; alpha=alphaInstall+beta. psi=alphaR−alphaL−
+psiFree, par positivo definido por ese eje, torques elásticos [+T;−T]. Gradiente
+energético es resistencia; la fuerza aplicada es su negativo. Bieleta lambda>0
+es tracción desde tip hacia driver. ZERO_AT_INSTALLATION declara instalación
+descargada y no impone universalmente psiFree=0. Coordenadas/pickups permanecen
+en el frame de chasis completo X atrás/Y derecha/Z arriba; UI convierte sólo
+en las fronteras. Cero, [] desconocido, NaN no disponible y fallo de dominio
+no se sustituyen entre sí. [Derivación y contratos](anti-roll-bar.md).
+
 ## Construcción v0.17
 
 SI/signs históricos intactos. Radio efectivo explícito separado del descargado;

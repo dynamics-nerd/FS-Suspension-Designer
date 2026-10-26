@@ -1,6 +1,41 @@
 # Roadmap
 
-## Estado vigente —24 octubre2026
+## Estado vigente — 26 octubre 2026
+
+El usuario comunica cierre independiente de V23-F-01 y nuevo MEDIUM V23-F-02.
+La prioridad inmediata es preservar declaraciones ARB por campo en Apply, sin
+reabrir física o compatibilidad. Corrección validada por el desarrollador
+(45/45 PASS, Analyzer 0/763), pendiente de reauditoría focalizada. No se inicia v0.24.
+[Seguimiento actual](v0.23-f02-validation.md). Se conservan los checkpoints siguientes.
+
+## Estado vigente —25 octubre2026
+
+Actualización de auditoría v0.23: CHANGES REQUIRED por V23-F-01, único MEDIUM
+de presentación/reaplicación de sizing entero. Corrección focalizada, pendiente
+de reauditoría independiente; no cambia el roadmap físico ni inicia v0.24.
+[Seguimiento](v0.23-f01-validation.md).
+
+El usuario confirma v0.22.0 publicada. v0.23 Anti-Roll Bar & Axle Coupling está
+implementada y validada por desarrollo sobre044aa1e, rama del usuario
+feature/v0.23-anti-roll-bar. A recursos/energía, B geometría/diseño, C equilibrio
+acoplado, D interfaz/packaging y E integridad/validación son incrementos internos,
+no releases. Modelo equivalente y coaxial, ROCKER/UPRIGHT/UCA/LCA, sizing escalar,
+comparación, GLOBAL_STATIC opcional por eje y persistencia; sin optimización
+automática conjunta ni nuevos modelos resistentes. [Contrato](anti-roll-bar.md).
+
+Estado de entrega: A–E implementados;385/385 seleccionados PASS,58 nuevos/327
+históricos,19 Desktop, Analyzer0/761, DAG27 y MAT0.19–0.22 exactos.
+[Evidencia y costes](v0.23-validation.md). Auditoría independiente y publicación
+siguen pendientes y corresponden a sus responsables.
+
+La validación de desarrollo y la auditoría independiente se mantienen separadas.
+No se inicia v0.24. El roadmap posterior conserva prestaciones reducidas0.24 y
+targets fundamentados0.25 como propuestas sujetas a alcance futuro. ARB-001
+INTEGRATED sigue requiriendo optimización conjunta. Direct Acting, reglas, Tilt,
+síntesis integral, UI final y Adams no desaparecen ni se simulan con esta entrega.
+Las restricciones y estados inferiores son históricos de cada entrega.
+
+## Estado histórico —24 octubre2026
 
 v0.21.0 publicada por el usuario. v0.22 Tire Models Foundation implementada,
 con validación del desarrollador completa y auditoría independiente pendiente:
@@ -31,12 +66,12 @@ inferiores registran entregas históricas y sus exclusiones de entonces.
 | v0.20 | Actuación/mecánica existentes operativas; base estable v0.19.0 y RF-01/02/03 | Configuración explícita → ACT/MECH → síntesis fija → comparación/adopción coherente → MAT; incrementos A/B/C/D, [contrato](guided-actuation-mechanics.md), [validación](v0.20-validation.md) |
 | v0.21 | Cuatro esquinas/equilibrio global implementados y validados localmente; auditoría independiente pendiente |324 casos seleccionados PASS,27 nuevos; preparación explícita, modelo reducido0.10, UI/worker/MAT; [contrato](guided-global-static.md), [validación](v0.21-validation.md) |
 | v0.22 | Neumáticos Geometry Only / Generic / Custom; interfaces reemplazables | Geometría sin datos de fuerza permitida; Generic con supuestos documentados, Custom con datos/procedencia/dominio/validación; elegir ecuaciones/datos al especificar, sin inventar parámetros universales |
-| v0.23 | Anti-roll bar; mecánica/equilibrio y estrategia ARB-001 | INTEGRATED / POST_DESIGN / DISABLED, acoplamiento y signos/energía/balances verificables; decidir geometría/modelo antes de implementar |
+| v0.23 | Anti-roll bar equivalente/coaxial y acoplamiento global autorizado | Recursos/referencias/ley/cierre/matrices, UI/packaging/sizing/STALE/MAT/worker; optimización INTEGRATED de ARB-001 sigue futura |
 | v0.24 | Performance Solver reducido y comparadores iniciales de eventos Formula Student;0.21/22/23 | Modelos de fidelidad explícita para eventos acordados, datos de pista/vehículo, validación independiente y límites; no lap time avanzado ni certificación |
 | v0.25 | Generación fundamentada y selección de targets; modelos aplicables de prestaciones y catálogo de métricas | Origen/ecuaciones/sensibilidades/incertidumbre/tradeoffs explícitos, confirmación/adopción, feedback a síntesis y escenarios reproducibles |
 
-El alcance0.22 está aprobado e implementado; los de0.23–0.25 se especificarán y
-aprobarán por separado. El registro central
+El alcance0.22 está publicado y el0.23 está aprobado; los de0.24–0.25 requieren
+especificación y autorización independientes. El registro central
 [development-register](development-register.md) conserva IDs, dependencias y estado.
 Direct Acting sigue pendiente (FSD-DIRECT), fuera de0.20 y sin rocker ficticio.
 También permanecen abiertos reglas por edición/competición, Tilt preliminar/detallado,

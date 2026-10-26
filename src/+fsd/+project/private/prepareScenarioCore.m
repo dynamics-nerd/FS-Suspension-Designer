@@ -2,6 +2,9 @@ function prepared = prepareScenarioCore(project,scenario,validation)
 %PREPARESCENARIOCORE Dependency selection and native structural adapters only.
 if nargin<3, validation=validationContext(); end
 d=scenario.definition; engine=d.engine; scope=d.scope; registry=project.definition.resources;
+if ismember(engine,["ARB_KINEMATICS","ARB_MECHANICAL","ARB_SIZING"])
+    prepared=prepareArbScenario(project,scenario); return;
+end
 if engine=="TIRE_CHARACTERIZATION"
     prepared=prepareTireScenario(project,scenario); return;
 end

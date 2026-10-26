@@ -5,14 +5,35 @@ execution evidence remain in their existing authoritative documents. Original
 documents under original-requirements are historical and remain unedited.
 Development validation does not imply independent audit acceptance.
 
-Current state24October2026: user published v0.21.0 at362e92e. Older audit/status
-entries retain their historical checkpoints. La auditoría independiente de v0.22
-emitió CHANGES REQUIRED por V22-F-01/02/03 (MEDIUM); las correcciones posteriores
-del desarrollador están validadas (112/112 seleccionados PASS), pendientes de
-confirmación independiente.
+## Auditoría v0.23 — V23-F-01
+
+**Estado vigente, 26 octubre 2026:** el usuario comunica cierre independiente
+de V23-F-01 y un nuevo MEDIUM V23-F-02. Corrección de preservación por campo
+validada por el desarrollador: 45/45 PASS, Analyzer 0/763, MAT exactos y Desktop;
+pendiente de reauditoría focalizada independiente.
+[V23-F-02](v0.23-f02-validation.md). El checkpoint histórico siguiente se conserva.
+
+Dictamen independiente comunicado por el usuario: **CHANGES REQUIRED**, un único
+MEDIUM V23-F-01 en presentación/reaplicación del target ARB_SIZING entero.
+Los contrastes de ARB, cinemática, energía/derivadas, GLOBAL_STATIC/contacto,
+worker/STALE/MAT y packaging son favorables según ese mismo comunicado; no se
+reabren ni se atribuye una aceptación final de la versión. Corrección focalizada
+validada por el desarrollador: 30/30 tests seleccionados PASS, Analyzer 0/762;
+**pendiente de reauditoría independiente**.
+Los385 PASS de la entrega original inferiores conservan su significado histórico.
+[Corrección y evidencia](v0.23-f01-validation.md).
+
+Current state25October2026: user confirms v0.22.0 published at044aa1e.
+v0.23 implemented and developer-validated on user-managed feature/v0.23-anti-roll-bar;
+independent audit pending.385/385 selected PASS,58 new/327 historical,
+Analyzer0/761, DAG27, inventory2144 with2086 old IDs preserved.
+Earlier audit/status entries retain their historical checkpoints; this register
+does not invent a later independent audit verdict.
 
 | ID | Kind / status | Planned version / dependencies | Acceptance and references |
 |---|---|---|---|
+| V23-F-01 | Incident / MEDIUM; CLOSED BY INDEPENDENT RE-AUDIT, reported by user 26 October 2026 | 0.23; ARB_SIZING presentation only | Original developer correction 30/30 selected PASS, Desktop/MAT, Analyzer 0/762. Original verdict and evidence preserved; [focused report](v0.23-f01-validation.md) |
+| V23-F-02 | Incident / MEDIUM; FIXED, DEVELOPER VALIDATION PASS; independent re-audit pending | 0.23; ARB plan UI preservation | 45/45 selected PASS (9 new/36 regressions), Analyzer 0/763; exact canonical snapshot, selective edits, unchanged options/metadata, revision 12/CURRENT_EXECUTION, real edit revision 13/STALE, MAT and Desktop; [focused report](v0.23-f02-validation.md) |
 | FSD-020 | Feature / IMPLEMENTED, DEVELOPER VALIDATION PASS; independent audit pending | 0.20; native v0.7/v0.8/v0.15 and RF-03 | Guided configuration→analysis→synthesis→adoption→MAT;592 unique selected PASS (33 new/559 historical), [contract](guided-actuation-mechanics.md), [evidence](v0.20-validation.md); original §14 and FUNC-003/004 |
 | FSD-021 | Feature / IMPLEMENTED; audit CHANGES REQUIRED for V21-F-01, correction validated by developer; independent re-audit pending | 0.21; FSD-020, native0.10, RF-01/02/03 |324 original developer-selected PASS (27 new/297 historical); audit358/358 PASS reported by user, one MEDIUM presentation finding; correction10/10 selected PASS; [integration contract](guided-global-static.md), [original evidence](v0.21-validation.md), [focused correction](v0.21-f01-validation.md) |
 | V21-F-01 | Incident / MEDIUM; FIXED, DEVELOPER VALIDATION PASS; independent re-audit pending | 0.21; pending native tires and completed refresh |10/10 unique selected PASS (4 new/6 related), Analyzer0/4, actual Desktop controls; empty tire rows without invented data, completed-render marker, retry, READY and exact MAT; [focused evidence](v0.21-f01-validation.md) |
@@ -25,7 +46,19 @@ confirmación independiente.
 | TIR-003 | Integrity / IMPLEMENTED, DEVELOPER VALIDATION PASS | 0.22 | Immutable revisions/assignments, selective vertical context, real worker and exact MAT0.19/0.20/0.21/0.22; [evidence](v0.22-validation.md) |
 | TIR-004 | Optional adapter / IMPLEMENTED,9/9 provider tests PASS | 0.22 | TIR import/contrast IMPORTED_UNVERIFIED through public APIs; no native family conversion/TTC fitting; native Desktop also tested with provider absent from path |
 | TIR-005 | Limitation / DOCUMENTED | 0.22 | Stationary Fx/Fy, explicit domains, no Mz/effective radius/transients or experimental prediction |
-| FSD-023 | Feature / PLANNED | 0.23; mechanics | ARB INTEGRATED/POST_DESIGN/DISABLED; ARB-001 in [decisions](decisions.md) |
+| FSD-023 | Feature / IMPLEMENTED; V23-F-01 independently closed, V23-F-02 fixed and developer-validated, focused re-audit pending | 0.23; stable0.22, mechanics/global and RF01–03 | Original checkpoint 385/385 selected PASS,58 new/327 historical,19 Desktop, Analyzer0/761, DAG27, MAT0.19–0.22 exact; [contract](anti-roll-bar.md), [original evidence](v0.23-validation.md), [current correction](v0.23-f02-validation.md); ARB-001 joint optimization remains future |
+| ARB-002 | Model contract / IMPLEMENTED | 0.23 A | Separate equivalent/coaxial capabilities; energy/virtual work, explicit references; Energy and Geometry oracles |
+| ARB-003 | Free reference / IMPLEMENTED | 0.23 A | UNKNOWN, explicit unloaded installation and declared free reference distinguished; installation difference need not be zero |
+| ARB-004 | Geometry / IMPLEMENTED | 0.23 B | Shared historical closure, native ROCKER/UPRIGHT/UCA/LCA points, segmented paths/implicit derivatives; no new suspension solver |
+| ARB-005 | Preliminary design / IMPLEMENTED | 0.23 B/D | Known port or circular GJ/L, user-target inverse sizing, discrete revisions and comparisons; no optimal target/strength certification |
+| ARB-006 | Global coupling / IMPLEMENTED | 0.23 C | Optional front/rear/both/none, energy/gradient/Hessian, unilateral contact and stability flags; Newton retained |
+| ARB-007 | Traceability / IMPLEMENTED, DEVELOPER VALIDATION PASS | 0.23 E | Exact receipt distinct from dependency reuse in ARB_RUN and GLOBAL_RUN; ProcessPool canonical mismatch/epochs/cancel/MAT; no fictitious old resources |
+| ARB-008 | UI and packaging / IMPLEMENTED, Desktop PASS | 0.23 D | Explicit declarations/units, curves/modal conditions/history, sampled selected volume checks and global association |
+| V23-UI-01 | Incident / FIXED, Desktop PASS | 0.23 D | Sizing edit timed out at nested table scrolling; dedicated Parameters page removes nested scrolling and preserves draft/apply ownership; third complete ARB UI run4/4 PASS, initial/repeated logs retained |
+| V23-PERF-01 | Observation / DOCUMENTED LIMITATION | 0.23 E |1001 prepared pairs0.466–0.494s; complete5-record SAVE19.58s/LOAD29.71s including semantic validation, not raw I/O. MATLAB memory stable over3 repeated sweeps; [scope and evidence](v0.23-validation.md) |
+| V23-UI-02 | Incident / FIXED, Desktop and visual QA PASS | 0.23 D/E | Axes in non-scrolling panels inside the scrolling grid; public scroll before capture. Real torsion/tangent/geometry PNGs reviewed; blank initial exports retained separately; isolated valid points remain visible |
+| V23-TEST-01 | Test corrections / documented | 0.23 E | Ledger indexed by identity, not sorted position; serial/process physical payload excludes measured elapsed time only; operation mismatch expects RF operation gate; stability test explicitly selects stable-only policy |
+| ARB-001 | Future strategy / OPEN | Future integrated synthesis | Preserve original meaning: global physical coupling does not implement joint optimization |
 | FSD-024 | Feature / PLANNED | 0.24; FSD-021/022/023 | Reduced performance and comparative event models; original §6, advanced lap-time/thermal models deferred |
 | FSD-025 | Feature / PLANNED | 0.25; applicable physical models | Derived targets with explicit fidelity/adoption and synthesis feedback; original §5/8; FUNC-001/002/005 |
 | FSD-DIRECT | Feature / DEFERRED, retained requirement | After 0.20, version OPEN | Real Direct Acting contract; no fictional rocker; original §9/25, ACS-007 |

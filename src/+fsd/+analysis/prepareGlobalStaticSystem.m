@@ -27,4 +27,18 @@ prepared = struct("schemaVersion","0.10.0","kind","PreparedGlobalStaticSystem", 
     "referenceLoadsV09",reference,"approximation","SAMPLED_PATH_APPROXIMATION", ...
     "performance",struct("sourceValidationTime_s",validationTime, ...
     "interpolationTime_s",interpolationTime,"sourceValidationPasses",1));
+if isfield(system,'antiRollBars')
+    prepared.schemaVersion="0.23.0"; prepared.antiRollBars=cell(size(system.antiRollBars));
+    for k=1:numel(system.antiRollBars)
+        bar=system.antiRollBars{k}; inputs={};
+        if bar.definition.representation=="COAXIAL_TORSION"
+            indices=[1,2]; if bar.definition.axleId=="REAR", indices=[3,4]; end
+            inputs=system.sources(indices);
+        end
+        arb=fsd.analysis.prepareAntiRollBar(bar,inputs);
+        assert(arb.readiness.status=="READY",'fsd:analysis:InvalidGlobalStaticSystem', ...
+            'Active ARB paths are not ready: %s',strjoin(arb.readiness.missing,'; '));
+        prepared.antiRollBars{k}=arb;
+    end
+end
 end

@@ -1,5 +1,17 @@
 # Convenciones y formulación matemática
 
+## v0.23 — energía acoplada ARB
+
+La formulación exacta y sus derivadas están en [anti-roll-bar](anti-roll-bar.md).
+Equivalente: x=wᵀz−xFree [m], U=.5*kLinear*x². Coaxial:
+psi=alphaR−alphaL−psiFree [rad], T=kTheta*psi, U=.5*kTheta*psi².
+Resistencia r=grad(U), fuerza generalizada aplicada −r, Hessiano
+K=k*a*aᵀ+k*x*C con a=grad(x), C=Hess(x), incluido el término geométrico.
+GLOBAL_STATIC suma estas energías y sus derivadas en los pares de ruedas;
+no añade un resorte directo de roll ni duplica fuerzas internas en world.
+Rigidez modal exige z'(s),z''(s); tangente y secante son conceptos distintos.
+N/m, Nm/rad y Nm/deg no son intercambiables sin la transformación declarada.
+
 ## v0.22 — neumáticos estacionarios
 
 DUGOFF_REDUCED_1 y sus leyes separadas de carga y camber se especifican en

@@ -1,5 +1,36 @@
 # Modelo de datos
 
+## Aclaración de edición ARB — V23-F-02
+
+El plan declarado del escenario conserva los tipos, formas y campos opcionales
+almacenados; no se confunde con el plan preparado en double por el evaluador.
+ArbView conserva la definición cargada y convierte únicamente las entradas
+editadas. Su snapshot de definición/controles es memoria transitoria de la vista,
+sin nuevos campos persistentes o identidades. MAT y el historial mantienen sus
+contratos actuales. [Detalle de preservación](v0.23-f02-validation.md).
+
+## Extensión v0.23
+
+`AntiRollBar0.23` es un valor plano SI con `definition` e `identity`, revisión,
+eje, representación, puertos, ajuste, referencia, ley, parámetros/procedencia y
+frame completo. No hay objetos proveedor, handles ni caché persistente. Parámetro
+desconocido `[]`; los números disponibles son double canónico. Identidad excluye
+sólo nombre/nota descriptivos, conserva revisión e hipótesis físicas.
+
+`resources.antiRollBars` es una biblioteca opcional de revisiones inmutables;
+`arbAssignments` enlaza eje/ID/revisión exactos. Un registro puede estar incompleto;
+readiness es por operación. ARB_KINEMATICS/ARB_MECHANICAL consumen una revisión y
+un plan explícito, con padres nativos sólo para la geometría/ROLL que los necesita.
+ARB_SIZING consume G, longitud, sección/diámetro interior y target con procedencia;
+no necesita un mecanismo completo. El resultado conserva fuentes, movimiento,
+estudio, diagnósticos y packaging solicitado. No se insertan curvas en el recurso.
+
+GLOBAL_STATIC añade opcionalmente `inputs.arbAxles` y consume las asignaciones
+vigentes. Sistema/preparación/estado/resultado físicos son0.23 sólo con ARB activa;
+sin ella conservan0.10. Los envelopes de proyecto/escenario/resultado/MAT
+históricos continúan, con whitelist consumidora0.23 ampliada. Cargar MAT antiguo
+no añade recursos ARB ni reetiqueta resultados. [Esquemas y APIs](anti-roll-bar.md).
+
 ## Extensión v0.22
 
 TireDefinition0.22 conserva definición SI, identidad y verticalIdentity. Geometría,

@@ -1,5 +1,23 @@
 # Application UI — Guided Design, Packaging, Actuation/Mechanics
 
+## ARB (v0.23)
+
+Definition/Parameters/Study/Packaging/Results in the ARB section keep draft ownership separate
+for resource, assignments and study. Apply registers immutable revisions; unknown
+values stay blank. Explicit synthetic drafts are optional actions, never FS data.
+Parameters use mm/deg/GPa/N/mm/Nm per degree, internal APIs remain SI. Complete
+native parent frame is inherited from the selected axle only when available.
+Study specifies paired wheel samples or native ROLL, driver sampling paths, or a
+user shaft-sizing target. Packaging uses declared component radii/obstacles/pairs.
+Results expose curves, matrices, modal tangent/secant with explicit trajectory,
+history, compatibility and the stored simplified geometry. Global static selects
+NONE/FRONT/REAR/FRONT+REAR from exact ARB assignments and compares stored results.
+Same async ownership, explicit missing-worker choice and MAT workflow as prior UI.
+[Detailed use and limitations](../docs/anti-roll-bar.md).
+Charts live in nonscrolling panels inside the scrolling results grid, following
+the documented [MATLAB container graphics guidance](https://www.mathworks.com/help/matlab/ref/matlab.ui.container.panel.html).
+Available isolated curve points are marked; invalid tangents are not connected.
+
 ## Tires (v0.22)
 
 TiresView edits partial native resources and explicit laws, assigns immutable

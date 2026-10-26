@@ -18,11 +18,12 @@ try
         if ~isfield(d.plan,name), r.missing(end+1,1)="PLAN:"+name; end
     end
     library=isfield(d.inputs,'tireSource');
+    inputNames=setdiff(string(fieldnames(d.inputs)),"arbAxles");
     if library
-        projectRequire(isequal(string(fieldnames(d.inputs)),"tireSource")&& ...
+        projectRequire(isequal(inputNames,"tireSource")&& ...
             isequal(d.inputs.tireSource,"LIBRARY_ASSIGNMENTS"),'Choose exactly one global tire source.');
     else
-        projectRequire(all(ismember(string(fieldnames(d.inputs)),"tires")),'Only native tires are global inputs.');
+        projectRequire(all(ismember(inputNames,"tires")),'Unknown global inputs.');
         if ~isfield(d.inputs,'tires'), r.missing(end+1,1)="INPUT:TIRES_FL_FR_RL_RR"; end
     end
     if ~isempty(r.missing), r.status="MISSING_DATA"; p.readiness=r; return; end
@@ -110,6 +111,32 @@ try
                 p.corners{1}.resources.geometries{1}.referenceFrame),'All four complete vehicle frames must agree.');
         end
     end
+    if isfield(d.inputs,'arbAxles')
+        requested=d.inputs.arbAxles;
+        projectRequire(isstring(requested)&&iscolumn(requested)&&~isempty(requested)&& ...
+            all(ismember(requested,["FRONT","REAR"]))&&numel(unique(requested))==numel(requested), ...
+            'Active ARB axles must be a nonempty unique FRONT/REAR column. Omit for historical no-ARB route.');
+        p.antiRollBars=cell(numel(requested),1); p.arbBindings=cell(numel(requested),1);
+        for j=1:numel(requested)
+            axisId=requested(j); mapping={};
+            if isfield(project.definition.resources,'arbAssignments')
+                mapping=project.definition.resources.arbAssignments(cellfun(@(a)a.axleId==axisId,project.definition.resources.arbAssignments));
+            end
+            if isempty(mapping), r.missing(end+1,1)="ARB:"+axisId+":ASSIGN_REVISION"; continue; end
+            a=mapping{1}; bar=fsd.project.findAntiRollBar(project,a.arbId,a.arbRevision);
+            ready=fsd.model.antiRollBarReadiness(bar,'MECHANICAL');
+            r.missing=[r.missing;ready.missing];
+            if ~ismember(ready.status,["READY","MISSING_DATA"]), r.status=ready.status; end
+            if bar.definition.representation=="COAXIAL_TORSION"&&~isempty(bar.definition.referenceFrame)
+                indices=[1,2]; if axisId=="REAR", indices=[3,4]; end
+                for corner=indices
+                    gs=p.corners{corner}.resources.geometries;
+                    if ~isempty(gs), projectRequire(isequaln(bar.definition.referenceFrame,gs{1}.referenceFrame),'ARB and global corner coordinate frames differ.'); end
+                end
+            end
+            p.antiRollBars{j}=bar; p.arbBindings{j}=struct('axleId',axisId,'arbId',a.arbId);
+        end
+    end
     if ~isempty(r.missing) && r.status=="READY", r.status="MISSING_DATA"; end
     if r.status~="READY", p.readiness=r; return; end
     projectRequire(all(wc([1,3],2)<0) && all(wc([2,4],2)>0) && ...
@@ -119,6 +146,10 @@ try
         'vehicle',p.vehicle.identity,'loadCase',p.loadCase.identity,'tires',{p.tires}, ...
         'systemOptions',so,'options',p.options,'initialGuesses',q);
     if library, p.context.verticalBindings=p.verticalBindings; end
+    if isfield(p,'antiRollBars')
+        p.context.antiRollBars=cellfun(@(b)fsd.model.antiRollBarDependencies(b,'MECHANICAL'),p.antiRollBars,'UniformOutput',false);
+        p.context.arbBindings=p.arbBindings;
+    end
 catch cause
     if ~startsWith(string(cause.identifier),["fsd:project:","fsd:model:","fsd:analysis:InvalidGlobalStaticInput"]), rethrow(cause); end
     r.status="INVALID_INPUT"; r.diagnostics(end+1,1)=string(cause.identifier)+": "+string(cause.message);

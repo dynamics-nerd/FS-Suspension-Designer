@@ -4,7 +4,8 @@ assert(record.engine=="GLOBAL_STATIC",'fsd:ui:GlobalInput','Global static result
 r=record.nativePayload.equilibrium;
 e=struct('summary',["Native status: "+r.status;"Selected alternative: "+string(r.selectedIndex); ...
     "Root completeness: "+r.rootCompleteness;"Convergence does not certify stability."], ...
-    'pose',{cell(0,3)},'corners',{cell(0,17)},'heights',{cell(0,2)},'attempts',{cell(0,5)},'details',strings(0,1));
+    'pose',{cell(0,3)},'corners',{cell(0,17)},'heights',{cell(0,2)},'attempts',{cell(0,5)}, ...
+    'antiRollBars',{cell(0,7)},'details',strings(0,1));
 for k=1:numel(r.attempts)
     a=r.attempts{k}; e.attempts(k,:)={k,a.solution.converged,char(a.solution.status),char(a.solution.stability),a.solution.jacobianReciprocalCondition};
 end
@@ -12,6 +13,14 @@ if isempty(index) || ~isfinite(index), return; end
 assert(isscalar(index) && index==fix(index) && index>=1 && index<=numel(r.alternatives), ...
     'fsd:ui:GlobalInput','Select a stored alternative.');
 a=r.alternatives{index}; s=a.state;
+if isfield(s,'antiRollBars')
+    for k=1:numel(s.antiRollBars)
+        b=s.antiRollBars{k};
+        e.antiRollBars(k,:)={char(b.barIdentity.axleId),b.energy_J,b.twist_rad*180/pi,b.torque_Nm, ...
+            b.resistance_N(1),b.resistance_N(2),char(b.status+" / K: "+b.tangentStatus)};
+    end
+    e.summary=[e.summary;"ARB energy [J]: "+s.antiRollBarEnergy_J+" | coupled internal forces; tire contact remains unilateral."];
+end
 e.summary=[e.summary;"Inspecting alternative "+index+" | converged="+a.converged+" | path feasible="+s.feasible; ...
     "Native admissibility/acceptance: "+a.status;"Stability: "+a.stability+" | ill-conditioned="+a.isIllConditioned];
 names=["Heave","Pitch","Roll","Front axle load","Rear axle load","Left load","Right load", ...

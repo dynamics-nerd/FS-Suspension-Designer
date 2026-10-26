@@ -1,5 +1,38 @@
 # Arquitectura
 
+## Actualización de edición ARB — V23-F-02
+
+ArbView mantiene un snapshot transitorio de la definición canónica cargada y
+sus controles renderizados. Apply fusiona los campos editados antes de invocar
+ARB_STUDY_CONFIG. La conversión de unidades continúa exclusivamente en la UI;
+las APIs existentes validan el escenario y deciden revisión/readiness/STALE.
+No hay cambio en recepción semántica, worker, dependencia entre módulos o física.
+[Contrato por campo y validación](v0.23-f02-validation.md).
+
+## Extensión v0.23 — ARB y acoplamiento por eje
+
+ArbView → Controller/operationBody → project → model/kinematics/analysis/packaging.
+No segundo framework de mecanismos, concurrencia, proyectos o almacenamiento.
+`model` declara AntiRollBar y readiness/dependencias. `geometry` comparte la
+aritmética histórica círculo/esfera, separada de la suspensión. `kinematics`
+transforma pickups materiales nativos y resuelve cierres por lado. `analysis`
+prepara caminos segmentados de los pickups, cierra analíticamente la bieleta y
+deriva una única energía. `packaging` reutiliza volúmenes/distancias existentes,
+sin solvers ni fuerzas. La UI convierte unidades y consulta evidencia.
+
+GLOBAL_STATIC conserva sus cuatro caminos, siete coordenadas, energía, Newton,
+contacto y selección histórica. Sólo los sistemas con barras activas incorporan
+la extensión0.23 y sus energías/gradientes/Hessianos, con guards de segmentos y
+ramas. La preparación geométrica reaprovecha los mismos padres MECHANICAL;
+el bucle energético no vuelve a resolver la suspensión. Sin barra no se añaden
+campos ni se migran proyectos a una barra ficticia.
+
+Proyecto separa snapshot exacto de ejecución y proyección estructural de consumo
+físico para reutilización; las proyecciones se reconstruyen localmente. RF01–03,
+epochs, cancelación, ProcessPool y MAT existentes cubren las acciones ARB nuevas.
+[Contrato y límites](anti-roll-bar.md). INTEGRATED de ARB-001 sigue pendiente de
+optimización conjunta futura; la ampliación estática no completa esa estrategia.
+
 ## Extensión v0.22 — Tire Models Foundation
 
 TiresView → Controller → operationBody → project → tire. El nuevo paquete tire

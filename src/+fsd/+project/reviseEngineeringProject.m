@@ -13,6 +13,12 @@ if isfield(project.definition.resources,'tires')
         projectRequire(isequaln(retained,t),'Registered tire revisions are immutable; append a new revision.');
     end
 end
+if isfield(project.definition.resources,'antiRollBars')
+    for old=project.definition.resources.antiRollBars'
+        b=old{1}; retained=fsd.project.findAntiRollBar(candidate,b.definition.id,b.definition.revision);
+        projectRequire(isequaln(retained,b),'Registered ARB revisions are immutable; append a new revision.');
+    end
+end
 if isequaln(candidate,project), revised=project; return; end
 d.revision=d.revision+1; revised=projectCore(d,context);
 end

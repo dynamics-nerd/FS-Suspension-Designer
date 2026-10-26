@@ -1,6 +1,48 @@
 # Contexto del proyecto
 
-## Desarrollo v0.22 —24 octubre2026 (contexto vigente)
+## Corrección focalizada V23-F-02 — 26 octubre 2026
+
+El usuario comunica el cierre independiente de V23-F-01 y el nuevo MEDIUM
+V23-F-02. Apply sin edición debe preservar exactamente todos los campos de los
+planes ARB y las opciones/metadatos cargados, manteniendo revisión y resultados
+CURRENT_EXECUTION. Las ediciones reales deben conservar la invalidación existente.
+Corrección en ArbView validada por el desarrollador: 45/45 PASS, Analyzer 0/763,
+MAT exactos y Desktop; reauditoría pendiente.
+Sin cambios de física, worker, compatibilidad ni esquema MAT, sin gestión Git
+ni v0.24. [Estado y evidencia](docs/v0.23-f02-validation.md).
+Los apartados siguientes son checkpoints históricos.
+
+## Corrección focalizada V23-F-01 — estado vigente
+
+Auditoría independiente v0.23: CHANGES REQUIRED, un único MEDIUM en conversión
+de target entero ARB_SIZING en ArbView. El usuario informa contrastes favorables
+del núcleo ARB/global y de integridad; no se reabren. Corrección limitada a
+presentación/Apply, tests y documentación, pendiente de reauditoría independiente.
+Sin gestión Git ni v0.24. [Seguimiento](docs/v0.23-f01-validation.md).
+
+## Desarrollo v0.23 —25 octubre2026 (contexto vigente)
+
+El usuario confirma v0.22.0 publicada. Base comprobada:
+`044aa1ea0c899f41146c015ee6e190b63d6829a7`; rama activa del usuario
+`feature/v0.23-anti-roll-bar`, repositorio principal, sin worktree nuevo.
+Gestión Git exclusiva del usuario. No v0.24. Los estados y prohibiciones de
+apartados anteriores se conservan como historia, no como alcance vigente.
+
+Alcance autorizado Anti-Roll Bar & Axle Coupling: recursos equivalentes y
+coaxiales, referencias libres explícitas, accionamientos ROCKER/UPRIGHT/UCA/LCA,
+energía/gradiente/Hessiano, dimensionamiento circular escalar, packaging
+muestreado y GLOBAL_STATIC opcional por eje. Núcleo independiente de UI y de
+complementos; no nuevos modelos estructurales, dinámica ni optimización conjunta.
+Contratos: [anti-roll-bar](docs/anti-roll-bar.md). El registro central conserva
+el estado de incrementos y los problemas encontrados. La validación de desarrollo
+y la auditoría independiente siguen siendo actividades separadas.
+Implementación y validación del desarrollador completas:385/385 seleccionados
+PASS (58 nuevos/327 históricos),19 Desktop, Analyzer0/761, DAG27, inventario2144
+con2086 IDs anteriores conservados. MAT auténticos0.19–0.22 exactos, worker real,
+ejemplo y rendimiento documentados en [v0.23-validation](docs/v0.23-validation.md).
+Auditoría independiente pendiente; sin gestión Git ni inicio de v0.24.
+
+## Desarrollo v0.22 —24 octubre2026 (contexto histórico)
 
 Base estable publicada v0.21.0, commit362e92e539e6941bd9d582966a934c25fe60d937.
 Rama del usuario feature/v0.22-tire-models-foundation; gestión Git exclusiva del
@@ -26,7 +68,7 @@ Sin TTC/identificación/MF propios ni expansión de prestaciones/targets/ARB.
 Los apartados siguientes son históricos: sus estados de auditoría/publicación
 no describen la base actualmente publicada y no cancelan la autorización0.22.
 
-## Desarrollo v0.21 —23 octubre2026 (contexto vigente)
+## Desarrollo v0.21 —23 octubre2026 (contexto histórico)
 
 Implementación y validación del desarrollador completas:324/324 identidades
 seleccionadas PASS (27 nuevas/297 históricas), Failed0/Incomplete0; inventario2014

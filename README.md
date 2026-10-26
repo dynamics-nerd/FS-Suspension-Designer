@@ -1,6 +1,33 @@
 # FS Suspension Designer
 
-## v0.22 — Tire Models Foundation (development)
+## v0.23 — Anti-Roll Bar & Axle Coupling (development)
+
+Actualización de auditoría, 26 octubre 2026: **V23-F-01 cerrado por reauditoría
+independiente**, según el usuario. Nuevo MEDIUM V23-F-02: Apply de planes ROLL
+sin edición alteraba declaraciones y provocaba STALE. Corrección focalizada
+validada por el desarrollador (45/45 PASS), pendiente de reauditoría. Los informes y evidencias
+históricos se conservan. [Estado vigente](docs/v0.23-f02-validation.md).
+
+Base estable **v0.22.0 publicada**, rama del usuario
+`feature/v0.23-anti-roll-bar`. La sección **ARB** declara barras equivalentes o
+coaxiales, conserva datos parciales, evalúa movimientos y compara recursos y
+ajustes con historial. ROCKER/UPRIGHT/UCA/LCA reutilizan la cinemática existente.
+GLOBAL_STATIC admite ninguna barra, delantera, trasera o ambas mediante energías
+acopladas, manteniendo la ruta histórica sin barras. Dimensionamiento circular
+preliminar y packaging de volúmenes declarados en muestras; sin certificación
+estructural ni optimización automática. Núcleo SI, presentación mm/grados.
+
+[Contrato, ecuaciones y uso](docs/anti-roll-bar.md) ·
+[Registro de desarrollo](docs/development-register.md) ·
+[Validación real](docs/v0.23-validation.md).
+**385/385 tests seleccionados PASS** (58 nuevos/327 históricos),19 Desktop,
+Analyzer0/761, DAG27; MAT auténticos0.19–0.22 exactos. No suite completa2144.
+Ejemplo: `setupProject; addpath('app','examples'); out=guidedAntiRollBarExample;`
+Destino MAT nuevo opcional: `guidedAntiRollBarExample('proyecto-nuevo.mat')`.
+Gestión Git y publicación exclusivamente del usuario; auditoría independiente
+separada. Los apartados inferiores conservan el estado histórico de cada entrega.
+
+## v0.22 — Tire Models Foundation (estado histórico de desarrollo)
 
 Base estable publicada v0.21.0. Desarrollo autorizado de neumáticos Geometry Only/
 Generic/Custom, biblioteca/revisiones/asignaciones, caracterización estacionaria

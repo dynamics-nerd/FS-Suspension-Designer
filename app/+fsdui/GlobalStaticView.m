@@ -57,6 +57,10 @@ classdef GlobalStaticView < handle
                     shown.definition.inputs=struct('tires',{prepared.tires});
                     if numel(prepared.tires)~=4, shown.definition.inputs.tires=cell(4,1); end
                 end
+                selection="NONE";
+                if ~isempty(obj.Scenario)&&isfield(obj.Scenario.definition.inputs,'arbAxles'), selection=join(obj.Scenario.definition.inputs.arbAxles,'+'); end
+                if ~ismember(selection,string(obj.UI.ARBAxles.Items)), obj.UI.ARBAxles.Items{end+1}=char(selection); end
+                obj.UI.ARBAxles.Value=char(selection);
                 rows=fsdui.globalStaticConfiguration('ROWS',shown); obj.setRows(rows);
                 obj.UI.tires.ColumnEditable=[false,repmat(strcmp(obj.UI.Source.Value,'SCENARIO_TIRES'),1,4)];
             end
@@ -93,6 +97,11 @@ classdef GlobalStaticView < handle
         function apply(obj)
             try
                 d=fsdui.globalStaticConfiguration('DEFINITION',obj.getRows(),obj.Scenario);
+                if string(obj.UI.ARBAxles.Value)=="NONE"
+                    if isfield(d.inputs,'arbAxles'), d.inputs=rmfield(d.inputs,'arbAxles'); end
+                else
+                    d.inputs.arbAxles=split(string(obj.UI.ARBAxles.Value),'+');
+                end
                 obj.Invoke('GLOBAL_CONFIG',struct('definition',d));
             catch cause
                 obj.UI.Status.Value=cellstr(fsdui.errorText(cause));
@@ -118,12 +127,15 @@ classdef GlobalStaticView < handle
         function configuration(obj)
             g=uigridlayout(obj.UI.Configuration,[21,1]); g.Scrollable='on';
             g.RowHeight={36,28,125,30,165,30,135,30,285,30,220,30,220,36,30,130,30,130,36,40,250};
-            bar=uigridlayout(g,[1,3]); bar.ColumnWidth={200,200,'1x'}; bar.Padding=0;
+            bar=uigridlayout(g,[1,4]); bar.ColumnWidth={200,200,'1x','1x'}; bar.Padding=0;
             obj.UI.Apply=uibutton(bar,'Text','Apply and check readiness','ButtonPushedFcn',@(~,~)obj.apply());
             obj.UI.Run=uibutton(bar,'Text','Run global equilibrium','ButtonPushedFcn',@(~,~)obj.run());
             obj.UI.Source=uidropdown(bar,'Items',{'SCENARIO_TIRES','LIBRARY_ASSIGNMENTS'}, ...
                 'Tooltip','Exclusive vertical source; configure library assignments on Tires.', ...
                 'ValueChangedFcn',@(~,~)obj.sourceChanged());
+            obj.UI.ARBAxles=uidropdown(bar,'Items',{'NONE','FRONT','REAR','FRONT+REAR'}, ...
+                'Tooltip','Active axle couplings; exact revisions are assigned on ARB.', ...
+                'ValueChangedFcn',@(~,~)obj.edited());
             uilabel(g,'Text','Registered corner resources (native identity validation occurs at readiness)');
             obj.UI.Resources=uitable(g,'ColumnName',{'Corner','Geometry','Actuation','Coilover'});
             uilabel(g,'Text','Vertical tires — linear unilateral law only');
@@ -153,7 +165,7 @@ classdef GlobalStaticView < handle
             obj.UI.options.Layout.Row=21;
         end
         function results(obj)
-            g=uigridlayout(obj.UI.Results,[10,1]); g.Scrollable='on'; g.RowHeight={36,36,110,200,190,95,125,180,200,180};
+            g=uigridlayout(obj.UI.Results,[11,1]); g.Scrollable='on'; g.RowHeight={36,36,110,200,190,95,125,180,200,100,180};
             bar=uigridlayout(g,[1,4]); bar.ColumnWidth={110,'1x',110,'1x'}; bar.Padding=0;
             uilabel(bar,'Text','Stored result'); obj.UI.Primary=uidropdown(bar,'Items',{'NONE'},'ValueChangedFcn',@(~,~)obj.selectResult());
             uilabel(bar,'Text','Compare with'); obj.UI.Reference=uidropdown(bar,'Items',{'NONE'},'ValueChangedFcn',@(~,~)obj.render());
@@ -169,6 +181,7 @@ classdef GlobalStaticView < handle
             obj.UI.Attempts=uitable(g,'ColumnName',{'Attempt','Converged/admissible','Status','Stability','rcond'});
             obj.UI.Comparison=uitable(g,'ColumnName',{'Corner','Primary N','Reference selected N','Difference N'});
             obj.UI.PoseComparison=uitable(g,'ColumnName',{'Magnitude','Primary','Reference selected','Difference','Unit'});
+            obj.UI.AntiRollBars=uitable(g,'ColumnName',{'Axle','Energy J','Twist deg','Torque Nm','Resistance L N','Resistance R N','Status'});
             obj.UI.Details=uitextarea(g,'Editable','off');
         end
         function table=table(obj,parent,columns,editable)
@@ -226,14 +239,14 @@ classdef GlobalStaticView < handle
             if isscalar(i) && numel(obj.Controller.Compatibility)>=i, status=obj.Controller.Compatibility{i}.status; end
         end
         function render(obj)
-            for name=["Pose","Corners","Heights","Attempts","Comparison","PoseComparison"], obj.UI.(name).Data=cell(0,numel(obj.UI.(name).ColumnName)); end
+            for name=["Pose","Corners","Heights","Attempts","Comparison","PoseComparison","AntiRollBars"], obj.UI.(name).Data=cell(0,numel(obj.UI.(name).ColumnName)); end
             obj.UI.Summary.Value={'No stored global result selected.'}; obj.UI.Details.Value={''};
             r=obj.findRecord(obj.UI.Primary.Value); if isempty(r), return; end
             e=fsdui.globalStaticEvidence(r,str2double(obj.UI.Alternative.Value));
             obj.UI.Summary.Value=cellstr(["Project "+r.projectId+" revision "+r.projectRevision+" | "+obj.compatibility(r); ...
                 "Scenario "+r.scenarioAtExecution.definition.id+" | software "+r.fsdVersion+ ...
                 " | physical system schema "+r.nativePayload.system.schemaVersion;e.summary]);
-            obj.UI.Pose.Data=e.pose; obj.UI.Corners.Data=e.corners; obj.UI.Heights.Data=e.heights;
+            obj.UI.Pose.Data=e.pose; obj.UI.Corners.Data=e.corners; obj.UI.Heights.Data=e.heights; obj.UI.AntiRollBars.Data=e.antiRollBars;
             obj.UI.Attempts.Data=e.attempts; obj.UI.Details.Value=cellstr([e.details;"Attempts diagnostics: "+string(jsonencode(r.nativePayload.equilibrium.attempts))]);
             ref=obj.findRecord(obj.UI.Reference.Value);
             if isempty(ref) || isempty(e.corners) || ~isfinite(ref.nativePayload.equilibrium.selectedIndex), return; end
